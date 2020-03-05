@@ -1,0 +1,6 @@
+this package is auto generate
+
+for generate models you should execute " clean install" maven task
+
+example:
+mvn clean install

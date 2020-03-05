@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-1">
+        <createTable tableName="BOTABLE">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="VERSION" type="TIMESTAMP(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STAGE" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-2">
+        <createTable tableName="ROLE">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="ROLE" columnNames="NAME" constraintName="ROLE_NAME"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-3">
+        <createTable tableName="PERMISSION">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PERMISSION_NAME" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="PERMISSION" columnNames="PERMISSION_NAME" constraintName="IDX_PERMISSION_NAME"/>
+        <addPrimaryKey columnNames="ID" constraintName="PERMISSION_PKEY" tableName="PERMISSION"/>
+        <insert tableName="PERMISSION">
+            <column name="ID" value="1000"/>
+            <column name="PERMISSION_NAME" value="MODIFY_USER"/>
+        </insert>
+        <insert tableName="PERMISSION">
+            <column name="ID" value="1001"/>
+            <column name="PERMISSION_NAME" value="MODIFY_ROLE"/>
+        </insert>
+        <insert tableName="PERMISSION">
+            <column name="ID" value="1002"/>
+            <column name="PERMISSION_NAME" value="APPROVAL"/>
+        </insert>
+        <insert tableName="PERMISSION">
+            <column name="ID" value="1003"/>
+            <column name="PERMISSION_NAME" value="USER"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-5">
+        <createTable tableName="USERDATA">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PASSWORD" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="USERDATA" columnNames="NAME" constraintName="USERDATA_NAME"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-6">
+        <createTable tableName="USERROLE">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ROLE_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-7">
+        <addPrimaryKey columnNames="ID" constraintName="BOTABLE_PKEY" tableName="BOTABLE"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-8">
+        <addPrimaryKey columnNames="ID" constraintName="ROLE_PKEY" tableName="ROLE"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-9">
+        <addPrimaryKey columnNames="ID" constraintName="USERDATA_PKEY" tableName="USERDATA"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-10">
+        <addPrimaryKey columnNames="ID" constraintName="USERROLE_PKEY" tableName="USERROLE"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-11">
+        <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="BOTABLE" constraintName="BOTABLE_USER_ID_FKEY"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="ID" referencedTableName="USERDATA"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-12">
+        <addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="userrole"
+                                 constraintName="userrole_ROLE_ID_fkey"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="ID" referencedTableName="ROLE"/>
+    </changeSet>
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-13">
+        <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="USERROLE"
+                                 constraintName="userrole_USER_ID_fkey"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="ID" referencedTableName="USERDATA"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="queryorm-14">
+        <createTable tableName="ROLE_PERMISSION">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PERMISSION_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ROLE_ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="ID" constraintName="ROLE_PERMISSION_PKEY" tableName="ROLE_PERMISSION"/>
+        <addForeignKeyConstraint baseColumnNames="PERMISSION_ID" baseTableName="ROLE_PERMISSION"
+                                 constraintName="ROLE_PERMISSION1_fkey"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="ID" referencedTableName="PERMISSION"/>
+        <addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="ROLE_PERMISSION"
+                                 constraintName="ROLE_PERMISSION2_fkey"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="ID" referencedTableName="ROLE"/>
+    </changeSet>
+
+    <changeSet author="vassio(generate)" context="production" id="initial_-1">
+        <insert tableName="USERDATA">
+            <column name="ID" value="1000"/>
+            <column name="NAME" value="admin"/>
+            <column name="PASSWORD" value="admin"/>
+        </insert>
+        <insert tableName="ROLE">
+            <column name="ID" value="1000"/>
+            <column name="NAME" value="ADMINISTRATOR"/>
+        </insert>
+        <insert tableName="USERROLE">
+            <column name="ID" value="1000"/>
+            <column name="USER_ID" value="1000"/>
+            <column name="ROLE_ID" value="1000"/>
+        </insert>
+
+        <insert tableName="ROLE_PERMISSION">
+            <column name="ID" value="1000"/>
+            <column name="PERMISSION_ID" value="1000"/>
+            <column name="ROLE_ID" value="1000"/>
+        </insert>
+
+        <insert tableName="ROLE_PERMISSION">
+            <column name="ID" value="1001"/>
+            <column name="PERMISSION_ID" value="1001"/>
+            <column name="ROLE_ID" value="1000"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="transactionManager" class="com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionNameManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="validateExistingTransaction" value="true"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <constructor-arg name="transactionManager" ref="transactionManager"/>
+        <property name="isolationLevelName" value="ISOLATION_READ_COMMITTED"/>
+        <property name="timeout" value="30000"/>
+    </bean>
+
+    <bean class="com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactoryImpl">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="transaction-cache"/>
+        <constructor-arg ref="transaction-publisher"/>
+        <constructor-arg ref="transactionManager"/>
+        <property name="debugSql" value="true"/>
+    </bean>
+
+    <bean class="com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactoryImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="cacheManager" class="org.springframework.cache.concurrent.ConcurrentMapCacheManager"/>
+
+    <bean id="transaction-cache" class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl"/>
+
+    <bean id="transaction-publisher"
+          class="com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionAwareApplicationEventPublisher"/>
+
+</beans>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="com.github.vzakharchenko.dynamic.orm.dataSource.DataSourceHelper"
+          factory-method="getDataSourceHsqldbCreateSchema">
+        <constructor-arg
+                value="jdbc:hsqldb:mem:DATABASE_MSS;sql.mss=true"/>
+    </bean>
+
+</beans>

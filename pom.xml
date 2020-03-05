@@ -10,6 +10,7 @@
     <modules>
         <module>dynamic-orm-core</module>
         <module>dynamic-orm-plugin</module>
+        <module>dynamic-orm-examples</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -61,6 +62,7 @@
 
         <testng>7.1.0</testng>
         <spring>5.2.4.RELEASE</spring>
+        <querydsl>4.2.2</querydsl>
     </properties>
 
     <profiles>
@@ -399,6 +401,7 @@
                     <excludes>
                         <exclude>**/models/**</exclude>
                     </excludes>
+                    <skip>${fast-build}</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -446,7 +449,7 @@
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.6</minimum>
+                                            <minimum>0.5</minimum>
                                         </limit>
                                         <limit>
                                             <counter>COMPLEXITY</counter>
@@ -524,13 +527,13 @@
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-core</artifactId>
-                <version>4.2.2</version>
+                <version>${querydsl}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-core -->
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-sql</artifactId>
-                <version>4.2.2</version>
+                <version>${querydsl}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.liquibase/liquibase-core -->

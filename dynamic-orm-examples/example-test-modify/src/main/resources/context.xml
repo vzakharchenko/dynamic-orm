@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="structureService" class="com.github.vzakharchenko.dynamic.orm.structure.DbStructureServiceImpl">
+        <property name="pathToChangeSets" value="classpath:/changeSets/"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+    <bean id="transactionManager" class="com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionNameManager">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="validateExistingTransaction" value="true"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <context:annotation-config/>
+
+
+    <bean class="com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactoryImpl">
+        <constructor-arg ref="dataSource"/>
+        <constructor-arg ref="transaction-cache-manager"/>
+        <constructor-arg ref="transaction-publisher"/>
+        <constructor-arg ref="transactionManager"/>
+    </bean>
+
+    <bean id="cacheManager" class="org.springframework.cache.concurrent.ConcurrentMapCacheManager"/>
+
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <constructor-arg value="jdbc:hsqldb:mem:DATABASE_TEST"/>
+        <constructor-arg value="sa"/>
+        <constructor-arg value=""/>
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
+    </bean>
+
+    <bean id="transaction-cache-manager" class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
+        <constructor-arg name="targetCacheManager" ref="cacheManager"/>
+    </bean>
+
+    <bean id="transaction-publisher"
+          class="com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionAwareApplicationEventPublisher"/>
+
+    <bean class="orm.query.examples.modify.AuditAccountListener"/>
+</beans>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
+
+    <changeSet author="queryorm(generate)" context="production" id="test-1">
+        <createTable tableName="TESTTABLE">
+            <column name="ID" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TEST2" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-2">
+        <addPrimaryKey columnNames="ID" constraintName="PRIMARY_1" tableName="TESTTABLE"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-3">
+        <createTable tableName="TEST_TABLE_CACHE">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test2" type="INT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-4">
+        <addPrimaryKey columnNames="id" constraintName="ID_PK" tableName="TEST_TABLE_CACHE"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-5">
+        <createTable tableName="TEST_TABLE_SEQUENCE">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test2" type="INT"/>
+        </createTable>
+        <createSequence sequenceName="TEST_SEQUENCE" startValue="10000"/>
+        <addPrimaryKey columnNames="id" constraintName="ID_SEQUANCE_PK" tableName="TEST_TABLE_SEQUENCE"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-6">
+        <createTable tableName="TEST_TABLE_VERSION">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_Version_PK" tableName="TEST_TABLE_VERSION"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-7">
+        <createTable tableName="TEST_TABLE_VERSION_ANNOTATION">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_Version2_PK" tableName="TEST_TABLE_VERSION_ANNOTATION"/>
+    </changeSet>
+
+    <changeSet author="queryorm(generate)" context="production" id="test-8">
+        <createTable tableName="TEST_TABLE_STATUS">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test_Column" type="INT"/>
+
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_Version3_PK" tableName="TEST_TABLE_STATUS"/>
+    </changeSet>
+</databaseChangeLog>
