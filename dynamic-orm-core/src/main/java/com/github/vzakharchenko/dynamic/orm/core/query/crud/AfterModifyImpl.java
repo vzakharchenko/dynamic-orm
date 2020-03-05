@@ -1,9 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import org.apache.commons.collections4.MapUtils;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
@@ -14,6 +10,10 @@ import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheContext;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.*;
@@ -61,6 +61,7 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
                         diffColumnModelMap));
     }
 
+    // CHECKSTYLE:OFF
     private void afterModification(Map<Serializable, DiffColumnModel> diffColumnModelMap,
                                    boolean clearOldModel, boolean clearNewModel) {
 
@@ -107,7 +108,7 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
         sendSoftDeleteEventIfNeeded(diffColumnModelMap);
 
     }
-
+    // CHECKSTYLE:ON
     private void sendSoftDeleteEventIfNeeded(
             Map<Serializable, DiffColumnModel> diffColumnModelMap) {
         if (softDelete != null) {

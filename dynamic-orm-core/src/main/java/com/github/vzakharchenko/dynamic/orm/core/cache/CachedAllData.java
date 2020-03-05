@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.StringUtils;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.io.Serializable;
 

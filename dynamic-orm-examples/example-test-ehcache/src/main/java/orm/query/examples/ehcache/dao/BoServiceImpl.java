@@ -1,15 +1,15 @@
 package orm.query.examples.ehcache.dao;
 
-import com.querydsl.sql.SQLCommonQuery;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
+import com.querydsl.sql.SQLCommonQuery;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import orm.query.examples.models.Botable;
 import orm.query.examples.models.Userdata;
 import orm.query.examples.qmodels.QBotable;

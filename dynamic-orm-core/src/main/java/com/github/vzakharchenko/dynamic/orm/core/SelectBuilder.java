@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
-import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 
 import java.util.List;
 

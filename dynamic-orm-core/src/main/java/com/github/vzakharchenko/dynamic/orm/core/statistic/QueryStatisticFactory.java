@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic;
 
+import com.github.vzakharchenko.dynamic.orm.core.statistic.resolver.QueryResolverFactory;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLQuery;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.resolver.QueryResolverFactory;
 
 import java.util.Arrays;
 import java.util.Collection;

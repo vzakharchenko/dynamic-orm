@@ -11,7 +11,7 @@ public class CombinatedObject<EVENT> {
     }
 
     public void combinate(EVENT event) {
-        transactionalCombinedEvent.combinate(event);
+        transactionalCombinedEvent.combine(event);
     }
 
     public TransactionEventType transactionEventType() {

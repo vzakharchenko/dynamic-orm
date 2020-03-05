@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm;
 
+import com.github.vzakharchenko.dynamic.orm.qModel.QUser;
 import com.querydsl.sql.OracleTemplates;
 import com.querydsl.sql.SQLQuery;
 import com.querydsl.sql.SQLTemplates;
 import org.testng.annotations.Test;
-import com.github.vzakharchenko.dynamic.orm.qModel.QUser;
 
 import java.sql.SQLException;
 import java.util.List;

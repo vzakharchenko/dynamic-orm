@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
 
 import java.io.Serializable;
 import java.util.Collections;

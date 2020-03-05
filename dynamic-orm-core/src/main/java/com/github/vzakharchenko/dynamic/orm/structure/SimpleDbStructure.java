@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
+import com.github.vzakharchenko.dynamic.orm.structure.exception.UploadException;
 import liquibase.database.Database;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.io.IOUtils;
@@ -7,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.UploadException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

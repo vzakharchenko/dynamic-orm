@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableSequence;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableSequence;
+import org.testng.annotations.Test;
 
 import java.util.List;
 

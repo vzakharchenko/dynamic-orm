@@ -33,7 +33,8 @@
 
     <bean id="cacheManager" class="org.springframework.cache.concurrent.ConcurrentMapCacheManager"/>
 
-    <bean id="transaction-cache" class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl"/>
+    <bean id="transaction-cache"
+          class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl"/>
 
     <bean id="transaction-publisher"
           class="com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionAwareApplicationEventPublisher"/>

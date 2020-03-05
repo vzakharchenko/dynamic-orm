@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.OrderSpecifier;
 import com.github.vzakharchenko.dynamic.orm.core.Range;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.OrderSpecifier;
 
 import java.util.List;
 

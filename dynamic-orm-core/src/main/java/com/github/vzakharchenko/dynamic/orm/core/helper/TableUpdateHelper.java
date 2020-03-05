@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.ArrayUtils;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 
 import java.util.HashMap;
 import java.util.List;

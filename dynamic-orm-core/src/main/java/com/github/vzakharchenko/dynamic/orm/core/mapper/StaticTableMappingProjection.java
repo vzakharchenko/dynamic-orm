@@ -1,13 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core.mapper;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.Maps;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.RelationalPath;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.List;
 import java.util.Map;

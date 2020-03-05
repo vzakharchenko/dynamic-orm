@@ -1,13 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 
 import java.lang.reflect.Method;
 
@@ -69,11 +69,8 @@ public class TransactionBuilderImpl implements TransactionBuilder {
                 .currentThread().getName() + " : " + transaction);
     }
 
-    @Override
-    public void rollback() {
-        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            return;
-        }
+
+    private void rollback0() {
         TransactionHolder transaction = getTransactionHolder();
         if (transaction == null) {
             if (isRollBackSpringTest()) {
@@ -81,9 +78,7 @@ public class TransactionBuilderImpl implements TransactionBuilder {
             }
             TransactionStatus transactionStatus = TransactionAspectSupport
                     .currentTransactionStatus();
-            if (transactionStatus != null) {
-                transactionStatus.setRollbackOnly();
-            }
+            transactionStatus.setRollbackOnly();
             return;
         }
         TransactionStatus status = transaction.getTransactionStatus();
@@ -96,6 +91,14 @@ public class TransactionBuilderImpl implements TransactionBuilder {
         queryContext.getTransactionManager().commit(status);
         LOGGER.error("Transaction rolled back at " + Thread
                 .currentThread().getName() + " : " + transaction);
+    }
+
+    @Override
+    public void rollback() {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            return;
+        }
+        rollback0();
     }
 
     private boolean isRollBackSpringTest() {

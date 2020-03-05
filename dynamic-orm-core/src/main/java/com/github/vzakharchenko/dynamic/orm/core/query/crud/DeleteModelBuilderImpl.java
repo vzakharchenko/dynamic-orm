@@ -1,15 +1,15 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.dml.SQLDeleteClause;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -82,22 +82,22 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     }
 
 
-    @Override
-    public Long delete() {
-        if (ModelHelper.hasPrimaryKey(qTable)) {
-            List<Serializable> pkeys = new ArrayList<>();
-            for (ModifyItem<MODEL> modifyItem : batch) {
-                if (!modifyItem.isEmpty()) {
-                    pkeys.add((Serializable) modifyItem.getPrimaryKeyValue());
-                }
-            }
-            try {
-                return queryContext.getOrmQueryFactory()
-                        .modify(qTable, modelClass).deleteByIds(pkeys);
-            } finally {
-                batch.clear();
+    private Long deleteWithPrimaryKey() {
+        List<Serializable> pkeys = new ArrayList<>();
+        for (ModifyItem<MODEL> modifyItem : batch) {
+            if (!modifyItem.isEmpty()) {
+                pkeys.add((Serializable) modifyItem.getPrimaryKeyValue());
             }
         }
+        try {
+            return queryContext.getOrmQueryFactory()
+                    .modify(qTable, modelClass).deleteByIds(pkeys);
+        } finally {
+            batch.clear();
+        }
+    }
+
+    public Long deleteWithOutPrimaryKey() {
         DBHelper.transactionCheck();
         Assert.notEmpty(batch);
         Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
@@ -119,5 +119,13 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
             DataSourceUtils.releaseConnection(connection, queryContext.getDataSource());
             batch.clear();
         }
+    }
+
+    @Override
+    public Long delete() {
+        if (ModelHelper.hasPrimaryKey(qTable)) {
+            return deleteWithPrimaryKey();
+        }
+        return deleteWithOutPrimaryKey();
     }
 }

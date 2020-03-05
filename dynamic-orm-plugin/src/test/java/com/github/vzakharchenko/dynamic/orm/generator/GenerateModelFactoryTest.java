@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.generator;
 
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.generator.qModel.QBotable;
+import org.testng.annotations.Test;
 
 /**
  *

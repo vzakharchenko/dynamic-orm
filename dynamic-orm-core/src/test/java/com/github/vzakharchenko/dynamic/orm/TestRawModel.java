@@ -1,14 +1,14 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import com.querydsl.core.types.dsl.Wildcard;
-import com.querydsl.sql.SQLCommonQuery;
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableCache;
 import com.github.vzakharchenko.dynamic.orm.model.Testtable;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableCache;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
+import com.querydsl.core.types.dsl.Wildcard;
+import com.querydsl.sql.SQLCommonQuery;
+import org.testng.annotations.Test;
 
 import java.util.List;
 

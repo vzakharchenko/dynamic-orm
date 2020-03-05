@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.core.pk;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.RelationalPath;
 
 import java.io.Serializable;
 

@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.core.types.Path;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.*;
+import com.querydsl.core.types.Path;
 
 /**
  * Created by vzakharchenko on 18.09.15.

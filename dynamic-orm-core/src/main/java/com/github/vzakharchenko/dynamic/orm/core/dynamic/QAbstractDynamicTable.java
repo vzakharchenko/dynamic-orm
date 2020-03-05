@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
 import com.querydsl.core.types.dsl.*;
@@ -12,7 +13,6 @@ import liquibase.datatype.DatabaseDataType;
 import liquibase.datatype.core.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.*;
 

@@ -1,14 +1,14 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureUpdater;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.io.Serializable;

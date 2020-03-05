@@ -1,12 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.mapper;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.Maps;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.Collection;
 import java.util.Map;

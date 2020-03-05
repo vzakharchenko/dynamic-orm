@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.core.mapper.expression;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.RawModelImpl;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.CommonMappingProjection;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.sql.RelationalPath;
 
 import java.util.Arrays;
 import java.util.Collection;

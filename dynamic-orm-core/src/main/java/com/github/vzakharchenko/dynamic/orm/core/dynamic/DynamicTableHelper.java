@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
-import com.querydsl.core.types.Path;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
+import com.querydsl.core.types.Path;
 
 import java.util.List;
 

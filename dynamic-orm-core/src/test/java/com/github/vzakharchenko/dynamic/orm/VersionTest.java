@@ -1,8 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
@@ -11,6 +8,9 @@ import com.github.vzakharchenko.dynamic.orm.model.TestTableVersion;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersion;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;

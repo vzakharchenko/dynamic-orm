@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
+import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
 import org.springframework.cache.Cache;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
-import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
 
 import java.io.Serializable;
 import java.util.HashMap;

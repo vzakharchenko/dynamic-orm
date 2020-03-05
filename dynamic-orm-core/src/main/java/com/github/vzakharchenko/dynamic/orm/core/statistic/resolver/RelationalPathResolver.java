@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic.resolver;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticRegistrator;
+import com.querydsl.sql.RelationalPath;
 
 /**
  *

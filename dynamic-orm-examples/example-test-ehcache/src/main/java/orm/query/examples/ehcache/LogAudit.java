@@ -1,14 +1,14 @@
 package orm.query.examples.ehcache;
 
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.event.CacheEvent;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.Path;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.event.CacheEvent;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.io.Serializable;
 import java.util.List;

@@ -1,5 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.SQLBuilderHelper;
+import com.github.vzakharchenko.dynamic.orm.core.mapper.StaticTableMappingProjection;
+import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.querydsl.core.JoinExpression;
 import com.querydsl.core.QueryException;
 import com.querydsl.core.types.Expression;
@@ -14,14 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.SQLBuilderHelper;
-import com.github.vzakharchenko.dynamic.orm.core.mapper.StaticTableMappingProjection;
-import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 
 import java.sql.Connection;
 import java.util.Arrays;

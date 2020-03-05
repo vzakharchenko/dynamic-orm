@@ -1,13 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core.query;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.StringUtils;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 
 import java.io.Serializable;
 import java.util.Collections;

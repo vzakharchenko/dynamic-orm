@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 
+import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
-import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 
 import java.io.Serializable;
 

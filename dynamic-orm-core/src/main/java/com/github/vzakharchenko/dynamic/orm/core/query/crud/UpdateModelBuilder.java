@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 
 import java.util.List;
 import java.util.Map;

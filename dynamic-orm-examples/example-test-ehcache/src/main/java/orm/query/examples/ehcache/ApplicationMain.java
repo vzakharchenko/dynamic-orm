@@ -1,5 +1,6 @@
 package orm.query.examples.ehcache;
 
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.stereotype.Component;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import orm.query.examples.ehcache.dao.AccountDAO;
 import orm.query.examples.ehcache.dao.BoDAO;
 import orm.query.examples.ehcache.dao.BoStage;

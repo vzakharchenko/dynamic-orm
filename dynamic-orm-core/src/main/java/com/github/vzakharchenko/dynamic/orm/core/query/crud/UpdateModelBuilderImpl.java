@@ -1,5 +1,15 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
+import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.VersionHelper;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.SimpleExpression;
@@ -14,16 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.VersionHelper;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -227,7 +227,7 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
         modifyItem.set((Path) versionColumn, newVersion);
         return ((SimpleExpression<Serializable>) versionColumn).eq(currentVersion);
     }
-
+    // CHECKSTYLE:OFF
     private Long updateWithCache() {
         List<Serializable> pkeys = new ArrayList<>();
         for (ModifyItem<MODEL> modifyItem : setsBatch) {
@@ -286,7 +286,7 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
             setsBatch.clear();
         }
     }
-
+    // CHECKSTYLE:ON
     protected Map<Serializable, DiffColumnModel> foundDiff(Map<Serializable,
             MapModel> oldModels) {
         Map<Serializable, DiffColumnModel> diffMap = new HashMap<>();

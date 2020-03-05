@@ -1,5 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.mapper.expression.RawModelExpression;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticImpl;
+import com.github.vzakharchenko.dynamic.orm.core.statistic.resolver.QueryResolverFactory;
 import com.querydsl.core.JoinExpression;
 import com.querydsl.core.QueryException;
 import com.querydsl.core.types.Expression;
@@ -10,10 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import com.github.vzakharchenko.dynamic.orm.core.mapper.expression.RawModelExpression;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticImpl;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.resolver.QueryResolverFactory;
 
 import java.sql.Connection;
 import java.util.Arrays;

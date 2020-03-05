@@ -1,5 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
@@ -9,10 +13,6 @@ import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,31 +32,44 @@ public class RawModelImpl implements RawModel {
         }
     }
 
+    private <TYPE> TYPE getPathValue(String columnName,
+                                     Expression expression,
+                                     Map.Entry<Expression<?>, Object> pathObjectEntry) {
+        Path column = (Path) expression;
+        if (StringUtils.equalsIgnoreCase(ModelHelper.getColumnName(column), columnName)) {
+            return (TYPE) pathObjectEntry.getValue();
+        }
+        return null;
+    }
+
+    private <TYPE> TYPE getOperationValue(String columnName,
+                                          Expression expression,
+                                          Map.Entry<Expression<?>, Object> pathObjectEntry) {
+        Operation operation = (Operation) expression;
+        List<Expression<?>> expressions = operation.getArgs();
+        for (Expression exp : expressions) {
+            if (exp instanceof Path) {
+                Path column = (Path) exp;
+                if (StringUtils.equalsIgnoreCase(ModelHelper
+                        .getColumnName(column), columnName)) {
+                    return (TYPE) pathObjectEntry.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+
     @Override
     public <TYPE> TYPE getValueByColumnName(String columnName, Class<TYPE> columnType) {
         for (Map.Entry<Expression<?>, Object> pathObjectEntry : rawMap.entrySet()) {
             Expression expression = pathObjectEntry.getKey();
             if (expression instanceof Path) {
-                Path column = (Path) expression;
-                if (StringUtils.equalsIgnoreCase(ModelHelper.getColumnName(column), columnName)) {
-                    return (TYPE) pathObjectEntry.getValue();
-                }
+                return getPathValue(columnName, expression, pathObjectEntry);
+            } else if (expression instanceof Operation) {
+                getOperationValue(columnName, expression, pathObjectEntry);
             } else {
-                if (expression instanceof Operation) {
-                    Operation operation = (Operation) expression;
-                    List<Expression<?>> expressions = operation.getArgs();
-                    for (Expression exp : expressions) {
-                        if (exp instanceof Path) {
-                            Path column = (Path) exp;
-                            if (StringUtils.equalsIgnoreCase(ModelHelper
-                                    .getColumnName(column), columnName)) {
-                                return (TYPE) pathObjectEntry.getValue();
-                            }
-                        }
-                    }
-                } else {
-                    throw new IllegalArgumentException(expression + " is not supported");
-                }
+                throw new IllegalArgumentException(expression + " is not supported");
             }
         }
         return null;

@@ -1,16 +1,16 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.MapModelFactory;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.MapModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.Collections;
 import java.util.HashMap;

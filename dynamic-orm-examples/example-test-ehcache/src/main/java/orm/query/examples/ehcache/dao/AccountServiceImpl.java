@@ -1,11 +1,11 @@
 package orm.query.examples.ehcache.dao;
 
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import orm.query.examples.models.Role;
 import orm.query.examples.models.Userdata;
 import orm.query.examples.models.Userrole;

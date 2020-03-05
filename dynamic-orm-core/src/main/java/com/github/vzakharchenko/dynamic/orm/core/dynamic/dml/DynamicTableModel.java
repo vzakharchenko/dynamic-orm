@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.dml;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.HashMap;

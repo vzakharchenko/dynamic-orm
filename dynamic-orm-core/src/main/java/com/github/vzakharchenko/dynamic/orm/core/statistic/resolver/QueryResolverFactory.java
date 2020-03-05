@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic.resolver;
 
+import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticRegistrator;
 import com.querydsl.core.QueryMetadata;
 import com.querydsl.core.types.*;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLQuery;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticRegistrator;
 
 /**
  *

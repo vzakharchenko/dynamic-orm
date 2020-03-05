@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.mapper;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.querydsl.sql.RelationalPath;
 
 import java.util.HashMap;
 import java.util.Map;

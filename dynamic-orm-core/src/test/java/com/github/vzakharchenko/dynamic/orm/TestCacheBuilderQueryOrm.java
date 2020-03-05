@@ -1,5 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm;
 
+import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
+import com.github.vzakharchenko.dynamic.orm.core.exception.IsNotActiveTransaction;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
+import com.github.vzakharchenko.dynamic.orm.model.Testtable;
+import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.TransactionStatus;
@@ -9,12 +15,6 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testng.annotations.Test;
-import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
-import com.github.vzakharchenko.dynamic.orm.core.exception.IsNotActiveTransaction;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
-import com.github.vzakharchenko.dynamic.orm.model.Testtable;
-import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 
 import java.util.List;
 

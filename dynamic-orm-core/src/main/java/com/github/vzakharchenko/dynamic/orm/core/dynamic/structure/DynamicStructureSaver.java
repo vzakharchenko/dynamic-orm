@@ -1,13 +1,20 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshot;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshotFactory;
+import com.github.vzakharchenko.dynamic.orm.structure.SimpleDbStructure;
+import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
 import com.google.common.collect.Maps;
 import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.diff.DiffGeneratorFactory;
 import liquibase.diff.DiffResult;
 import liquibase.diff.output.changelog.DiffToChangeLog;
+import liquibase.exception.DatabaseException;
 import liquibase.serializer.core.xml.XMLChangeLogSerializer;
 import liquibase.snapshot.DatabaseSnapshot;
+import liquibase.snapshot.InvalidExampleException;
 import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.DatabaseObject;
@@ -18,10 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshot;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshotFactory;
-import com.github.vzakharchenko.dynamic.orm.structure.SimpleDbStructure;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -61,50 +64,72 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
         }
     }
 
+    private void checkChangeSet(List<ChangeSet> changeSets)
+            throws IOException,
+            UpdateException {
+        String fileName = DYNAMIC + new SimpleDateFormat(PATTERN).format(
+                new Date()) + "_" + System.nanoTime() + ".xml";
+        File file = new File(WORK_DIR, FilenameUtils.getName(fileName));
+        PrintStream out = new PrintStream(file, Charset.defaultCharset().name());
+        try {
+            XMLChangeLogSerializer xmlChangeLogSerializer = new XMLChangeLogSerializer();
+            xmlChangeLogSerializer.write(changeSets, out);
+        } finally {
+            out.flush();
+            out.close();
+        }
+        LOGGER.error(FileUtils.readFileToString(file, Charset.defaultCharset()));
+        update(dataSource, fileName);
+        moveToTempDir(file);
+    }
+
+    private void createDiff(
+            DatabaseSnapshot databaseSnapshot,
+            DatabaseSnapshot referenceSnapshot
+    ) throws DatabaseException, IOException,
+            UpdateException {
+        DiffResult diffResult = DiffGeneratorFactory.getInstance()
+                .compare(databaseSnapshot, referenceSnapshot, getCompareControl());
+        DiffToChangeLog diffToChangeLog = new DiffToChangeLog(diffResult,
+                getDiffOutputControl());
+        diffToChangeLog.setChangeSetAuthor(AUTHOR_NAME);
+        diffToChangeLog.setChangeSetContext(CONTEXT_NAME);
+        diffToChangeLog.setIdRoot(getIdPrefix());
+        List<ChangeSet> changeSets = diffToChangeLog.generateChangeSets();
+        updateChangeSets(changeSets);
+        if (CollectionUtils.isNotEmpty(changeSets)) {
+            checkChangeSet(changeSets);
+        }
+    }
+
+    private void update0(Connection connection,
+                         Map<String, QDynamicTable> qDynamicMap) throws IOException,
+            DatabaseException,
+            InvalidExampleException,
+            UpdateException {
+        clearTempDir();
+        Database referenceDatabase = currentDataBase(connection);
+        // generate snapshot database for definition
+        DynamicDatabaseSnapshot databaseSnapshot = DynamicDatabaseSnapshotFactory
+                .build(referenceDatabase, qDynamicMap.values());
+        // create snapshot for current database
+        Set<Class<? extends DatabaseObject>> compareTypes = getCompareTypes();
+        DatabaseSnapshot referenceSnapshot = SnapshotGeneratorFactory.getInstance()
+                .createSnapshot(
+                        referenceDatabase.getDefaultSchema(), referenceDatabase,
+                        new SnapshotControl(referenceDatabase,
+                                compareTypes.toArray(new Class[compareTypes.size()])));
+        // merge definition base and reference database(origin is definition)
+        databaseSnapshot.mergedDatabase(referenceSnapshot);
+        // generate DiFF
+        createDiff(databaseSnapshot, referenceSnapshot);
+    }
+
     @Override
     public void update(Map<String, QDynamicTable> qDynamicMap) {
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {
-            clearTempDir();
-            Database referenceDatabase = currentDataBase(connection);
-            // generate snapshot database for definition
-            DynamicDatabaseSnapshot databaseSnapshot = DynamicDatabaseSnapshotFactory
-                    .build(referenceDatabase, qDynamicMap.values());
-            // create snapshot for current database
-            Set<Class<? extends DatabaseObject>> compareTypes = getCompareTypes();
-            DatabaseSnapshot referenceSnapshot = SnapshotGeneratorFactory.getInstance()
-                    .createSnapshot(
-                            referenceDatabase.getDefaultSchema(), referenceDatabase,
-                            new SnapshotControl(referenceDatabase,
-                                    compareTypes.toArray(new Class[compareTypes.size()])));
-            // merge definition base and reference database(origin is definition)
-            databaseSnapshot.mergedDatabase(referenceSnapshot);
-            // generate DiFF
-            DiffResult diffResult = DiffGeneratorFactory.getInstance()
-                    .compare(databaseSnapshot, referenceSnapshot, getCompareControl());
-            DiffToChangeLog diffToChangeLog = new DiffToChangeLog(diffResult,
-                    getDiffOutputControl());
-            diffToChangeLog.setChangeSetAuthor(AUTHOR_NAME);
-            diffToChangeLog.setChangeSetContext(CONTEXT_NAME);
-            diffToChangeLog.setIdRoot(getIdPrefix());
-            List<ChangeSet> changeSets = diffToChangeLog.generateChangeSets();
-            updateChangeSets(changeSets);
-            if (CollectionUtils.isNotEmpty(changeSets)) {
-                String fileName = DYNAMIC + new SimpleDateFormat(PATTERN).format(
-                        new Date()) + "_" + System.nanoTime() + ".xml";
-                File file = new File(WORK_DIR, FilenameUtils.getName(fileName));
-                PrintStream out = new PrintStream(file, Charset.defaultCharset().name());
-                try {
-                    XMLChangeLogSerializer xmlChangeLogSerializer = new XMLChangeLogSerializer();
-                    xmlChangeLogSerializer.write(changeSets, out);
-                } finally {
-                    out.flush();
-                    out.close();
-                }
-                LOGGER.error(FileUtils.readFileToString(file, Charset.defaultCharset()));
-                update(dataSource, fileName);
-                moveToTempDir(file);
-            }
+            update0(connection, qDynamicMap);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception ex) {

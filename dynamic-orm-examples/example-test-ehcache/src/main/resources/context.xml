@@ -44,7 +44,8 @@
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
     </bean>
 
-    <bean id="transaction-cache-manager" class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
+    <bean id="transaction-cache-manager"
+          class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
         <constructor-arg name="targetCacheManager" ref="cacheManager"/>
     </bean>
 

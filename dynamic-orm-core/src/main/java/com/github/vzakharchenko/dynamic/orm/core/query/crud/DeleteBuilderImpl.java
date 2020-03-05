@@ -1,11 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.dml.SQLDeleteClause;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
@@ -14,6 +8,12 @@ import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.dml.SQLDeleteClause;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.sql.Connection;

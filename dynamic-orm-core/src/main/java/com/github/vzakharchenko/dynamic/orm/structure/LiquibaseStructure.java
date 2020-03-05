@@ -1,5 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
+import com.github.vzakharchenko.dynamic.orm.structure.exception.DBException;
+import com.github.vzakharchenko.dynamic.orm.structure.exception.DropAllException;
+import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
+import com.github.vzakharchenko.dynamic.orm.structure.exception.UploadException;
 import liquibase.Liquibase;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
@@ -24,10 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.DBException;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.DropAllException;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.UploadException;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;

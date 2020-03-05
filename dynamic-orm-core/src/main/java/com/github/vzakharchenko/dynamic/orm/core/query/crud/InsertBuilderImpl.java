@@ -1,11 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.dml.SQLInsertClause;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
@@ -19,6 +13,12 @@ import com.github.vzakharchenko.dynamic.orm.core.mapper.AbstractMappingProjectio
 import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.dml.SQLInsertClause;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -58,6 +58,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
         return insert(Arrays.asList(models));
     }
 
+    // CHECKSTYLE:OFF
     @Override
     public Long insert(List<MODEL> models) {
         DBHelper.transactionCheck();
@@ -113,7 +114,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
         }
 
     }
-
+    // CHECKSTYLE:ON
     private AbstractMappingProjection<MODEL> getMappingProjection() {
         if (mappingProjection == null) {
             mappingProjection = TableMappingProjectionFactory.buildMapper(qTable, modelClass);

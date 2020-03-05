@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.querydsl.sql.RelationalPath;
 
 /**
  * Created by vzakharchenko on 18.09.15.

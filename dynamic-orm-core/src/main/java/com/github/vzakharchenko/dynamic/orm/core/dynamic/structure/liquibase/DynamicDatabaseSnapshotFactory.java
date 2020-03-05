@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import liquibase.database.Database;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.core.Table;
 import org.apache.commons.collections.CollectionUtils;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 
 import java.util.Collection;
 import java.util.List;

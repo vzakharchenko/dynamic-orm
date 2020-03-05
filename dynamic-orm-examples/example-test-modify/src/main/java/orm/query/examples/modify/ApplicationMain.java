@@ -1,8 +1,8 @@
 package orm.query.examples.modify;
 
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import orm.query.examples.models.Userdata;
 import orm.query.examples.qmodels.QUserdata;
 

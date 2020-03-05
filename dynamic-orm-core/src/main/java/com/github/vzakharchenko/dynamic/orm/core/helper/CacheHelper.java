@@ -1,14 +1,14 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.*;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Collections;

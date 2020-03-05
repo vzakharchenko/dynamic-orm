@@ -1,5 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicModel;
+import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Operation;
 import com.querydsl.core.types.Ops;
@@ -16,13 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicModel;
-import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 
 import java.util.List;
 import java.util.Objects;

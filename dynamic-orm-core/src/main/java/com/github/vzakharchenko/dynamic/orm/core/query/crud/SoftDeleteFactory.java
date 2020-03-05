@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.FormatHelper;
 import com.querydsl.core.types.Path;
 import org.apache.commons.lang3.StringUtils;
-import com.github.vzakharchenko.dynamic.orm.core.helper.FormatHelper;
 
 import java.io.Serializable;
 

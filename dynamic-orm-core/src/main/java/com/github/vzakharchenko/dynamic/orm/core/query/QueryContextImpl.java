@@ -1,5 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.query;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheContext;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionalEventPublisher;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.Configuration;
 import com.querydsl.sql.RelationalPath;
@@ -8,13 +15,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheContext;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionalEventPublisher;
 
 import javax.sql.DataSource;
 

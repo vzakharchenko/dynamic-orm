@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
-import com.querydsl.core.types.Path;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
+import com.querydsl.core.types.Path;
 
 import java.io.Serializable;
 import java.util.List;

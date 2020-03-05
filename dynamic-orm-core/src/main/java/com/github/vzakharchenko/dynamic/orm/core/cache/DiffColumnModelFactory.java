@@ -1,12 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.Maps;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,12 +62,11 @@ public abstract class DiffColumnModelFactory {
         return new DiffColumnModel(qTable, diffColumnMap);
     }
 
-    public static DiffColumnModel buildDiffColumnModel(
-            MapModel oldMapModel, MapModel affectedMapModel) {
+    private static RelationalPath<?> getQTable(MapModel oldMapModel,
+                                               MapModel affectedMapModel) {
         RelationalPath<?> qTable;
         if (oldMapModel != null) {
             qTable = oldMapModel.getQTable();
-
             Assert.isTrue(Objects
                             .equals(oldMapModel.getEffectedColumns().size(), qTable
                                     .getColumns().size()),
@@ -78,16 +77,17 @@ public abstract class DiffColumnModelFactory {
         } else {
             throw new IllegalStateException("Old model and new  model are null");
         }
+        return qTable;
+    }
 
-        Map<Path<?>, Object> oldDiffModels =
-                oldMapModel != null ? oldMapModel.getDiffModel() : Collections.emptyMap();
-        Map<Path<?>, Object> newDiffModels =
-                affectedMapModel != null ? affectedMapModel.getDiffModel() : Collections
-                        .emptyMap();
-        List<Path<?>> columns = qTable.getColumns();
+    private static Map<Path<?>, DiffColumn<?>> getDiffColumnMap(
+            Map<Path<?>, Object> oldDiffModels,
+            Map<Path<?>, Object> newDiffModels,
+            List<Path<?>> columns
+    ) {
         Map<Path<?>, DiffColumn<?>> diffColumnMap = Maps
                 .newHashMapWithExpectedSize(columns.size());
-        for (Path<?> column : columns) {
+        columns.forEach(column -> {
             boolean containsNewKey = newDiffModels.containsKey(column);
             boolean containsOldKey = oldDiffModels.containsKey(column);
             if (!containsNewKey && !containsOldKey) {
@@ -102,7 +102,21 @@ public abstract class DiffColumnModelFactory {
                 diffColumn = buildDiffColumn((Path) column, oldValue, oldValue);
             }
             diffColumnMap.put(column, diffColumn);
-        }
+        });
+        return diffColumnMap;
+    }
+
+    public static DiffColumnModel buildDiffColumnModel(
+            MapModel oldMapModel, MapModel affectedMapModel) {
+        RelationalPath<?> qTable = getQTable(oldMapModel, affectedMapModel);
+        Map<Path<?>, Object> oldDiffModels =
+                oldMapModel != null ? oldMapModel.getDiffModel() : Collections.emptyMap();
+        Map<Path<?>, Object> newDiffModels =
+                affectedMapModel != null ? affectedMapModel.getDiffModel() : Collections
+                        .emptyMap();
+        List<Path<?>> columns = qTable.getColumns();
+        Map<Path<?>, DiffColumn<?>> diffColumnMap =
+                getDiffColumnMap(oldDiffModels, newDiffModels, columns);
         return new DiffColumnModel(qTable, diffColumnMap);
     }
 }

@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableStatus;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableStatus;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
 

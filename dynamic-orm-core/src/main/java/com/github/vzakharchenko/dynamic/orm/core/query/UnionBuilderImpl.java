@@ -1,5 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query;
 
+import com.github.vzakharchenko.dynamic.orm.core.Range;
+import com.github.vzakharchenko.dynamic.orm.core.RawModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.mapper.expression.RawModelExpression;
 import com.querydsl.core.QueryException;
 import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.Expressions;
@@ -11,10 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import com.github.vzakharchenko.dynamic.orm.core.Range;
-import com.github.vzakharchenko.dynamic.orm.core.RawModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.mapper.expression.RawModelExpression;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -136,7 +136,7 @@ public class UnionBuilderImpl implements UnionBuilder {
         MappingProjection<RawModel> simpleRawMapper = createRawModelExpression();
         return clone.select(simpleRawMapper).getSQL().getSQL();
     }
-
+    // CHECKSTYLE:OFF
     private List<Expression<?>> getExpressions() {
         List<Expression<?>> columns = new ArrayList<>();
         SubQueryExpression listSubQuery = listSubQueries.get(0);
@@ -169,7 +169,7 @@ public class UnionBuilderImpl implements UnionBuilder {
         }
         return columns;
     }
-
+    // CHECKSTYLE:ON
     @Override
     public String showCountSql() {
         SQLQuery clone = getUnionQuery();

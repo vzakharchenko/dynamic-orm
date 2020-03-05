@@ -1,12 +1,12 @@
 package orm.query.examples.modify;
 
-import com.querydsl.core.types.Path;
-import org.springframework.context.event.EventListener;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.event.CacheEvent;
 import com.github.vzakharchenko.dynamic.orm.core.cache.event.DiffEvent;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.querydsl.core.types.Path;
+import org.springframework.context.event.EventListener;
 
 import java.io.Serializable;
 import java.util.List;

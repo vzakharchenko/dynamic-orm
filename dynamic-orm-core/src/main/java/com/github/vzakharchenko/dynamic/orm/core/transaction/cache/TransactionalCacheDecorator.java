@@ -1,15 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.Cache;
-import org.springframework.core.Ordered;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -45,93 +43,40 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         if (transactionalCache != null) {
             return transactionalCache;
         }
-
         LOGGER.info("Starting Transaction cache for " +
                 cacheName + " transactionName:" + transactionName);
 
         transactionalCache = new TransactionalCacheImpl(targetCache, cacheKeyLockStrategy);
         TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronizationAdapter() {
-
-                    @Override
-                    public int getOrder() {
-                        return Ordered.HIGHEST_PRECEDENCE;
-                    }
-
-                    @Override
-                    public void afterCompletion(int status) {
-                        if (status == STATUS_COMMITTED) {
-                            LOGGER.debug("Starting merge Transaction cache for " +
-                                    cacheName + " Cache. Transaction Name:" +
-                                    transactionName);
-                            TransactionalCacheImpl transactionalCache =
-                                    (TransactionalCacheImpl)
-                                            TransactionSynchronizationManager
-                                                    .getResource(cacheName);
-                            if (transactionalCache != null) {
-
-                                for (Serializable evictKey : transactionalCache
-                                        .getEvictObjects()) {
-                                    LOGGER.info("Cleaning  " + evictKey +
-                                            ". Transaction Name:" + transactionName);
-                                    targetCache.evict(evictKey);
-                                }
-
-                                for (Serializable evictKey : transactionalCache
-                                        .getDeletedObjects()) {
-                                    LOGGER.debug("delete model  " + evictKey +
-                                            ". Transaction Name:" + transactionName);
-                                    targetCache.evict(evictKey);
-                                }
-
-                                for (Serializable evictKey : transactionalCache
-                                        .getInsertedObjects()) {
-                                    LOGGER.debug("added new model  " + evictKey +
-                                            ". Transaction Name:" + transactionName);
-                                    targetCache.evict(evictKey);
-                                }
-
-                                for (Serializable evictKey : transactionalCache
-                                        .getUpdatedObjects()) {
-                                    LOGGER.debug("updated model  " + evictKey +
-                                            ". Transaction Name:" + transactionName);
-                                    targetCache.evict(evictKey);
-                                }
-                            }
-                        }
-                        TransactionSynchronizationManager.unbindResource(cacheName);
-                    }
-                });
+                new OrmTransactionSynchronizationAdapter(cacheName, transactionName, targetCache));
         TransactionSynchronizationManager.bindResource(cacheName, transactionalCache);
         return transactionalCache;
-
-
     }
 
+
+    public <T> T getFromActiveTransaction(Serializable key, Class<T> tClass) {
+        TransactionalCacheImpl transactionalCache = getTransactionCache();
+        T value = transactionalCache.getFromCache(key, tClass);
+        if (value == null) {
+            if (transactionalCache.getEvictObjects().contains(key)) {
+                return null;
+            }
+            Cache.ValueWrapper valueWrapper = targetCache.get(key);
+            value = valueWrapper != null ? (T) valueWrapper.get() : null;
+            if (value instanceof DMLModel) {
+                value = (T) ModelHelper.cloneModel((DMLModel) value);
+            }
+            if (value != null) {
+                transactionalCache.putToCache(key, (Serializable) value);
+            }
+        }
+        return value;
+    }
 
     @Override
     public <T> T getFromCache(Serializable key, Class<T> tClass) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionalCacheImpl transactionalCache = getTransactionCache();
-            // first check is Object in the Transaction cache
-            T value = transactionalCache.getFromCache(key, tClass);
-            if (value == null) {
-                // second check is evict Object
-                if (transactionalCache.getEvictObjects().contains(key)) {
-                    return null;
-                }
-                //third try to get Object from target Cache
-                Cache.ValueWrapper valueWrapper = targetCache.get(key);
-                value = valueWrapper != null ? (T) valueWrapper.get() : null;
-                if (value instanceof DMLModel) {
-                    value = (T) ModelHelper.cloneModel((DMLModel) value);
-                }
-
-                if (value != null) {
-                    transactionalCache.putToCache(key, (Serializable) value);
-                }
-            }
-            return value;
+            return getFromActiveTransaction(key, tClass);
         } else {
             Cache.ValueWrapper valueWrapper = targetCache.get(key);
             Object value = valueWrapper != null ? valueWrapper.get() : null;

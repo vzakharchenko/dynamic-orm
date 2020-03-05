@@ -1,10 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
-import com.querydsl.sql.Configuration;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.SQLQuery;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.transaction.PlatformTransactionManager;
 import com.github.vzakharchenko.dynamic.orm.core.exception.EmptyBatchException;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
@@ -19,6 +14,11 @@ import com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionBuilderImpl;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionalEventPublisher;
+import com.querydsl.sql.Configuration;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.SQLQuery;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -53,7 +53,8 @@ public class OrmQueryFactoryImpl implements OrmQueryFactory, AccessQueryContext 
     public OrmQueryFactoryImpl(DataSource dataSource,
                                TransactionCacheManager transactionCacheManager,
                                TransactionalEventPublisher transactionalEventPublisher,
-                               PlatformTransactionManager transactionManager, boolean quote) {
+                               PlatformTransactionManager transactionManager,
+                               boolean quote) {
         this(dataSource, transactionCacheManager, transactionalEventPublisher, transactionManager,
                 new Configuration(QueryDslJdbcTemplateFactory
                         .getDialect(dataSource, quote)));

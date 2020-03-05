@@ -1,5 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache.event;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.event.transaction.TransactionalCombinedEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.querydsl.core.types.Path;
@@ -7,43 +12,58 @@ import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.context.ApplicationEvent;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.event.transaction.TransactionalCombinedEvent;
 
 import java.io.Serializable;
 import java.util.*;
 
 /**
- *
+ * Modify Event.
  */
 public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         extends ApplicationEvent
-        implements TransactionalCombinedEvent<EVENT>, Cloneable {
+        implements TransactionalCombinedEvent<EVENT>,
+        ModifyEventBuilder<EVENT>,
+        Cloneable {
 
-    protected final List<EVENT> transactionHistory;
-    private final Class<? extends DMLModel> modelClass;
     private final RelationalPath<?> qTable;
-    private final String resourceName;
+    protected List<EVENT> transactionHistory = new ArrayList<>();
+    private Class<? extends DMLModel> modelClass0;
+    private String resourceName;
     private DMLModel oldModel;
     private DMLModel newModel;
-    private Map<Serializable, DiffColumnModel> diffColumnModelMap;
-    private CacheEventType cacheEventType;
+    private Map<Serializable, DiffColumnModel> diffColumnModelMap0;
+    private CacheEventType cacheEventType0;
 
-    protected ModifyEvent(CacheEventType cacheEventType,
-                          RelationalPath<?> qTable,
-                          Class<? extends DMLModel> modelClass,
-                          Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+    protected ModifyEvent(RelationalPath<?> qTable) {
         super(qTable);
         this.qTable = qTable;
-        this.modelClass = modelClass;
-        this.diffColumnModelMap = diffColumnModelMap;
-        this.cacheEventType = cacheEventType;
         this.resourceName = getClass().getName() + getQTable().getTableName();
-        this.transactionHistory = new ArrayList<>();
+    }
+
+    @Override
+    public ModifyEventBuilder<EVENT> modelClass(Class<? extends DMLModel> modelClass) {
+        this.modelClass0 = modelClass;
+        return this;
+    }
+
+    @Override
+    public ModifyEventBuilder<EVENT> diffColumnModelMap(
+            Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+        this.diffColumnModelMap0 = diffColumnModelMap;
+        return this;
+    }
+
+    @Override
+    public ModifyEventBuilder<EVENT> cacheEventType(
+            CacheEventType cacheEventType) {
+        this.cacheEventType0 = cacheEventType;
+        return this;
+    }
+
+    @Override
+    public EVENT create() {
         this.transactionHistory.add(clone());
+        return (EVENT) this;
     }
 
     /**
@@ -52,7 +72,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
      * @return list of primary keys
      */
     public final List<Serializable> getListIds() {
-        return ImmutableList.copyOf(diffColumnModelMap.keySet());
+        return ImmutableList.copyOf(diffColumnModelMap0.keySet());
     }
 
     /**
@@ -63,7 +83,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
      * @see DiffColumnModel
      */
     public final DiffColumnModel getDiffModel(Serializable id) {
-        return diffColumnModelMap.get(id);
+        return diffColumnModelMap0.get(id);
     }
 
     public final <TYPE> DiffColumn<TYPE> getDiffColumnValue(Serializable id,
@@ -113,7 +133,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         }
 
         if (oldModel == null) {
-            oldModel = DiffColumnModelFactory.buildOldModel(modelClass, diffModel);
+            oldModel = DiffColumnModelFactory.buildOldModel(modelClass0, diffModel);
         }
         return oldModel;
     }
@@ -126,7 +146,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         }
 
         if (newModel == null) {
-            newModel = DiffColumnModelFactory.buildNewModel(modelClass, diffModel);
+            newModel = DiffColumnModelFactory.buildNewModel(modelClass0, diffModel);
         }
         return newModel;
     }
@@ -138,7 +158,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     public final CacheEventType cacheEventType() {
-        return cacheEventType;
+        return cacheEventType0;
     }
 
     public final boolean isOneOf(RelationalPath... qTables) {
@@ -150,40 +170,46 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         return qTable;
     }
 
-    @Override
-    public void combinate(EVENT modelModifyEvent) {
-        Map<Serializable, DiffColumnModel> newDiffColumnModelMap = new HashMap<>();
-        newDiffColumnModelMap.putAll(diffColumnModelMap);
-        Map<Serializable, DiffColumnModel> diffColumnModelMap0 = modelModifyEvent
-                .getDiffColumnModelMap();
-        for (Map.Entry<Serializable, DiffColumnModel> entry : diffColumnModelMap0.entrySet()) {
-            Serializable key = entry.getKey();
-            DiffColumnModel diffColumnModelMerge = entry.getValue();
-            DiffColumnModel diffColumnModelOrigin = this.diffColumnModelMap.get(key);
-            if (diffColumnModelOrigin == null) {
-                newDiffColumnModelMap.put(key, diffColumnModelMerge);
-            } else {
-                Map<Path<?>, DiffColumn<?>> onlyChangedColumns = diffColumnModelMerge
-                        .getOnlyChangedColumns();
-                Map<Path<?>, DiffColumn<?>> diffModels = diffColumnModelOrigin.getDiffModels();
-                Map<Path<?>, DiffColumn<?>> newDiffModels = Maps
-                        .newHashMapWithExpectedSize(onlyChangedColumns.size());
-                newDiffModels.putAll(diffModels);
-                for (Map.Entry<Path<?>, DiffColumn<?>> columnEntry : onlyChangedColumns
-                        .entrySet()) {
-                    Path<?> column = columnEntry.getKey();
-                    DiffColumn<?> diffColumn = diffModels.get(column);
-                    newDiffModels.put(column, DiffColumnModelFactory
-                            .buildDiffColumn((Path) column, diffColumn.getOldValue(),
-                                    columnEntry.getValue().getNewValue()));
-                }
-                newDiffColumnModelMap.put(key, DiffColumnModelFactory
-                        .buildDiffColumnModel(qTable, newDiffModels));
-            }
+    private void combine(
+            Map<Serializable, DiffColumnModel> newDiffColumnModelMap,
+            Map.Entry<Serializable, DiffColumnModel> entry
+    ) {
+        Serializable key = entry.getKey();
+        DiffColumnModel diffColumnModelMerge = entry.getValue();
+        DiffColumnModel diffColumnModelOrigin = this.diffColumnModelMap0.get(key);
+        if (diffColumnModelOrigin == null) {
+            newDiffColumnModelMap.put(key, diffColumnModelMerge);
+        } else {
+            Map<Path<?>, DiffColumn<?>> onlyChangedColumns = diffColumnModelMerge
+                    .getOnlyChangedColumns();
+            Map<Path<?>, DiffColumn<?>> diffModels = diffColumnModelOrigin.getDiffModels();
+            Map<Path<?>, DiffColumn<?>> newDiffModels = Maps
+                    .newHashMapWithExpectedSize(onlyChangedColumns.size());
+            newDiffModels.putAll(diffModels);
+            onlyChangedColumns.forEach((column, value) -> {
+                DiffColumn<?> diffColumn = diffModels.get(column);
+                newDiffModels.put(column, DiffColumnModelFactory
+                        .buildDiffColumn((Path) column, diffColumn.getOldValue(),
+                                value.getNewValue()));
+            });
+
+            newDiffColumnModelMap.put(key, DiffColumnModelFactory
+                    .buildDiffColumnModel(qTable, newDiffModels));
         }
-        this.diffColumnModelMap = newDiffColumnModelMap;
+    }
+
+    @Override
+    public void combine(EVENT modelModifyEvent) {
+        Map<Serializable, DiffColumnModel> newDiffColumnModelMap
+                = new HashMap<>(diffColumnModelMap0);
+        Map<Serializable, DiffColumnModel> diffColumnMap = modelModifyEvent
+                .getDiffColumnModelMap();
+        for (Map.Entry<Serializable, DiffColumnModel> entry : diffColumnMap.entrySet()) {
+            combine(newDiffColumnModelMap, entry);
+        }
+        this.diffColumnModelMap0 = newDiffColumnModelMap;
         this.transactionHistory.add(modelModifyEvent);
-        this.cacheEventType = CacheEventType.BATCH;
+        this.cacheEventType0 = CacheEventType.BATCH;
         oldModel = null;
         newModel = null;
     }
@@ -195,7 +221,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     public final Class<? extends DMLModel> getModelClass() {
-        return modelClass;
+        return modelClass0;
     }
 
     @Override
@@ -204,7 +230,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     protected Map<Serializable, DiffColumnModel> getDiffColumnModelMap() {
-        return diffColumnModelMap;
+        return diffColumnModelMap0;
     }
 
     @Override

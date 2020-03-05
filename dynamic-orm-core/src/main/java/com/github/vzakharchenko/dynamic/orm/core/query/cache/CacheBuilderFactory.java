@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.querydsl.sql.RelationalPath;
 
 /**
  *

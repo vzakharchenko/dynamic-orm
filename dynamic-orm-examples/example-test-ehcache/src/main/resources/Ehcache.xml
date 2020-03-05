@@ -4,7 +4,7 @@
         monitoring="autodetect"
         dynamicConfig="true"
         maxBytesLocalHeap="150M"
-        >
+>
     <diskStore path="java.io.tmpdir"/>
 
     <cache name="cache-orm"

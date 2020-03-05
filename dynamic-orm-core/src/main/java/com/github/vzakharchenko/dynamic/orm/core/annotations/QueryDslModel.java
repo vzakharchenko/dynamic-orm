@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.annotations;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
+import com.querydsl.sql.RelationalPath;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

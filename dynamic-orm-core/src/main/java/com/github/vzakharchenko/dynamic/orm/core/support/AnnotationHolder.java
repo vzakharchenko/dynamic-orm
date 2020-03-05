@@ -1,7 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.support;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SequanceName;
@@ -10,6 +8,8 @@ import com.github.vzakharchenko.dynamic.orm.core.annotations.Version;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
 
 import java.lang.reflect.Field;
 

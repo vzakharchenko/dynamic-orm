@@ -1,12 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import com.querydsl.sql.SQLCommonQuery;
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.Testtable;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
+import com.querydsl.sql.SQLCommonQuery;
+import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Objects;

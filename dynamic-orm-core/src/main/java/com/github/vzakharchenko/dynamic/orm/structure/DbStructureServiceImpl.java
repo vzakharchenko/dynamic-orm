@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
+import com.github.vzakharchenko.dynamic.orm.structure.exception.EmptyPathToChangeSets;
+import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.EmptyPathToChangeSets;
-import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
 
 import javax.sql.DataSource;
 

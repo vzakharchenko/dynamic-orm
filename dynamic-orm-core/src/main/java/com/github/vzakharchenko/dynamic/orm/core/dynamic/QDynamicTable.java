@@ -1,15 +1,15 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
 import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
-import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -29,6 +29,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         super(StringUtils.upperCase(tableName));
     }
 
+    // CHECKSTYLE:OFF
     @Override
     public boolean equals(Object o) { //NOPMD
         if (o instanceof QDynamicTable) {
@@ -49,6 +50,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
             return super.equals(o);
         }
     }
+    // CHECKSTYLE:ON
 
     protected QDynamicTable addPKGenerator(PKGenerator<?> pkGenerator0) {
         Path<?> primaryKeyColumn = ModelHelper.getPrimaryKeyColumn(this);

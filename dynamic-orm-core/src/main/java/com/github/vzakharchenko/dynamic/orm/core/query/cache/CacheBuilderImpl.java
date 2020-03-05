@@ -1,12 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.SQLCommonQuery;
-import org.apache.commons.collections4.MapUtils;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.*;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
@@ -14,6 +7,13 @@ import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.SQLCommonQuery;
+import org.apache.commons.collections4.MapUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.*;
@@ -84,16 +84,13 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     }
 
 
-    @Override
-    public Map<Serializable, MapModel> findAllOfMapByIds(List<? extends Serializable> keys) {
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        Map<Serializable, Map<Path<?>, Object>> models = new LinkedHashMap<>();
+    private List<Serializable> skippedList(List<? extends Serializable> keys,
+                                           Map<Serializable, Map<Path<?>, Object>> models) {
 
         List<Serializable> skippedList = new ArrayList<>();
-
         for (Serializable key : keys) {
             PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(key, qTable);
-            Map<Path<?>, Object> modelMap = transactionCache
+            Map<Path<?>, Object> modelMap = queryContext.getTransactionCache()
                     .getFromCache(pkCacheKey, HashMap.class);
             if (modelMap != null) {
                 models.put(key, modelMap);
@@ -101,30 +98,42 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
                 skippedList.add(key);
             }
         }
+        return skippedList;
+    }
+
+    private void transactionModel(MODEL model, Map<Serializable, Map<Path<?>, Object>> models) {
+        TransactionalCache transactionCache = queryContext.getTransactionCache();
+        Serializable primaryKeyValue = ModelHelper
+                .getPrimaryKeyValue(model, qTable, Serializable.class);
+        Map<Path<?>, Object> modelMap = CacheHelper.buildMapFromModel(qTable, model);
+        models.put(primaryKeyValue, modelMap);
+        PrimaryKeyCacheKey pkCacheKey = CacheHelper
+                .buildPrimaryKeyCacheKey(primaryKeyValue, qTable);
+        transactionCache.lock(pkCacheKey);
+        try {
+            if (softDelete == null || Objects.equals(
+                    modelMap.get(softDelete.getColumn()), softDelete.getDeletedValue())) {
+                transactionCache.putToCache(pkCacheKey, (Serializable) modelMap);
+            }
+        } finally {
+            transactionCache.unLock(pkCacheKey);
+        }
+    }
+
+    @Override
+    public Map<Serializable, MapModel> findAllOfMapByIds(List<? extends Serializable> keys) {
+
+        Map<Serializable, Map<Path<?>, Object>> models = new LinkedHashMap<>();
+
+        List<Serializable> skippedList = skippedList(keys, models);
 
         List<MODEL> modelList = queryContext.getOrmQueryFactory().select()
                 .findAll(findByIdsQuery(skippedList), qTable, modelClass);
 
         for (MODEL model : modelList) {
-            Serializable primaryKeyValue = ModelHelper
-                    .getPrimaryKeyValue(model, qTable, Serializable.class);
-            Map<Path<?>, Object> modelMap = CacheHelper.buildMapFromModel(qTable, model);
-            models.put(primaryKeyValue, modelMap);
-            PrimaryKeyCacheKey pkCacheKey = CacheHelper
-                    .buildPrimaryKeyCacheKey(primaryKeyValue, qTable);
-            transactionCache.lock(pkCacheKey);
-            try {
-                if (softDelete == null || Objects.equals(
-                        modelMap.get(softDelete.getColumn()), softDelete.getDeletedValue())) {
-                    transactionCache.putToCache(pkCacheKey, (Serializable) modelMap);
-                }
-            } finally {
-                transactionCache.unLock(pkCacheKey);
-            }
+            transactionModel(model, models);
         }
-
         Map<Serializable, MapModel> returnedModels = new LinkedHashMap<>(keys.size());
-
         for (Serializable key : keys) {
             Map<Path<?>, Object> diffModels = models.get(key);
             if (diffModels == null) {
@@ -132,7 +141,6 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
             }
             returnedModels.put(key, MapModelFactory.buildMapModel(qTable, diffModels));
         }
-
         return returnedModels;
     }
 
@@ -141,7 +149,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
                 .where(buildWhereWithSoftDelete(ModelHelper.getPrimaryKey(qTable).in(keys)));
     }
 
-
+    // CHECKSTYLE:OFF
     private <TYPE extends Serializable> LazyList<MODEL> findAllByColumn(Path<TYPE> column,
                                                                         TYPE columnValue,
                                                                         boolean isNotNull) {
@@ -178,7 +186,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
             transactionCache.unLock(cachedColumn);
         }
     }
-
+    // CHECKSTYLE:ON
     private SQLCommonQuery<?> expressionQuery(BooleanExpression expression) {
         return queryContext.getOrmQueryFactory().buildQuery().from(qTable)
                 .where(buildWhereWithSoftDelete(expression));

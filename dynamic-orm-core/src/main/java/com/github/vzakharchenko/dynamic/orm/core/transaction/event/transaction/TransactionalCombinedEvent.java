@@ -19,7 +19,7 @@ public interface TransactionalCombinedEvent<EVENT> extends TransactionEvent {
      *
      * @param event
      */
-    void combinate(EVENT event);
+    void combine(EVENT event);
 
 
     /**

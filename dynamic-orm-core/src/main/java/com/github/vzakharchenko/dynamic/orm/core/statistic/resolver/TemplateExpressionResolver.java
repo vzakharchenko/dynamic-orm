@@ -1,9 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic.resolver;
 
+import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticRegistrator;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.TemplateExpression;
 import org.apache.commons.collections4.CollectionUtils;
-import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticRegistrator;
 
 import java.util.List;
 

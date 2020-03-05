@@ -1,5 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.ColumnMetaDataInfo;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.IndexData;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.ForeignKey;
@@ -10,11 +15,6 @@ import liquibase.structure.core.Index;
 import liquibase.structure.core.Table;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.util.Assert;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.ColumnMetaDataInfo;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.IndexData;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,18 +25,24 @@ import java.util.List;
  */
 public abstract class TableFactory {
 
-    public static Table createTable(QDynamicTable dynamicTable) {
-        Assert.notNull(dynamicTable);
-        Table table = new Table("", "", dynamicTable.getTableName());
+    private static void createColumns(QDynamicTable dynamicTable,
+                                      Table table
+    ) {
         table.setAttribute("columns", Lists.newArrayList());
-        List<Path<?>> columns = dynamicTable.getColumns();
-        for (Path column : columns) {
-            table.getColumns().add(buildColumn(table, dynamicTable.getMetaInfo(column)));
-        }
+        dynamicTable.getColumns().forEach(column -> table.getColumns()
+                .add(buildColumn(table, dynamicTable.getMetaInfo(column))));
+    }
+
+    private static void createPrivateKey(QDynamicTable dynamicTable,
+                                         Table table) {
         PrimaryKey primaryKey = dynamicTable.getPrimaryKey();
         if (primaryKey != null) {
             table.setPrimaryKey(buildPrimaryKey(table, primaryKey));
         }
+    }
+
+    private static void createForeignKeys(QDynamicTable dynamicTable,
+                                          Table table) {
         Collection<ForeignKey<?>> foreignKeys = dynamicTable.getForeignKeys();
         table.setAttribute("outgoingForeignKeys", Lists.newArrayList());
         if (CollectionUtils.isNotEmpty(foreignKeys)) {
@@ -46,15 +52,27 @@ public abstract class TableFactory {
                 cnt++;
             }
         }
+    }
+
+    private static void createIndexes(QDynamicTable dynamicTable,
+                                      Table table) {
         List<IndexData> indexDatas = DynamicTableHelper.getIndexDatas(dynamicTable);
         table.setAttribute("indexes", Lists.newArrayList());
         if (CollectionUtils.isNotEmpty(indexDatas)) {
             for (int i = 0; i < indexDatas.size(); i++) {
-
                 table.getIndexes().add(buildIndex(table, indexDatas.get(i),
                         "IDX_" + table.getName() + i));
             }
         }
+    }
+
+    public static Table createTable(QDynamicTable dynamicTable) {
+        Assert.notNull(dynamicTable);
+        Table table = new Table("", "", dynamicTable.getTableName());
+        createColumns(dynamicTable, table);
+        createPrivateKey(dynamicTable, table);
+        createForeignKeys(dynamicTable, table);
+        createIndexes(dynamicTable, table);
         return table;
     }
 

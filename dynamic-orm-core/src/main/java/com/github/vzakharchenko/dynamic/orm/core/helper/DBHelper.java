@@ -1,11 +1,11 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
-import com.querydsl.sql.SQLCommonQuery;
-import com.querydsl.sql.SQLQuery;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.github.vzakharchenko.dynamic.orm.core.exception.IsNotActiveTransaction;
 import com.github.vzakharchenko.dynamic.orm.core.exception.NoActionExeption;
 import com.github.vzakharchenko.dynamic.orm.core.exception.NoRowExeption;
+import com.querydsl.sql.SQLCommonQuery;
+import com.querydsl.sql.SQLQuery;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Objects;
 

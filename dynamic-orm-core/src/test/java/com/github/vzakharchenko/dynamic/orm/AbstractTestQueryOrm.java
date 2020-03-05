@@ -1,5 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm;
 
+import com.github.vzakharchenko.dynamic.orm.core.AccessQueryContext;
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.AccessDynamicContext;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactory;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
+import com.github.vzakharchenko.dynamic.orm.dataSource.DBFacade;
+import com.github.vzakharchenko.dynamic.orm.structure.DbStructureService;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +21,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
-import com.github.vzakharchenko.dynamic.orm.core.AccessQueryContext;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.AccessDynamicContext;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
-import com.github.vzakharchenko.dynamic.orm.structure.DbStructureService;
-import com.github.vzakharchenko.dynamic.orm.dataSource.DBFacade;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;

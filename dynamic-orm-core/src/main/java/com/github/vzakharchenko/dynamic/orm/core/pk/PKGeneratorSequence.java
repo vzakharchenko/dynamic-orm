@@ -1,12 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.pk;
 
+import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLExpressions;
 import org.apache.commons.lang3.StringUtils;
-import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 
 /**
  *

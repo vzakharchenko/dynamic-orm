@@ -1,7 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.SQLCommonQuery;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SequanceName;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SoftDelete;
@@ -11,6 +9,8 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionBuilder;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.SQLCommonQuery;
 
 import java.util.List;
 

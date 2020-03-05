@@ -33,14 +33,11 @@ public class DatabaseChangeLogReaderImpl implements DatabaseChangeLogReader {
     public void read(DatabaseChangeLog databaseChangeLog, String path,
                      Comparator<String> comporator)
             throws IOException, LiquibaseException {
-
         Collection<String> unsortedResources = resourceAccessor
                 .list(path, path, true, false, false);
-
         if (CollectionUtils.isNotEmpty(unsortedResources)) {
             Collection<String> resources = new TreeSet<>(comporator);
             resources.addAll(unsortedResources);
-
             for (String file : resources) {
                 DatabaseChangeLog changeLog = ChangeLogParserFactory.getInstance()
                         .getParser(file, resourceAccessor)
@@ -48,7 +45,6 @@ public class DatabaseChangeLogReaderImpl implements DatabaseChangeLogReader {
                 PreconditionContainer preconditions = changeLog.getPreconditions();
                 List<Precondition> nestedPreconditions = preconditions.getNestedPreconditions();
                 databaseChangeLog.getChangeSets().addAll(changeLog.getChangeSets());
-
                 if (CollectionUtils.isNotEmpty(nestedPreconditions)) {
                     for (Precondition precondition : nestedPreconditions) {
                         databaseChangeLog.getPreconditions().addNestedPrecondition(precondition);
@@ -56,6 +52,5 @@ public class DatabaseChangeLogReaderImpl implements DatabaseChangeLogReader {
                 }
             }
         }
-
     }
 }

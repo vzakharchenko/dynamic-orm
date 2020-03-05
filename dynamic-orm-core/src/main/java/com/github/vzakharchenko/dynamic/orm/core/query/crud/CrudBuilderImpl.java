@@ -1,12 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.sql.RelationalPath;
-import org.springframework.util.Assert;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.querydsl.core.types.Path;
+import com.querydsl.sql.RelationalPath;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.Arrays;

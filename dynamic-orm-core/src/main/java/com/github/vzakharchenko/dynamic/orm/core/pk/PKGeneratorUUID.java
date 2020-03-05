@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.pk;
 
-import com.querydsl.sql.RelationalPath;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.querydsl.sql.RelationalPath;
 
 import java.util.UUID;
 

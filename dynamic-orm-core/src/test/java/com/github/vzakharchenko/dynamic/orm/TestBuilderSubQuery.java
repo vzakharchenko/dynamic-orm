@@ -1,13 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.sql.SQLCommonQuery;
-import com.querydsl.sql.SQLExpressions;
-import org.testng.annotations.Test;
 import com.github.vzakharchenko.dynamic.orm.core.Range;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
@@ -16,6 +8,14 @@ import com.github.vzakharchenko.dynamic.orm.model.Testtable;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableCache;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 import com.github.vzakharchenko.dynamic.orm.qModel.QUser;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.SubQueryExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.sql.SQLCommonQuery;
+import com.querydsl.sql.SQLExpressions;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;

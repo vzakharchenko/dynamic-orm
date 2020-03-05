@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
-import com.querydsl.core.types.Path;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.querydsl.core.types.Path;
 
 import java.io.Serializable;
 

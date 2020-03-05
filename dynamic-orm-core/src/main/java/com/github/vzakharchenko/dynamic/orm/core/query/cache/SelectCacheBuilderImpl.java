@@ -1,10 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.SQLCommonQuery;
 import com.github.vzakharchenko.dynamic.orm.core.*;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.cache.ModelLazyListFactory;
@@ -15,6 +10,11 @@ import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.SubQueryExpression;
+import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.RelationalPath;
+import com.querydsl.sql.SQLCommonQuery;
 
 import java.io.Serializable;
 import java.util.Collection;
