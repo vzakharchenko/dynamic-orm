@@ -160,6 +160,13 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 ## 3. Example to Use
 
 ```java
+
+    @Autowired
+    private OrmQueryFactory ormQueryFactory;
+
+    @Autowired
+    private QDynamicTableFactory qDynamicTableFactory;
+    
  // suspend the current transaction if one exists.
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testQuery() {
