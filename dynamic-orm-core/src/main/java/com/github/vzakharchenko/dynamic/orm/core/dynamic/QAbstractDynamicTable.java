@@ -82,21 +82,21 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
             Database database, String columnName, boolean notNull) {
         DatabaseDataType databaseDataType = new DateType().toDatabaseDataType(database);
         return addColumn(new ColumnMetaDataInfo(createDate(columnName, Date.class),
-                databaseDataType.getType(), 26, !notNull));
+                databaseDataType.getType(), null, !notNull));
     }
 
     protected DYNAMIC_TABLE createDateTimeColumn(
             Database database, String columnName, boolean notNull) {
         DatabaseDataType databaseDataType = new TimestampType().toDatabaseDataType(database);
         return addColumn(new ColumnMetaDataInfo(createDateTime(columnName, Date.class),
-                databaseDataType.getType(), 26, !notNull));
+                databaseDataType.getType(), null, !notNull));
     }
 
     protected DYNAMIC_TABLE createTimeColumn(
             Database database, String columnName, boolean notNull) {
         DatabaseDataType databaseDataType = new TimeType().toDatabaseDataType(database);
         return addColumn(new ColumnMetaDataInfo(createTime(columnName, Date.class),
-                databaseDataType.getType(), 26, !notNull));
+                databaseDataType.getType(), null, !notNull));
     }
 
 
@@ -160,8 +160,10 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         Assert.notNull(columnMetaDataInfo);
         Path column = columnMetaDataInfo.getColumn();
         ColumnMetadata columnMetadata = ColumnMetadata
-                .named(StringUtils.upperCase(column.getMetadata().getName()))
-                .withSize(columnMetaDataInfo.getSize());
+                .named(StringUtils.upperCase(column.getMetadata().getName()));
+        if (columnMetaDataInfo.getSize() != null) {
+            columnMetadata = columnMetadata.withSize(columnMetaDataInfo.getSize());
+        }
         if (columnMetaDataInfo.getDecimalDigits() != null) {
             columnMetadata = columnMetadata.withDigits(columnMetaDataInfo.getDecimalDigits());
         }

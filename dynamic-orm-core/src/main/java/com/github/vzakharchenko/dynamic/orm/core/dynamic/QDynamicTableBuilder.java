@@ -51,12 +51,12 @@ public final class QDynamicTableBuilder implements QTableBuilder {
             DynamicContext dynamicContext,
             Map<String, QDynamicTable> dynamicTableMap) {
         return new QDynamicTableBuilder(
-                new QDynamicTable(tableName), dataSource, dynamicContext, dynamicTableMap);
+                dynamicContext.createQTable(tableName), dataSource, dynamicContext, dynamicTableMap);
     }
 
     public static QTableBuilder createBuilder(
             String tableName, DataSource dataSource, DynamicContext dynamicContext) {
-        return new QDynamicTableBuilder(new QDynamicTable(tableName), dataSource, dynamicContext);
+        return new QDynamicTableBuilder(dynamicContext.createQTable(tableName), dataSource, dynamicContext);
     }
 
     @Override

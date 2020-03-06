@@ -5,6 +5,7 @@ import liquibase.database.jvm.JdbcConnection;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,5 +42,14 @@ public class DynamicContext {
 
     public void clear() {
         dynamicTableMap.clear();
+    }
+
+    public Collection<QDynamicTable> getQTables() {
+        return dynamicTableMap.values();
+    }
+
+    public QDynamicTable createQTable(String tableName) {
+        QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
+        return qDynamicTable != null ? qDynamicTable : new QDynamicTable(tableName);
     }
 }

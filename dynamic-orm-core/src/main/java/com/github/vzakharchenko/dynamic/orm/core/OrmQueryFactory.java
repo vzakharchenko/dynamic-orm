@@ -137,4 +137,5 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
      */
     <MODEL extends DMLModel> CacheBuilder<MODEL> modelCacheBuilder(Class<MODEL> modelClass);
 
+    void clearCache();
 }

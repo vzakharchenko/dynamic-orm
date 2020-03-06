@@ -32,6 +32,12 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
 
 
     @Override
+    public <MODEL extends DMLModel> List<MODEL> findAll(
+            RelationalPath<?> qTable, Class<MODEL> modelClass) {
+        return findAll(queryContext.getOrmQueryFactory().buildQuery(), qTable, modelClass);
+    }
+
+    @Override
     public <MODEL extends DMLModel> List<MODEL> findAll(SQLCommonQuery<?> sqlQuery,
                                                         RelationalPath<?> qTable,
                                                         Class<MODEL> modelClass) {

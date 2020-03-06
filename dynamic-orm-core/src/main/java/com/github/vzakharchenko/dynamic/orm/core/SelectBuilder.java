@@ -16,6 +16,17 @@ public interface SelectBuilder
      * The fetch all  data models from a database using sqlQuery query.
      * the result is mapped to the data models
      *
+     * @param qTable     QueryDsl Model (QTable)
+     * @param modelClass data MOdel Class
+     * @param <MODEL>    data MOdel Class
+     * @return List of Models
+     */
+    <MODEL extends DMLModel> List<MODEL> findAll(RelationalPath<?> qTable,
+                                                 Class<MODEL> modelClass);
+    /**
+     * The fetch all  data models from a database using sqlQuery query.
+     * the result is mapped to the data models
+     *
      * @param sqlQuery   queryDsl query
      * @param qTable     QueryDsl Model (QTable)
      * @param modelClass data MOdel Class

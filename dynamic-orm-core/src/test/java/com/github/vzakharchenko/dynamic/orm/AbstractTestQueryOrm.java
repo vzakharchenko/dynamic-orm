@@ -41,9 +41,9 @@ public abstract class AbstractTestQueryOrm
 
     @Autowired
     protected CacheManager cacheManager;
-
-    @Autowired
-    protected TransactionCacheManager transactionCacheManager;
+//
+//    @Autowired
+//    protected TransactionCacheManager transactionCacheManager;
 
     @Autowired
     protected TransactionTemplate transactionTemplate;
@@ -84,7 +84,6 @@ public abstract class AbstractTestQueryOrm
     }
 
     @AfterMethod
-    @AfterTest
     public void dropSchema() throws Exception {
         Collection<String> cacheNames = cacheManager.getCacheNames();
         for (String cacheName : cacheNames) {
@@ -106,8 +105,7 @@ public abstract class AbstractTestQueryOrm
 
     }
 
-    @AfterMethod(enabled = true)
-    @AfterTest(enabled = true)
+    @AfterMethod()
     public void testConnectionLeaks() {
         if (DBFacade.getDBConnectionsInUse() > 0) {
             if (!TransactionSynchronizationManager.isSynchronizationActive()) {

@@ -8,6 +8,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.Collection;
 
 /**
  *
@@ -48,6 +49,11 @@ public class QDynamicTableFactoryImpl implements QDynamicTableFactory, AccessDyn
     @Override
     public QDynamicTable getQDynamicTableByName(String tableName) {
         return getDynamicContext().getQTable(tableName);
+    }
+
+    @Override
+    public Collection<QDynamicTable> getQDynamicTables() {
+        return getDynamicContext().getQTables();
     }
 
 
