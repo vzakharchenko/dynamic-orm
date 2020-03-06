@@ -15,7 +15,7 @@
         <targetFolder>${project.basedir}/src/main/java</targetFolder>
         <QmodelPackage>orm.query.examples.qmodels</QmodelPackage>
         <driver>org.hsqldb.jdbc.JDBCDriver</driver>
-        <changeSetsPath>${project.basedir}/src/main/resources/changeSets
+        <changeSetsPath>${basedir}/src/main/resources/changeSets
         </changeSetsPath>
         <changeSetFileName>${groupId}-Structure.xml</changeSetFileName>
         <jdbcUrl>jdbc:hsqldb:file:${project.basedir}/testdb;readonly=true</jdbcUrl>

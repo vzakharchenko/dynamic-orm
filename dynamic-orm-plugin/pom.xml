@@ -19,6 +19,7 @@
         <findBugsLocation>${basedir}/../analizers/</findBugsLocation>
         <javadoc>${basedir}/../analizers/javadoc</javadoc>
         <fast-build>true</fast-build>
+        <coveralls>true</coveralls>
     </properties>
 
     <dependencies>

@@ -58,7 +58,9 @@
         <sources>${basedir}/./analizers/sources</sources>
         <javadoc>${basedir}/./analizers/javadoc</javadoc>
         <repoToken>repoToken</repoToken>
-        <coveralls>true</coveralls>
+
+        <skipCoveralls>true</skipCoveralls>
+        <coveralls>${skipCoveralls}</coveralls>
 
         <testng>7.1.0</testng>
         <spring>5.2.4.RELEASE</spring>
