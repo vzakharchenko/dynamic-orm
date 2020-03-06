@@ -68,6 +68,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
                 dataType.getType(), size, !notNull));
     }
 
+    // CHECKSTYLE:OFF
     protected <T extends Number & Comparable<?>> DYNAMIC_TABLE createNumberColumn(
             Database database, String columnName, Class<T> typeClass, Integer size,
             Integer decimalDigits, boolean notNull) {
@@ -76,6 +77,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
                 databaseDataType.getType(), size, !notNull, decimalDigits));
     }
 
+    // CHECKSTYLE:ON
     protected DYNAMIC_TABLE createDateColumn(
             Database database, String columnName, boolean notNull) {
         DatabaseDataType databaseDataType = new DateType().toDatabaseDataType(database);
@@ -199,8 +201,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
     public StringPath getStringColumnByName(String columnName) {
-        SimpleExpression<String> column = getColumnByName(columnName, String.class);
-        return (StringPath) column;
+        return (StringPath) getColumnByName(columnName, String.class);
     }
 
     public StringPath getCharColumnByName(String columnName) {
@@ -212,40 +213,33 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
     public BooleanPath getBooleanColumnByName(String columnName) {
-        SimpleExpression<Boolean> column = getColumnByName(columnName, Boolean.class);
-        return (BooleanPath) column;
+        return (BooleanPath) getColumnByName(columnName, Boolean.class);
     }
 
     public SimplePath<byte[]> getBlobColumnByName(String columnName) {
-        SimpleExpression<byte[]> column = getColumnByName(columnName, byte[].class);
-        return (SimplePath<byte[]>) column;
+        return (SimplePath<byte[]>) getColumnByName(columnName, byte[].class);
     }
 
     public DatePath<Date> getDateColumnByName(String columnName) {
-        SimpleExpression<Date> column = getColumnByName(columnName, Date.class);
-        return (DatePath<Date>) column;
+        return (DatePath<Date>) getColumnByName(columnName, Date.class);
     }
 
     public DateTimePath<Date> getDateTimeColumnByName(String columnName) {
-        SimpleExpression<Date> column = getColumnByName(columnName, Date.class);
-        return (DateTimePath<Date>) column;
+        return (DateTimePath<Date>) getColumnByName(columnName, Date.class);
     }
 
     public TimePath<Date> getTimeColumnByName(String columnName) {
-        SimpleExpression<Date> column = getColumnByName(columnName, Date.class);
-        return (TimePath<Date>) column;
+        return (TimePath<Date>) getColumnByName(columnName, Date.class);
     }
 
     public <T extends Number & Comparable<?>> NumberPath<T> getNumberColumnByName(
             String columnName, Class<T> tClass) {
-        SimpleExpression<T> column = getColumnByName(columnName, tClass);
-        return (NumberPath<T>) column;
+        return (NumberPath<T>) getColumnByName(columnName, tClass);
     }
 
     public <T extends Number & Comparable<?>> NumberPath<T> getNumberColumnByName(
             String columnName) {
-        SimpleExpression<Number> column = getColumnByName(columnName, Number.class);
-        return (NumberPath) column;
+        return (NumberPath) getColumnByName(columnName, Number.class);
     }
 
 

@@ -14,7 +14,6 @@ public class CachedColumnTest {
         CachedColumn cachedColumn1 = new CachedColumn(QTesttable.testtable.id);
         CachedColumn cachedColumn2 = new CachedColumn("TESTTABLE", "ID");
         assertEquals(cachedColumn1, cachedColumn2);
-        assertTrue(cachedColumn2.hashCode() > 0);
 
 
     }

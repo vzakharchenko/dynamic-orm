@@ -25,11 +25,12 @@ import java.util.List;
  */
 public class UnionBuilderImpl implements UnionBuilder {
 
+    public static final int SIZE = 1;
     protected final QueryContextImpl queryContext;
     protected final List<SubQueryExpression<?>> listSubQueries;
     private final Logger logger = LoggerFactory.getLogger(UnionBuilderImpl.class);
     protected SQLQuery sqlQuery;
-    protected boolean unionAll = false;
+    protected boolean unionAll;
     private MappingProjection<RawModel> mappingProjection;
 
     public UnionBuilderImpl(SQLQuery sqlQuery, List<SubQueryExpression<?>> listSubQueries,
@@ -48,7 +49,7 @@ public class UnionBuilderImpl implements UnionBuilder {
             List<RawModel> list = findAll();
             if (list.isEmpty()) {
                 return null;
-            } else if (list.size() > 1) {
+            } else if (list.size() > SIZE) {
                 throw new IncorrectResultSizeDataAccessException(1, list.size());
             } else {
                 return list.get(0);

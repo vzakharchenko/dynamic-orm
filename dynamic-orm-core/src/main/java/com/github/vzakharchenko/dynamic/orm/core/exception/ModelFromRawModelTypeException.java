@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.core.exception;
 public class ModelFromRawModelTypeException extends Exception {
 
     public ModelFromRawModelTypeException() {
+        super();
     }
 
     public ModelFromRawModelTypeException(String message) {

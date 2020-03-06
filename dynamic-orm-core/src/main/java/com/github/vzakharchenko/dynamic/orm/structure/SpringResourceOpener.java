@@ -18,7 +18,7 @@ import java.util.Set;
 public class SpringResourceOpener implements ResourceAccessor {
 
     private static final ResourceLoader RESOURCE_LOADER = new PathMatchingResourcePatternResolver();
-
+    // CHECKSTYLE:OFF
     @Override
     public Set<String> list(String relativeTo, String path, boolean includeFiles,
                             boolean includeDirectories, boolean recursive) throws IOException {
@@ -38,7 +38,7 @@ public class SpringResourceOpener implements ResourceAccessor {
 
         return returnSet;
     }
-
+    // CHECKSTYLE:ON
     @Override
     public Set<InputStream> getResourcesAsStream(String path) throws IOException {
 

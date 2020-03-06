@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.core.exception;
 public class UpdateDBException extends Exception {
 
     public UpdateDBException() {
+        super();
     }
 
     public UpdateDBException(String message) {

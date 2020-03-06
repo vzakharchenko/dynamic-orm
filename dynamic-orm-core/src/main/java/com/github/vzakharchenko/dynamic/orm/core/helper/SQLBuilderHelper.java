@@ -23,18 +23,16 @@ public abstract class SQLBuilderHelper {
 
     public static SubQueryExpression<Tuple> createSubQuery(SQLQuery sqlQuery,
                                                            SimpleExpression... columns) {
-        return createSubQuery(sqlQuery, Tuple.class, columns);
+        return createSubQuery(sqlQuery, (Expression[]) columns);
     }
 
     public static <T> SubQueryExpression<T> createSubQuery(SQLQuery sqlQuery,
-                                                           Class<T> type,
                                                            Expression... columns) {
         return (SubQueryExpression<T>) sqlQuery.select(columns);
     }
 
     public static <T> SubQueryExpression<T> createSubQuery(
             SQLQuery sqlQuery,
-            Class<T> type,
             List<? extends Expression<?>> columns) {
         return (SubQueryExpression<T>) sqlQuery.select(columns
                 .toArray(new Expression[columns.size()]));

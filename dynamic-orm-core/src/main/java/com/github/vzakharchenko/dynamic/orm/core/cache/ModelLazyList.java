@@ -17,6 +17,7 @@ public class ModelLazyList<MODEL extends DMLModel> extends AbstractList<MODEL> {
     private final CacheBuilder<MODEL> cacheBuilder;
 
     protected ModelLazyList(List<Serializable> listIds, CacheBuilder<MODEL> cacheBuilder) {
+        super();
         this.listIds = listIds;
         this.cacheBuilder = cacheBuilder;
     }

@@ -25,6 +25,7 @@ import java.util.List;
 public class RawModelBuilderImpl implements RawModelBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RawModelBuilderImpl.class);
+    public static final int SIZE = 1;
 
     protected final SQLQuery sqlQuery;
 
@@ -51,7 +52,7 @@ public class RawModelBuilderImpl implements RawModelBuilder {
             List<RawModel> list = findAll(columns);
             if (list.isEmpty()) {
                 return null;
-            } else if (list.size() > 1) {
+            } else if (list.size() > SIZE) {
                 throw new IncorrectResultSizeDataAccessException(1, list.size());
             } else {
                 return list.get(0);
@@ -90,7 +91,7 @@ public class RawModelBuilderImpl implements RawModelBuilder {
                     .getConnection(queryContext.getDataSource());
             try {
                 if (queryContext.isDebugSql()) {
-                    LOGGER.info("execute: " + selectBuilder
+                    LOGGER.debug("execute: " + selectBuilder
                             .showSql(sqlQuery, rawModelExpression));
                 }
                 return sqlQuery.clone(connection).select(rawModelExpression).fetch();

@@ -27,10 +27,10 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     private final Class<MODEL> modelClass;
 
     private final RelationalPath<?> qTable;
-    private final LinkedList<ModifyItem<MODEL>> batch = new LinkedList<>();
+    private final LinkedList<ModifyItem<MODEL>> batch0 = new LinkedList<>();
     private final AfterModify<MODEL> afterModify;
     private final Path<?> versionColumn;
-
+    // CHECKSTYLE:OFF
     protected DeleteModelBuilderImpl(RelationalPath<?> qTable, Class<MODEL> modelClass,
                                      MODEL model, QueryContextImpl queryContext,
                                      Path<?> versionColumn) {
@@ -40,14 +40,14 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
         this.afterModify = new AfterModifyImpl<>(qTable, modelClass, queryContext);
         this.versionColumn = versionColumn;
         addDeleteItem(model);
-
     }
+    // CHECKSTYLE:ON
 
     private void addDeleteItem(MODEL model) {
         ModifyItem<MODEL> newDeleteItem = createNewDeleteItem();
         newDeleteItem.set(ModelHelper.getPrimaryKeyColumn(qTable),
                 ModelHelper.getPrimaryKeyValue(model, qTable, Object.class));
-        batch.add(newDeleteItem);
+        batch0.add(newDeleteItem);
     }
 
     private ModifyItem<MODEL> createNewDeleteItem() {
@@ -55,7 +55,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     }
 
     private ModifyItem<MODEL> getCurrentItem() {
-        return batch.getLast();
+        return batch0.getLast();
     }
 
     private void whereAnd(BooleanExpression and) {
@@ -84,7 +84,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
 
     private Long deleteWithPrimaryKey() {
         List<Serializable> pkeys = new ArrayList<>();
-        for (ModifyItem<MODEL> modifyItem : batch) {
+        for (ModifyItem<MODEL> modifyItem : batch0) {
             if (!modifyItem.isEmpty()) {
                 pkeys.add((Serializable) modifyItem.getPrimaryKeyValue());
             }
@@ -93,31 +93,31 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
             return queryContext.getOrmQueryFactory()
                     .modify(qTable, modelClass).deleteByIds(pkeys);
         } finally {
-            batch.clear();
+            batch0.clear();
         }
     }
 
     public Long deleteWithOutPrimaryKey() {
         DBHelper.transactionCheck();
-        Assert.notEmpty(batch);
+        Assert.notEmpty(batch0);
         Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
         try {
             SQLDeleteClause sqlDeleteClause = new SQLDeleteClause(connection,
                     queryContext.getDialect(), qTable);
-            for (ModifyItem<MODEL> modifyItem : batch) {
+            for (ModifyItem<MODEL> modifyItem : batch0) {
                 if (!modifyItem.isEmpty()) {
                     sqlDeleteClause = sqlDeleteClause.where(modifyItem.getWhere()).addBatch();
                 }
             }
             long execute = sqlDeleteClause.execute();
             if (versionColumn != null) {
-                DBHelper.invokeExceptionIfNoAction(execute, batch.size());
+                DBHelper.invokeExceptionIfNoAction(execute, batch0.size());
             }
             afterModify.cleanQueryCache();
             return execute;
         } finally {
             DataSourceUtils.releaseConnection(connection, queryContext.getDataSource());
-            batch.clear();
+            batch0.clear();
         }
     }
 

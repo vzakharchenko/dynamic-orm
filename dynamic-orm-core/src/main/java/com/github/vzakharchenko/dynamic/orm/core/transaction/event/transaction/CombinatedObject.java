@@ -4,9 +4,10 @@ package com.github.vzakharchenko.dynamic.orm.core.transaction.event.transaction;
  *
  */
 public class CombinatedObject<EVENT> {
-    private TransactionalCombinedEvent<EVENT> transactionalCombinedEvent;
+    private final TransactionalCombinedEvent<EVENT> transactionalCombinedEvent;
 
     public CombinatedObject(TransactionalCombinedEvent<EVENT> transactionalCombinedEvent) {
+        super();
         this.transactionalCombinedEvent = transactionalCombinedEvent;
     }
 

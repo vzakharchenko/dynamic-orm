@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
  * Time: 11:00
  */
 @ContextConfiguration(
-        locations = {"classpath:defaultTestQueryOrm.xml",
+        locations = {"classpath:defaultDynamicQueryBeans.xml",
                 "classpath:test-spring-dao-context.xml"})
 public abstract class DefaultTestQueryOrm extends AbstractTestQueryOrm {
 

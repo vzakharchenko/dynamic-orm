@@ -12,7 +12,7 @@ public interface TransactionalCombinedEvent<EVENT> extends TransactionEvent {
     /**
      * unique transaction resource name
      */
-    Serializable resourceName();
+    Serializable getResourceName();
 
     /**
      * Merging event

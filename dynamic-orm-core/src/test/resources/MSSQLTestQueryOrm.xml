@@ -8,5 +8,10 @@
         <constructor-arg
                 value="jdbc:hsqldb:mem:DATABASE_MSS;sql.mss=true"/>
     </bean>
+    <bean id="cacheManager" class="org.springframework.cache.concurrent.ConcurrentMapCacheManager"/>
 
+    <bean id="transaction-cache"
+          class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
+        <constructor-arg name="targetCacheManager" ref="cacheManager"/>
+    </bean>
 </beans>

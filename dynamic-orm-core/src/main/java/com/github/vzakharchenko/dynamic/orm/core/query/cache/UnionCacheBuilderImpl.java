@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class UnionCacheBuilderImpl extends UnionBuilderImpl {
     private final QueryCacheContext queryCacheContext;
-
+    // CHECKSTYLE:OFF
     public UnionCacheBuilderImpl(SQLQuery sqlQuery, List<SubQueryExpression<?>> listSubQueries,
                                  boolean unionAll,
                                  QueryContextImpl queryContext,
@@ -25,6 +25,7 @@ public class UnionCacheBuilderImpl extends UnionBuilderImpl {
         super(sqlQuery, listSubQueries, unionAll, queryContext);
         this.queryCacheContext = queryCacheContext;
     }
+    // CHECKSTYLE:ON
 
     @Override
     public List<RawModel> findAll() {

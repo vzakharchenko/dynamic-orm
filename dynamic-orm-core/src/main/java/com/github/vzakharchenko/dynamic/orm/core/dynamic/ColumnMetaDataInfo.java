@@ -19,8 +19,8 @@ public class ColumnMetaDataInfo implements Serializable {
 
     private Integer decimalDigits;
 
-    private boolean nullable = true;
-
+    private final boolean nullable;
+    // CHECKSTYLE:OFF
     protected ColumnMetaDataInfo(Path column, String type, Integer size,
                                  boolean nullable, Integer decimalDigits) {
         this.column = column;
@@ -29,7 +29,7 @@ public class ColumnMetaDataInfo implements Serializable {
         this.size = size;
         this.decimalDigits = decimalDigits;
     }
-
+    // CHECKSTYLE:ON
     protected ColumnMetaDataInfo(Path column, String type,
                                  Integer size, boolean nullable) {
         this.column = column;

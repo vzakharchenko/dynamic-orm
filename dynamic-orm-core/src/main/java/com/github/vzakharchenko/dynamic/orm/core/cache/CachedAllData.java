@@ -13,6 +13,7 @@ public class CachedAllData implements Serializable {
     private String tableName;
 
     public CachedAllData() {
+        super();
     }
 
 

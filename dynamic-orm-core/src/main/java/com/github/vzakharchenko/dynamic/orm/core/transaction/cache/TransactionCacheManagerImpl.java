@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TransactionCacheManagerImpl implements TransactionCacheManager {
     private final Map<String, TransactionalCache> cacheNames = new ConcurrentHashMap<>();
 
-    private CacheManager targetCacheManager;
+    private final CacheManager targetCacheManager;
 
     private CacheKeyLockStrategy cacheKeyLockStrategy = new SimpleCacheKeyLockStrategy();
 

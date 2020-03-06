@@ -11,13 +11,14 @@ import java.util.UUID;
  */
 public final class UUIDPKGenerator implements PKGenerator<String> {
 
-    private static UUIDPKGenerator uuidpkGenerator = new UUIDPKGenerator();
+    private static final UUIDPKGenerator INSTANCE = new UUIDPKGenerator();
 
     private UUIDPKGenerator() {
+        super();
     }
 
     public static UUIDPKGenerator getInstance() {
-        return uuidpkGenerator;
+        return INSTANCE;
     }
 
     @Override

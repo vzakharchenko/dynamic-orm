@@ -7,13 +7,14 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public final class PKGeneratorInteger extends PKGeneratorUUID<Integer> {
 
-    private static PKGeneratorInteger pkGeneratorInteger = new PKGeneratorInteger();
+    private static final PKGeneratorInteger INSTANCE = new PKGeneratorInteger();
 
     private PKGeneratorInteger() {
+        super();
     }
 
     public static PKGeneratorInteger getInstance() {
-        return pkGeneratorInteger;
+        return INSTANCE;
     }
 
     @Override

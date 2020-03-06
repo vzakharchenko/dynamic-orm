@@ -17,7 +17,7 @@ import java.util.Map;
 public class DynamicTableMappingProjection
         extends StaticTableMappingProjection<DynamicTableModel> {
 
-    private QDynamicTable qDynamicTable;
+    private final QDynamicTable qDynamicTable;
 
 
     protected DynamicTableMappingProjection(QDynamicTable qTable,
@@ -40,8 +40,10 @@ public class DynamicTableMappingProjection
                 model.addColumnValue(ModelHelper.getColumnName(path), row.get(path));
             }
             return model;
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -67,7 +69,7 @@ public class DynamicTableMappingProjection
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 

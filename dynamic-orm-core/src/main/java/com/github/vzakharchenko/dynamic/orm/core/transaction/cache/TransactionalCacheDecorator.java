@@ -34,7 +34,6 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     private TransactionalCacheImpl getTransactionCache() {
-        String transactionName = TransactionSynchronizationManager.getCurrentTransactionName();
 
         final String cacheName = targetCache.getName();
         TransactionalCacheImpl transactionalCache =
@@ -43,6 +42,8 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         if (transactionalCache != null) {
             return transactionalCache;
         }
+
+        String transactionName = TransactionSynchronizationManager.getCurrentTransactionName();
         LOGGER.info("Starting Transaction cache for " +
                 cacheName + " transactionName:" + transactionName);
 

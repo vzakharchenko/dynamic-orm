@@ -6,35 +6,20 @@
                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <import resource="defaultDynamicQueryBeans.xml"/>
     <bean id="structureService" class="com.github.vzakharchenko.dynamic.orm.structure.DbStructureServiceImpl">
         <property name="pathToChangeSets" value="classpath:/changeSets/"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
 
-    <bean id="transactionManager" class="com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionNameManager">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="validateExistingTransaction" value="true"/>
-    </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-    <context:annotation-config/>
-
-
-    <bean class="com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactoryImpl">
-        <constructor-arg ref="dataSource"/>
-        <constructor-arg ref="transaction-cache-manager"/>
-        <constructor-arg ref="transaction-publisher"/>
-        <constructor-arg ref="transactionManager"/>
-        <property name="debugSql" value="true"/>
-    </bean>
-
-    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
-        <property name="cacheManager" ref="ehcache"/>
-    </bean>
     <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
         <property name="configLocation" value="classpath:Ehcache.xml"/>
         <property name="shared" value="true"/>
+    </bean>
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="ehcache"/>
     </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -44,12 +29,10 @@
         <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver"/>
     </bean>
 
-    <bean id="transaction-cache-manager"
+    <bean id="transaction-cache"
           class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
         <constructor-arg name="targetCacheManager" ref="cacheManager"/>
     </bean>
 
-    <bean id="transaction-publisher"
-          class="com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionAwareApplicationEventPublisher"/>
     <context:component-scan base-package="orm.query.examples.ehcache"/>
 </beans>

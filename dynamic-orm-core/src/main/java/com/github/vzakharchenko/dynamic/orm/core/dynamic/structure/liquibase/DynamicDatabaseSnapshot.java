@@ -3,12 +3,15 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.change.ChangeDatabaseObjectFactory;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.change.ChangeMissedDatabaseObject;
 import liquibase.database.Database;
+import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
+import liquibase.snapshot.InvalidExampleException;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.DatabaseObjectCollection;
 import liquibase.structure.core.*;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -20,8 +23,11 @@ import java.util.stream.Collectors;
  */
 public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
 
-    protected DynamicDatabaseSnapshot(Class<? extends Database> databaseType) throws Exception {
-        super(null, databaseType.newInstance());
+    protected DynamicDatabaseSnapshot(Class<? extends Database> databaseType)
+            throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException,
+            DatabaseException, InvalidExampleException {
+        super(null, databaseType.getConstructor().newInstance());
     }
 
     private DatabaseObjectCollection getDatabaseObjectCollection(

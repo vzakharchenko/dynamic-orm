@@ -27,14 +27,14 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     private PKGenerator pkGenerator;
 
-    private Path<?> versionColumn;
+    private Path<?> versionColumnPath;
 
     protected CrudBuilderImpl(Class<MODEL> modelClass, RelationalPath<?> qTable,
                               QueryContextImpl queryContext) {
         this.modelClass = modelClass;
         this.qTable = qTable;
         this.queryContext = queryContext;
-        versionColumn = this.queryContext.getVersionColumn(qTable, modelClass);
+        versionColumnPath = this.queryContext.getVersionColumn(qTable, modelClass);
         this.afterModify = new AfterModifyImpl(qTable, modelClass, queryContext);
     }
 
@@ -42,7 +42,7 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
     @Override
     public UpdateModelBuilder<MODEL> updateBuilder() {
         return new UpdateModelBuilderImpl(qTable, queryContext,
-                versionColumn, modelClass);
+                versionColumnPath, modelClass);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
         RelationalPath<?> qTable0 = ModelHelper.getQTable(versionColumn0);
         Assert.isTrue(Objects.equals(qTable0, this.qTable), "expected " +
                 this.qTable + " but found " + qTable0);
-        this.versionColumn = versionColumn0;
+        this.versionColumnPath = versionColumn0;
         return this;
     }
 
@@ -69,12 +69,12 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
     @Override
     public Long insert(List<MODEL> models) {
         return new InsertBuilderImpl<>(modelClass, qTable, queryContext,
-                afterModify, versionColumn, pkGenerator).insert(models);
+                afterModify, versionColumnPath, pkGenerator).insert(models);
     }
 
     @Override
     public DeleteModelBuilder<MODEL> delete(MODEL model) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .delete(model);
     }
 
@@ -85,7 +85,7 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long deleteModelByIds(List<MODEL> models) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .deleteModelByIds(models);
     }
 
@@ -96,7 +96,7 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long softDeleteModelByIds(List<MODEL> models) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .softDeleteModelByIds(models);
     }
 
@@ -107,19 +107,19 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long softDeleteByIds(List<Serializable> ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .softDeleteByIds(ids);
     }
 
     @Override
     public Long deleteByIds(Serializable... ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .deleteByIds(ids);
     }
 
     @Override
     public Long deleteByIds(List<Serializable> ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumn)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
                 .deleteByIds(ids);
     }
 }

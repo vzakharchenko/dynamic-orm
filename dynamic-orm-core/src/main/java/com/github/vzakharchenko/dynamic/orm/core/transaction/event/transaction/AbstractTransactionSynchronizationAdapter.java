@@ -11,6 +11,7 @@ public abstract class AbstractTransactionSynchronizationAdapter
 
     protected AbstractTransactionSynchronizationAdapter(Object event,
                                                         ApplicationEventPublisher publisher) {
+        super();
         this.event = event;
         this.publisher = publisher;
     }

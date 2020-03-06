@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public class RawModelImpl implements RawModel {
 
     protected final Map<Expression<?>, Object> rawMap = new LinkedHashMap<>();
-    private transient List<Expression<?>> columns = null;
-    private transient List<Object> values = null;
+    private transient List<Expression<?>> columns;
+    private transient List<Object> values;
 
     public RawModelImpl(Tuple tuple, Collection<? extends Expression<?>> columns) {
         for (Expression column : columns) {

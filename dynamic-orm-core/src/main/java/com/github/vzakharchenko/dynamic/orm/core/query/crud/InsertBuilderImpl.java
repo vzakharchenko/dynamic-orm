@@ -37,9 +37,9 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
     private final AfterModify<MODEL> afterModify;
     private final PKGenerator<?> pkGenerator;
     private AbstractMappingProjection<MODEL> mappingProjection;
-    private Path<?> versionColumn;
-    private SoftDelete<?> softDelete;
-
+    private final Path<?> versionColumn;
+    private final SoftDelete<?> softDelete;
+    // CHECKSTYLE:OFF
     protected InsertBuilderImpl(Class<MODEL> modelClass, RelationalPath<?> qTable,
                                 QueryContextImpl queryContext, AfterModify<MODEL> afterModify,
                                 Path<?> versionColumn, PKGenerator<?> pkGenerator) {
@@ -51,6 +51,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
         this.versionColumn = versionColumn;
         this.softDelete = queryContext.getSoftDeleteColumn(qTable, modelClass);
     }
+    // CHECKSTYLE:ON
 
     @SafeVarargs
     @Override

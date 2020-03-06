@@ -23,11 +23,11 @@ public abstract class TableMappingProjectionFactory {
             RelationalPath<?> qTable, Class<MODEL> modelClass) {
         //todo factory needed
         if (qTable instanceof QDynamicTable) {
-            QDynamicTable qDynamicTable = (QDynamicTable) qTable;
             if (!modelClass.isAssignableFrom(DynamicTableModel.class)) {
                 throw new IllegalStateException("For dynamic Tables support only " +
                         DynamicTableModel.class + " DML Model");
             }
+            QDynamicTable qDynamicTable = (QDynamicTable) qTable;
             return (StaticTableMappingProjection<MODEL>) new DynamicTableMappingProjection(
                     qDynamicTable,
                     DynamicTableModel.class);

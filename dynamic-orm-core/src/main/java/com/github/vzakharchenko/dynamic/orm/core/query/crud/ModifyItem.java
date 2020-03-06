@@ -29,15 +29,15 @@ public class ModifyItem<MODEL extends DMLModel> {
     private final Class<MODEL> modelClass;
 
 
-    private Path<?> primaryKey;
+    private final Path<?> primaryKey;
 
     private BooleanExpression where;
 
-    private BooleanExpression byId;
+    private BooleanExpression byId0;
 
-    private MapModel mapModel = null;
+    private MapModel mapModel;
 
-    private DiffColumnModel diffColumnModel = null;
+    private DiffColumnModel diffColumnModel;
 
     public ModifyItem(RelationalPath<?> qTable, Class<MODEL> modelClass) {
         this.qTable = qTable;
@@ -52,7 +52,7 @@ public class ModifyItem<MODEL extends DMLModel> {
 
     public <T> void set(Path<T> column, T value) {
         setMap.put(column, value);
-        if (byId != null && Objects.equals(primaryKey, column)) {
+        if (byId0 != null && Objects.equals(primaryKey, column)) {
             byId();
         }
         mapModel = null;
@@ -61,7 +61,7 @@ public class ModifyItem<MODEL extends DMLModel> {
 
     public void set(Map<Path<?>, Object> setMap0) {
         this.setMap.putAll(setMap0);
-        if (byId != null && setMap0.containsKey(primaryKey)) {
+        if (byId0 != null && setMap0.containsKey(primaryKey)) {
             byId();
         }
         mapModel = null;
@@ -103,7 +103,7 @@ public class ModifyItem<MODEL extends DMLModel> {
         BooleanExpression where0 = null;
 
         if (byId()) {
-            where0 = byId;
+            where0 = byId0;
         }
         if (this.where != null) {
             if (where0 != null) {
@@ -123,7 +123,7 @@ public class ModifyItem<MODEL extends DMLModel> {
     }
 
     public boolean byId() {
-        if (byId != null) {
+        if (byId0 != null) {
             return true;
         }
         ComparableExpressionBase<Comparable<?>> primaryKey0 = getPrimaryKey();
@@ -132,7 +132,7 @@ public class ModifyItem<MODEL extends DMLModel> {
         }
         Comparable<?> primaryKeyValue = getPrimaryKeyValue();
         Assert.notNull(primaryKeyValue, "primary key is not found " + qTable);
-        byId = primaryKey0.eq(primaryKeyValue);
+        byId0 = primaryKey0.eq(primaryKeyValue);
         return true;
     }
 

@@ -11,6 +11,7 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(OrmTransactionSynchronizationAdapter.class);
+    public static final String TRANSACTION_NAME = ". Transaction Name:";
 
     private final String cacheName;
     private final String transactionName;
@@ -20,6 +21,7 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
     public OrmTransactionSynchronizationAdapter(String cacheName,
                                                 String transactionName,
                                                 Cache targetCache) {
+        super();
         this.cacheName = cacheName;
         this.transactionName = transactionName;
         this.targetCache = targetCache;
@@ -34,22 +36,22 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
         if (transactionalCache != null) {
             transactionalCache.getEvictObjects().forEach(evictKey -> {
                 LOGGER.debug("Cleaning  " + evictKey +
-                        ". Transaction Name:" + transactionName);
+                        TRANSACTION_NAME + transactionName);
                 targetCache.evict(evictKey);
             });
             transactionalCache.getDeletedObjects().forEach(evictKey -> {
                 LOGGER.debug("delete model  " + evictKey +
-                        ". Transaction Name:" + transactionName);
+                        TRANSACTION_NAME + transactionName);
                 targetCache.evict(evictKey);
             });
             transactionalCache.getInsertedObjects().forEach(evictKey -> {
                 LOGGER.debug("added new model  " + evictKey +
-                        ". Transaction Name:" + transactionName);
+                        TRANSACTION_NAME + transactionName);
                 targetCache.evict(evictKey);
             });
             transactionalCache.getUpdatedObjects().forEach(evictKey -> {
                 LOGGER.debug("updated model  " + evictKey +
-                        ". Transaction Name:" + transactionName);
+                        TRANSACTION_NAME + transactionName);
                 targetCache.evict(evictKey);
             });
         }

@@ -22,12 +22,12 @@ public interface QTableBuilder {
     QTableBuilder createBooleanColumn(String columnName, boolean notNull);
 
     QTableBuilder createBlobColumn(String columnName, int size, boolean notNull);
-
+    // CHECKSTYLE:OFF
     <T extends Number & Comparable<?>> QTableBuilder createNumberColumn(
             String columnName,
             Class<T> typeClass,
             Integer size, Integer decimalDigits, boolean notNull);
-
+    // CHECKSTYLE:ON
     QTableBuilder createDateColumn(String columnName, boolean notNull);
 
     QTableBuilder createDateTimeColumn(String columnName, boolean notNull);

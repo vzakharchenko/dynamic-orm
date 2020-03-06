@@ -13,9 +13,6 @@ import java.util.Collection;
 public class QueryCacheContext implements Cloneable, CacheSupport<QueryCacheContext> {
     private Collection<RelationalPath> qRelatedTables = new ArrayList<>();
 
-    public QueryCacheContext() {
-    }
-
     @Override
     public QueryCacheContext registerRelatedTables(RelationalPath... qTables) {
         return registerRelatedTables(Arrays.asList(qTables));
@@ -32,7 +29,7 @@ public class QueryCacheContext implements Cloneable, CacheSupport<QueryCacheCont
     }
 
     @Override
-    protected QueryCacheContext clone() {
+    public QueryCacheContext clone() {
         try {
             QueryCacheContext queryCacheContext = (QueryCacheContext) super.clone();
             queryCacheContext.qRelatedTables = new ArrayList<>();

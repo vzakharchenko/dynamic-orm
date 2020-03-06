@@ -32,6 +32,7 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
     private final Path<?> versionColumn;
     private final AfterModify<MODEL> afterModify;
 
+    // CHECKSTYLE:OFF
     protected DeleteBuilderImpl(Class<MODEL> modelClass, RelationalPath<?> qTable,
                                 QueryContextImpl queryContext, Path<?> versionColumn) {
         this.modelClass = modelClass;
@@ -40,6 +41,7 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
         this.afterModify = new AfterModifyImpl<>(qTable, modelClass, queryContext);
         this.versionColumn = versionColumn;
     }
+    // CHECKSTYLE:ON
 
     @Override
     public DeleteModelBuilder<MODEL> delete(MODEL model) {

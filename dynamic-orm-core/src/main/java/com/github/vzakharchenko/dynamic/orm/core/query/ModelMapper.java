@@ -16,10 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class ModelMapper {
-    private Map<String, Class<? extends DMLModel>> dmlModelMap = new ConcurrentHashMap<>();
-    private Map<Class<? extends DMLModel>, RelationalPath> qModelMap = new ConcurrentHashMap<>();
-    private Map<String, Path<?>> versionMap = new ConcurrentHashMap<>();
-    private Map<String, SoftDelete<?>> softDeleteMap = new ConcurrentHashMap<>();
+    private final Map<String, Class<? extends DMLModel>> dmlModelMap = new ConcurrentHashMap<>();
+    private final Map<Class<? extends DMLModel>, RelationalPath> qModelMap = new ConcurrentHashMap<>();
+    private final Map<String, Path<?>> versionMap = new ConcurrentHashMap<>();
+    private final Map<String, SoftDelete<?>> softDeleteMap = new ConcurrentHashMap<>();
 
 
     public void validateModel(RelationalPath<?> qTable, Class<? extends DMLModel> modelClass) {

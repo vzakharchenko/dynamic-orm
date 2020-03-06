@@ -24,6 +24,7 @@ import java.util.*;
 public class CacheBuilderImpl<MODEL extends DMLModel>
         implements CacheBuilder<MODEL>, RawCacheBuilder {
 
+    public static final int SIZE = 1;
     private final Class<MODEL> modelClass;
 
     private final QueryContextImpl queryContext;
@@ -91,7 +92,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         for (Serializable key : keys) {
             PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(key, qTable);
             Map<Path<?>, Object> modelMap = queryContext.getTransactionCache()
-                    .getFromCache(pkCacheKey, HashMap.class);
+                    .getFromCache(pkCacheKey, Map.class);
             if (modelMap != null) {
                 models.put(key, modelMap);
             } else {
@@ -235,7 +236,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         LazyList<MODEL> lazyList = findAllByColumn(column, columnValue, false);
         if (lazyList.size() == 0) {
             return null;
-        } else if (lazyList.size() > 1) {
+        } else if (lazyList.size() > SIZE) {
             throw new IllegalStateException("found " + lazyList.size() + " but expected 1");
         }
 
@@ -247,7 +248,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         LazyList<MODEL> lazyList = findAllByColumn(column, null, true);
         if (lazyList.size() == 0) {
             return null;
-        } else if (lazyList.size() > 1) {
+        } else if (lazyList.size() > SIZE) {
             throw new IllegalStateException("found " + lazyList.size() + " but expected 1");
         }
 

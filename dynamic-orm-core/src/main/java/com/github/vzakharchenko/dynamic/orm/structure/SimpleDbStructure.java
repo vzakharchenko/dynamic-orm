@@ -9,10 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 
 /**
  *
@@ -23,14 +21,14 @@ public class SimpleDbStructure extends LiquibaseStructure {
     private static final String DEFAULT_PREFIX = "unknown_";
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDbStructure.class);
     private ResourceAccessor resourceAccessor = new SpringResourceOpener();
-    private String pathToChangeSets;
+    private String pathToChangeSets0;
     private String pathToSaveChangeSets = ".";
     private String prefix;
 
 
     @Override
     protected String pathToChangeSets() {
-        return pathToChangeSets;
+        return pathToChangeSets0;
     }
 
     @Override
@@ -53,7 +51,9 @@ public class SimpleDbStructure extends LiquibaseStructure {
         try {
             String fileName = generateFileName(currentDatabase);
             File file = new File(pathToSaveChangeSets, fileName);
-            IOUtils.write(outputStream.toByteArray(), new FileOutputStream(file));
+            try (OutputStream output = Files.newOutputStream(file.toPath())) {
+                IOUtils.write(outputStream.toByteArray(), output);
+            }
             LOGGER.info("upload " + fileName + " Success");
             return fileName;
         } catch (IOException e) {
@@ -65,8 +65,8 @@ public class SimpleDbStructure extends LiquibaseStructure {
         return getIdPrefix() + database.getDefaultCatalogName() + ".xml";
     }
 
-    public void setPathToChangeSets(String pathToChangeSets) {
-        this.pathToChangeSets = pathToChangeSets;
+    public final void setPathToChangeSets(String pathToChangeSets) {
+        this.pathToChangeSets0 = pathToChangeSets;
     }
 
     public void setPrefix(String prefix) {

@@ -12,6 +12,7 @@ public class CachedColumnWithValue extends CachedColumn {
     private Serializable value;
 
     public CachedColumnWithValue() {
+        super();
     }
 
     public CachedColumnWithValue(

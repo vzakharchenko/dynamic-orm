@@ -65,11 +65,11 @@ public abstract class CacheHelper {
     public static <MODEL extends DMLModel> MODEL newInstance(
             RelationalPath<?> qTable, Class<MODEL> modelClass) {
         if (qTable instanceof QDynamicTable) {
-            QDynamicTable dynamicTable = (QDynamicTable) qTable;
             if (ObjectUtils.notEqual(DynamicTableModel.class, modelClass)) {
                 throw new IllegalStateException("for dynamic Table use only " +
                         DynamicTableModel.class + " DML Model");
             }
+            QDynamicTable dynamicTable = (QDynamicTable) qTable;
             return (MODEL) new DynamicTableModel(dynamicTable);
         }
         try {
@@ -104,12 +104,11 @@ public abstract class CacheHelper {
     public static <MODEL extends DMLModel> MODEL buildModel(
             Class<MODEL> modelClass, MapModel mapModel) {
         try {
-            MODEL model = null;
             if (mapModel != null) {
                 RelationalPath<?> qTable = mapModel.getQTable();
                 return buildModel(qTable, modelClass, mapModel.getDiffModel());
             }
-            return model;
+            return null;
 
         } catch (RuntimeException e) {
             throw e;
@@ -130,8 +129,10 @@ public abstract class CacheHelper {
                 }
             }
             return Collections.unmodifiableMap(modelMap);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
-import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
 
@@ -11,7 +9,8 @@ import java.util.List;
 /**
  * All queries for fetch data and data models from a database
  */
-public interface SelectBuilder {
+public interface SelectBuilder
+        extends UnionSelectBuilder, RawSelectBuilder, ShowSqlBuilder {
 
     /**
      * The fetch all  data models from a database using sqlQuery query.
@@ -114,99 +113,4 @@ public interface SelectBuilder {
      * @return true if not exists rows
      */
     boolean notExist(SQLCommonQuery<?> sqlQuery);
-
-
-    /**
-     * Allows to query specific columns, as well as Aggregate Functions
-     * <p>
-     * example:
-     * List<RawModel> rawModels = ormQueryFactory.select().rawSelect(ormQueryFactory.buildQuery()
-     * .from(QTable.table).groupBy(QTable.table.name)).findAll(QTable.table.name,WildCard.count);
-     * for(RawModel rawModel: rawModels){
-     * String name = rawModel.getColumnValue(Table.table.name);
-     * Long cnt =  rawModel.getColumnValue(WildCard.count);
-     * }
-     *
-     * @param sqlQuery querydsl query
-     * @return Builder
-     * @see RawModelBuilder
-     */
-    RawModelBuilder rawSelect(SQLCommonQuery<?> sqlQuery);
-
-    /**
-     * creates the sql query from querydsl object query.
-     *
-     * @param sqlQuery   querydsl query
-     * @param expression column or any other expression
-     * @return sql query string
-     */
-
-    String showSql(SQLCommonQuery<?> sqlQuery, Expression expression);
-
-    /**
-     * creates the sql query from querydsl object query.
-     *
-     * @param sqlQuery   querydsl query
-     * @param qTable     querydsl model
-     * @param modelClass model class
-     * @param <MODEL>    data Model Class
-     * @return sql query string
-     */
-    <MODEL extends DMLModel> String showSql(SQLCommonQuery<?> sqlQuery,
-                                            RelationalPath<?> qTable,
-                                            Class<MODEL> modelClass);
-
-    /**
-     * creates the sql query from querydsl object query.
-     *
-     * @param sqlQuery   querydsl query
-     * @param modelClass model class with annotation com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel
-     * @param <MODEL>    data Model Class
-     * @return sql query string
-     * @see com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel
-     */
-    <MODEL extends DMLModel> String showSql(SQLCommonQuery<?> sqlQuery,
-                                            Class<MODEL> modelClass);
-
-    /**
-     * union query
-     *
-     * @param sqlQuery   common querydsl query(for example  CTE)
-     * @param subQueries union subqueries
-     * @return union query builder
-     */
-    UnionBuilder union(SQLCommonQuery<?> sqlQuery,
-                       SubQueryExpression<?>... subQueries);
-
-    /**
-     * union query
-     *
-     * @param sqlQuery   common querydsl query(for example  CTE)
-     * @param subQueries union subqueries
-     * @return union query builder
-     */
-    UnionBuilder union(SQLCommonQuery<?> sqlQuery,
-                       List<SubQueryExpression<?>> subQueries);
-
-    /**
-     * unionAll query
-     *
-     * @param sqlQuery   common querydsl query(for example  CTE)
-     * @param subQueries union subqueries
-     * @return union query builder
-     */
-    UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
-                          SubQueryExpression<?>... subQueries);
-
-    /**
-     * unionAll query
-     *
-     * @param sqlQuery   common querydsl query(for example  CTE)
-     * @param subQueries union subqueries
-     * @return union query builder
-     */
-    UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
-                          List<SubQueryExpression<?>> subQueries);
-
-
 }

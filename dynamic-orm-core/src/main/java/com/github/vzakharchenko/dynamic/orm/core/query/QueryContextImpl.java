@@ -32,9 +32,9 @@ public class QueryContextImpl implements Cloneable, QueryContext {
     private final ModelMapper modelMapper = new ModelMapper();
     private final String cacheName;
     private final OrmQueryFactory ormQueryFactory;
-    private boolean debugSql = false;
+    private boolean debugSql;
 
-
+    // CHECKSTYLE:OFF
     public QueryContextImpl(OrmQueryFactory ormQueryFactory, DataSource dataSource,
                             Configuration configuration,
                             TransactionCacheManager transactionCacheManager,
@@ -58,7 +58,7 @@ public class QueryContextImpl implements Cloneable, QueryContext {
         this.transactionManager = transactionManager;
         transactionDefinition = new TransactionTemplate(transactionManager);
     }
-
+// CHECKSTYLE:ON
 
     public DataSource getDataSource() {
         return dataSource;

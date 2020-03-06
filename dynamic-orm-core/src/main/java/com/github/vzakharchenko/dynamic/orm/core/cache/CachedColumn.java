@@ -14,6 +14,7 @@ public class CachedColumn implements Serializable {
     private String columnName;
 
     public CachedColumn() {
+        super();
     }
 
     public CachedColumn(Path column) {

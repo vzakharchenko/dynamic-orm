@@ -51,7 +51,7 @@ public abstract class ModelHelper {
             LOGGER.error(
                     "Failed to get property " + getColumnName(path) + " from model :" +
                             modeltype + "; path=" + path);
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class ModelHelper {
             }
             return qTable.getTableName();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 

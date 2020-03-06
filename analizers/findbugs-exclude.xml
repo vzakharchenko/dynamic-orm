@@ -1,5 +1,96 @@
 <FindBugsFilter>
     <Match>
-        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>\
+    </Match>
+    <Match>
+        <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Match>
+    <Match>
+        <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
+    </Match>
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    </Match>
+    <Match>
+        <Bug pattern="WEM_WEAK_EXCEPTION_MESSAGING"/>
+    </Match>
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED"/>
+    </Match>
+    <Match>
+        <Bug pattern="PSC_PRESIZE_COLLECTIONS"/>
+    </Match>
+    <Match>
+        <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+    </Match>
+    <Match>
+        <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    </Match>
+    <Match>
+        <Bug pattern="USBR_UNNECESSARY_STORE_BEFORE_RETURN"/>
+    </Match>
+    <Match>
+        <Bug pattern="CRLF_INJECTION_LOGS"/>
+    </Match>
+    <Match>
+        <Bug pattern="PDP_POORLY_DEFINED_PARAMETER"/>
+    </Match>
+    <Match>
+        <Bug pattern="FCCD_FIND_CLASS_CIRCULAR_DEPENDENCY"/>
+    </Match>
+    <Match>
+        <Bug pattern="WEAK_FILENAMEUTILS"/>
+    </Match>
+    <Match>
+        <Bug pattern="URV_INHERITED_METHOD_WITH_RELATED_TYPES"/>
+    </Match>
+    <Match>
+        <Bug pattern="FII_USE_FUNCTION_IDENTITY"/>
+    </Match>
+    <Match>
+        <Bug pattern="OCP_OVERLY_CONCRETE_PARAMETER"/>
+    </Match>
+    <Match>
+        <Bug pattern="EXS_EXCEPTION_SOFTENING_HAS_CHECKED"/>
+    </Match>
+    <Match>
+        <Bug pattern="PATH_TRAVERSAL_IN"/>
+    </Match>
+    <Match>
+        <Bug pattern="UAC_UNNECESSARY_API_CONVERSION_FILE_TO_PATH"/>
+    </Match>
+    <Match>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    </Match>
+    <Match>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.RawModelImpl"/>
+        <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver"/>
+        <Bug pattern="PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory"/>
+        <Bug pattern="PMB_POSSIBLE_MEMORY_BLOAT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver"/>
+        <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper"/>
+        <Bug pattern="UP_UNUSED_PARAMETER"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.transaction.event.TransactionAwareApplicationEventPublisher"/>
+        <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.structure.DbStructureServiceImpl"/>
+        <Bug pattern="JPAI_NON_PROXIED_TRANSACTION_CALL"/>
     </Match>
 </FindBugsFilter>

@@ -8,9 +8,10 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class KeyLock extends ReentrantLock {
 
-    private Serializable key;
+    private final Serializable key;
 
     public KeyLock(Serializable key) {
+        super();
         this.key = key;
     }
 

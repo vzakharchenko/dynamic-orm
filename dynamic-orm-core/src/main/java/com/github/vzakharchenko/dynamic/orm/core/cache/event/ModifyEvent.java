@@ -25,10 +25,11 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         ModifyEventBuilder<EVENT>,
         Cloneable {
 
+    public static final String IS_NOT_FOUND = " is not found: ";
     private final RelationalPath<?> qTable;
     protected List<EVENT> transactionHistory = new ArrayList<>();
     private Class<? extends DMLModel> modelClass0;
-    private String resourceName;
+    private final String resourceName;
     private DMLModel oldModel;
     private DMLModel newModel;
     private Map<Serializable, DiffColumnModel> diffColumnModelMap0;
@@ -91,7 +92,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         DiffColumnModel diffModel = getDiffModel(id);
 
         if (diffModel == null) {
-            throw new IllegalStateException(id + " is not found: " + ToStringBuilder
+            throw new IllegalStateException(id + IS_NOT_FOUND + ToStringBuilder
                     .reflectionToString(getListIds()));
         }
 
@@ -109,7 +110,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         DiffColumnModel diffModel = getDiffModel(id);
 
         if (diffModel == null) {
-            throw new IllegalStateException(id + " is not found: " +
+            throw new IllegalStateException(id + IS_NOT_FOUND +
                     ToStringBuilder.reflectionToString(getListIds()));
         }
 
@@ -128,7 +129,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     public final DMLModel getOldModel(Serializable id) {
         DiffColumnModel diffModel = getDiffModel(id);
         if (diffModel == null) {
-            throw new IllegalStateException(id + " is not found: " +
+            throw new IllegalStateException(id + IS_NOT_FOUND +
                     ToStringBuilder.reflectionToString(getListIds()));
         }
 
@@ -141,7 +142,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     public final DMLModel getNewModel(Serializable id) {
         DiffColumnModel diffModel = getDiffModel(id);
         if (diffModel == null) {
-            throw new IllegalStateException(id + " is not found: " +
+            throw new IllegalStateException(id + IS_NOT_FOUND +
                     ToStringBuilder.reflectionToString(getListIds()));
         }
 
@@ -215,7 +216,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     @Override
-    public Serializable resourceName() {
+    public Serializable getResourceName() {
 
         return resourceName;
     }
@@ -234,7 +235,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     @Override
-    protected EVENT clone() {
+    public EVENT clone() {
         try {
             return (EVENT) super.clone();
         } catch (CloneNotSupportedException e) {

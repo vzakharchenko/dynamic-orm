@@ -1,10 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.structure.exception.EmptyPathToChangeSets;
 import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
@@ -15,7 +17,8 @@ import javax.sql.DataSource;
  * Date: 12.04.15
  * Time: 22:30
  */
-public class DbStructureServiceImpl implements DbStructureService, InitializingBean {
+public class DbStructureServiceImpl implements DbStructureService,
+        ApplicationListener<ContextRefreshedEvent> {
 
     private DBStructure daoStructureSaver;
 
@@ -64,18 +67,6 @@ public class DbStructureServiceImpl implements DbStructureService, InitializingB
         }
     }
 
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (StringUtils.isEmpty(pathToChangeSets)) {
-            throw new EmptyPathToChangeSets();
-        }
-        SimpleDbStructure springStructureSaver = new SimpleDbStructure();
-        springStructureSaver.setPathToChangeSets(pathToChangeSets);
-        daoStructureSaver = springStructureSaver;
-        load();
-    }
-
     @Autowired
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -83,5 +74,27 @@ public class DbStructureServiceImpl implements DbStructureService, InitializingB
 
     public void setPathToChangeSets(String pathToChangeSets) {
         this.pathToChangeSets = pathToChangeSets;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (StringUtils.isEmpty(pathToChangeSets)) {
+            throw new EmptyPathToChangeSets();
+        }
+        SimpleDbStructure springStructureSaver = new SimpleDbStructure();
+        springStructureSaver.setPathToChangeSets(pathToChangeSets);
+        daoStructureSaver = springStructureSaver;
+        OrmQueryFactory ormQueryFactory = event
+                .getApplicationContext().getBean(OrmQueryFactory.class);
+        boolean started = ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        try {
+            load();
+        } catch (RuntimeException e) {
+            if (started) {
+                ormQueryFactory.transactionManager().rollback();
+            }
+            throw e;
+        }
+        ormQueryFactory.transactionManager().commit();
     }
 }

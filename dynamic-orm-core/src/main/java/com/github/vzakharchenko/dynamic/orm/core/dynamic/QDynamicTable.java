@@ -19,11 +19,12 @@ import java.util.*;
  */
 public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
 
+    public static final String WRONG_COLUMN = "Wrong column ";
     private final Map<Serializable, Serializable> customFields = new HashMap<>();
     private PKGenerator<?> pkGenerator;
     private Path<?> versionColumn;
     private SoftDelete<?> softDelete;
-    private List<IndexData> indexDatas = new ArrayList<>();
+    private final List<IndexData> indexDatas = new ArrayList<>();
 
     protected QDynamicTable(String tableName) {
         super(StringUtils.upperCase(tableName));
@@ -68,7 +69,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         }
         RelationalPath<?> qTable = ModelHelper.getQTable(versionColumn0);
         if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException("Wrong column " + versionColumn0);
+            throw new IllegalStateException(WRONG_COLUMN + versionColumn0);
         }
         this.versionColumn = versionColumn0;
         return this;
@@ -90,7 +91,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         }
         RelationalPath<?> qTable = ModelHelper.getQTable(softDelete0);
         if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException("Wrong column " + softDelete0);
+            throw new IllegalStateException(WRONG_COLUMN + softDelete0);
         }
         this.softDelete = SoftDeleteFactory.createSoftDelete(softDelete0, value, defaultValue);
         return this;
@@ -105,7 +106,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         }
         RelationalPath<?> qTable = ModelHelper.getQTable(softDeleteColumn);
         if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException("Wrong column " + softDeleteColumn);
+            throw new IllegalStateException(WRONG_COLUMN + softDeleteColumn);
         }
         if (value != null && !value.getClass().isAssignableFrom(softDeleteColumn.getType())) {
             throw new IllegalStateException("wrong value type: expected " + softDeleteColumn
@@ -127,7 +128,7 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         }
         RelationalPath<?> qTable = ModelHelper.getQTable(column);
         if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException("Wrong column " + column);
+            throw new IllegalStateException(WRONG_COLUMN + column);
         }
         indexDatas.add(new IndexData(column, unique));
         return this;

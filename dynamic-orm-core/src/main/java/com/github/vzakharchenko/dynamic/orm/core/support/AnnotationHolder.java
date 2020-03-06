@@ -17,10 +17,10 @@ import java.lang.reflect.Field;
  *
  */
 public class AnnotationHolder {
-    private QueryDslModel queryDslModel;
+    private final QueryDslModel queryDslModel;
     private Version version;
     private SoftDelete softDelete;
-    private SequanceName sequanceName;
+    private final SequanceName sequanceName;
 
     private Field versionField;
     private Path<?> versionColumn;
@@ -28,7 +28,7 @@ public class AnnotationHolder {
     private com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete<?> softDeleteColumn;
 
 
-    private RelationalPath<?> qTable = null;
+    private RelationalPath<?> qTable;
 
 
     public AnnotationHolder(Class<? extends DMLModel> dmlModel) {

@@ -68,12 +68,16 @@
         <exclude name="BeanMembersShouldSerialize"/>
         <exclude name="DataflowAnomalyAnalysis"/>
         <exclude name="MissingSerialVersionUID"/>
+        <exclude name="CloseResource"/>
+        <exclude name="CloneThrowsCloneNotSupportedException"/>
+        <exclude name="ConstructorCallsOverridableMethod"/>
     </rule>
     <rule ref="category/java/multithreading.xml">
         <exclude name="UseConcurrentHashMap"/>
     </rule>
     <rule ref="category/java/performance.xml">
         <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="OptimizableToArrayCall"/>
     </rule>
     <rule ref="category/java/security.xml"/>
 

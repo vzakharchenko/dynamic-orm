@@ -53,6 +53,7 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
     private final DataSource dataSource;
 
     public DynamicStructureSaver(DataSource dataSource) {
+        super();
         this.dataSource = dataSource;
         try {
             createTempDir();
@@ -67,7 +68,7 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
     private void checkChangeSet(List<ChangeSet> changeSets)
             throws IOException,
             UpdateException {
-        String fileName = DYNAMIC + new SimpleDateFormat(PATTERN).format(
+        String fileName = DYNAMIC + new SimpleDateFormat(PATTERN, Locale.getDefault()).format(
                 new Date()) + "_" + System.nanoTime() + ".xml";
         File file = new File(WORK_DIR, FilenameUtils.getName(fileName));
         PrintStream out = new PrintStream(file, Charset.defaultCharset().name());

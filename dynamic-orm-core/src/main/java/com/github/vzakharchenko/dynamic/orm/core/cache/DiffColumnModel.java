@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public final class DiffColumnModel implements Serializable {
     private final RelationalPath<?> qTable;
-    private Map<Path<?>, DiffColumn<?>> diffColumnMap;
+    private final Map<Path<?>, DiffColumn<?>> diffColumnMap;
 
     protected DiffColumnModel(
             RelationalPath<?> qTable, Map<Path<?>, DiffColumn<?>> diffColumnMap) {

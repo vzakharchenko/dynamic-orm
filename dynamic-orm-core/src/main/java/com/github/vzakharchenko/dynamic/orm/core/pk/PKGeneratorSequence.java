@@ -14,10 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 public final class PKGeneratorSequence<NUMBER extends Number>
         implements PKGenerator<NUMBER> {
 
-    private static PKGeneratorSequence pkGeneratorSequence = new PKGeneratorSequence();
+    private static final PKGeneratorSequence INSTANCE = new PKGeneratorSequence();
     private String sequanceName;
 
     private PKGeneratorSequence() {
+        super();
     }
 
     public PKGeneratorSequence(String sequanceName) {
@@ -25,7 +26,7 @@ public final class PKGeneratorSequence<NUMBER extends Number>
     }
 
     public static PKGeneratorSequence getInstance() {
-        return pkGeneratorSequence;
+        return INSTANCE;
     }
 
     @Override

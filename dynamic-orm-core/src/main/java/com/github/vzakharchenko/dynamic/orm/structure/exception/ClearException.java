@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.structure.exception;
 public class ClearException extends Exception {
 
     public ClearException() {
+        super();
     }
 
     public ClearException(String message) {

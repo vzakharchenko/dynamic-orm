@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.core.exception;
 public class NotFoundModelException extends ModelFromRawModelTypeException {
 
     public NotFoundModelException() {
+        super();
     }
 
     public NotFoundModelException(String message) {

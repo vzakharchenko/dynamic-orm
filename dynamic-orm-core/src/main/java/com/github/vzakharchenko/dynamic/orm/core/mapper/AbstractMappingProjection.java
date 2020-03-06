@@ -18,8 +18,10 @@ public abstract class AbstractMappingProjection<MODEL>
     protected MODEL createModel() {
         try {
             return this.getType().newInstance();
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

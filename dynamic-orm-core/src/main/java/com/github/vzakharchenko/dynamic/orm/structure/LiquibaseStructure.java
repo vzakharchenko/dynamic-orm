@@ -47,9 +47,6 @@ public abstract class LiquibaseStructure implements DBStructure {
     private Comparator<String> fileNameComporator = StringComparator.getStringComparator();
     private boolean compareData = true;
 
-    public LiquibaseStructure() {
-    }
-
     protected Database currentDataBase(Connection connection) throws DatabaseException {
         return DatabaseFactory.getInstance()
                 .findCorrectDatabaseImplementation(new JdbcConnection(connection));
@@ -137,7 +134,7 @@ public abstract class LiquibaseStructure implements DBStructure {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 
@@ -180,7 +177,7 @@ public abstract class LiquibaseStructure implements DBStructure {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -231,7 +228,7 @@ public abstract class LiquibaseStructure implements DBStructure {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -247,7 +244,7 @@ public abstract class LiquibaseStructure implements DBStructure {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -261,14 +258,14 @@ public abstract class LiquibaseStructure implements DBStructure {
         this.compareData = compareData;
     }
 
-    public static class StringComparator implements Comparator<String>, Serializable {
+    public static final class StringComparator implements Comparator<String>, Serializable {
 
         private static final StringComparator COMPARATOR = new StringComparator();
 
-        StringComparator() {
+        private StringComparator() {
         }
 
-        static StringComparator getStringComparator() {
+        private static StringComparator getStringComparator() {
             return COMPARATOR;
         }
 

@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.structure.exception;
 public class UploadException extends Exception {
 
     public UploadException() {
+        super();
     }
 
     public UploadException(String message) {

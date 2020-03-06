@@ -9,6 +9,7 @@ package com.github.vzakharchenko.dynamic.orm.structure.exception;
 public class DropAllException extends Exception {
 
     public DropAllException() {
+        super();
     }
 
     public DropAllException(String message) {

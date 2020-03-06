@@ -13,9 +13,9 @@ public abstract class PKGeneratorUUID<NUMBER extends Number> implements PKGenera
 
     public NUMBER generateUniqueId() {
         UUID idOne = UUID.randomUUID();
-        String str = "" + idOne;
+        String str = idOne.toString();
         int uid = str.hashCode();
-        String filterStr = "" + uid;
+        String filterStr = String.valueOf(uid);
         str = filterStr.replaceAll("-", "");
         return parseString(str);
     }

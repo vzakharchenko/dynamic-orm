@@ -15,6 +15,7 @@ public class PrimaryKeyCacheKey implements Serializable {
     private String tableName;
 
     public PrimaryKeyCacheKey() {
+        super();
     }
 
     public PrimaryKeyCacheKey(Serializable key, RelationalPath<?> qTable) {

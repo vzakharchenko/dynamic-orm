@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
  * Time: 11:00
  */
 @ContextConfiguration(
-        locations = {"classpath:defaultTestQueryOrm.xml", "classpath:MSSQLTestQueryOrm.xml",
+        locations = {"classpath:defaultDynamicQueryBeans.xml", "classpath:MSSQLTestQueryOrm.xml",
                 "classpath:test-spring-dao-context.xml"})
 public abstract class MSSQLTestQueryOrm extends AbstractTestQueryOrm {
 

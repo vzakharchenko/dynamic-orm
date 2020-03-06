@@ -8,8 +8,8 @@ import java.io.Serializable;
  *
  */
 public class IndexData implements Serializable {
-    private Path<?> column;
-    private boolean unique;
+    private final Path<?> column;
+    private final boolean unique;
 
     protected IndexData(Path<?> column, boolean unique) {
         this.column = column;

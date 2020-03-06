@@ -13,7 +13,7 @@ import java.util.List;
  */
 public abstract class ModelLazyListFactory {
 
-    static <MODEL extends DMLModel> List<MODEL> buildModelLazyList(
+    public static <MODEL extends DMLModel> List<MODEL> buildModelLazyList(
             List<Serializable> keys, CacheBuilder<MODEL> cacheBuilder) {
         return new ModelLazyList<>(keys, cacheBuilder);
     }

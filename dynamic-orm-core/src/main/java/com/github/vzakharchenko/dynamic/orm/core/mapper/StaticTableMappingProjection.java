@@ -53,7 +53,7 @@ public class StaticTableMappingProjection<MODEL extends DMLModel>
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
 
     }
@@ -75,7 +75,7 @@ public class StaticTableMappingProjection<MODEL extends DMLModel>
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 

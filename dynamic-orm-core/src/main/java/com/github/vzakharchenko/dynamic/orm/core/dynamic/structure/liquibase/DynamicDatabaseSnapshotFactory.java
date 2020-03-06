@@ -22,6 +22,8 @@ public abstract class DynamicDatabaseSnapshotFactory {
             Set<Table> tables = dynamicTables.stream().map(TableFactory::createTable)
                     .collect(Collectors.toSet());
             return createDatabaseObject(databaseType, tables);
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -43,8 +45,10 @@ public abstract class DynamicDatabaseSnapshotFactory {
                 //databaseSnapshot.addDatabaseObject(table.getSchema());
             }
             return databaseSnapshot;
+        } catch (RuntimeException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 

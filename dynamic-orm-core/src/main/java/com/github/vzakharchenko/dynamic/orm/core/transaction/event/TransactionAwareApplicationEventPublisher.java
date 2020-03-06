@@ -14,7 +14,7 @@ import java.util.Objects;
  * */
 public class TransactionAwareApplicationEventPublisher implements TransactionalEventPublisher {
 
-    private ApplicationEventPublisher publisher = null;
+    private ApplicationEventPublisher publisher;
 
 
     private void checkTransaction(TransactionEventType transactionEventType) {
@@ -27,7 +27,7 @@ public class TransactionAwareApplicationEventPublisher implements TransactionalE
     private void publishCombineEvent(final Object event) {
         TransactionalCombinedEvent<Object> transactionalCombinedEvent =
                 (TransactionalCombinedEvent<Object>) event;
-        Serializable resourceName = transactionalCombinedEvent.resourceName();
+        Serializable resourceName = transactionalCombinedEvent.getResourceName();
         CombinatedObject<Object> combinatedObject =
                 (CombinatedObject<Object>) TransactionSynchronizationManager
                         .getResource(resourceName);

@@ -54,7 +54,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
                 new QDynamicTable(tableName), dataSource, dynamicContext, dynamicTableMap);
     }
 
-    protected static QTableBuilder createBuilder(
+    public static QTableBuilder createBuilder(
             String tableName, DataSource dataSource, DynamicContext dynamicContext) {
         return new QDynamicTableBuilder(new QDynamicTable(tableName), dataSource, dynamicContext);
     }
@@ -125,7 +125,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
         }
         return this;
     }
-
+    // CHECKSTYLE:OFF
     @Override
     public <T extends Number & Comparable<?>> QTableBuilder createNumberColumn(
             String columnName, Class<T> typeClass, Integer size, Integer decimalDigits,
@@ -141,6 +141,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
         }
         return this;
     }
+    // CHECKSTYLE:ON
 
     @Override
     public QTableBuilder createDateColumn(String columnName, boolean notNull) {

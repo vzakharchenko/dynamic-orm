@@ -12,4 +12,4 @@ jobs:
 
       - run:
           name: build with examples
-          command: mvn clean install -P build-examples
+          command: mvn clean install

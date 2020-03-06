@@ -15,7 +15,7 @@ import java.util.Map;
 public final class DynamicTableModel implements DynamicModel {
     private Map<String, Object> columns = new HashMap<>();
 
-    private QDynamicTable qDynamicTable;
+    private final QDynamicTable qDynamicTable;
 
     public DynamicTableModel(QDynamicTable qDynamicTable) {
         this.qDynamicTable = qDynamicTable;

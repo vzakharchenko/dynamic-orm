@@ -20,7 +20,7 @@ public interface UpdateModelBuilder<MODEL extends DMLModel> {
 
     UpdateModelBuilder<MODEL> byId();
 
-    <T> UpdateModelBuilder<MODEL> batch();
+    UpdateModelBuilder<MODEL> batch();
 
     Long updateModelsById(MODEL... models);
 

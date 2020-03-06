@@ -13,7 +13,7 @@ import java.sql.Connection;
  *
  */
 public class QDynamicTableFactoryImpl implements QDynamicTableFactory, AccessDynamicContext {
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     private DynamicContext dynamicContext;
 
