@@ -25,6 +25,7 @@
     - Transaction and External(ehcache, infinispan, redis, etc) cache
     - cache queries based on Primary Key, Column, and Column and Values
     - synchronization cache with crud operations
+  - support clustering( if use distributed cache)
 
 # dependencies
  - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, with)
@@ -158,6 +159,102 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 ```
 
 ## 3. Example to Use
+ - autowire factories
+```java
+    @Autowired
+    private OrmQueryFactory ormQueryFactory;
+
+    @Autowired
+    private QDynamicTableFactory qDynamicTableFactory;
+```
+ - add @Transactional annotation, or use transaction Manager
+```java
+    @Transactional()
+    public void testQuery() {
+     ...
+    }
+```
+ or
+```java
+    public void testQuery() {
+               TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
+        transactionManager.startTransactionIfNeeded();
+        ...
+        transactionManager.commit();
+    }
+```
+ - create schema example
+```java
+@Transactional()
+public void testQuery() {
+qDynamicTableFactory.buildTable("firstTable")
+                .addPrimaryStringKey("Id", 255)
+                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .createStringColumn("TestStringColumn", 255, false)
+                .createDateTimeColumn("modificationTime", true)
+                .addVersionColumn("modificationTime")
+                .buildSchema();
+}
+```
+ - get  table metadata
+```java
+ QDynamicTable firstTable = qDynamicTableFactory.getQDynamicTableByName("firstTable");
+```
+   - insert operation
+```java
+        DynamicTableModel firstTableModel1 = new DynamicTableModel(firstTable);
+        firstTableModel1.addColumnValue("TestStringColumn", "testValue");
+        ormQueryFactory.insert(firstTableModel1);
+```
+   - modify table metadata
+```java
+  // add integer column to table
+ qDynamicTableFactory.buildTable("firstTable")
+                .createNumberColumn("newColumn", Integer.class, null, null, false)
+                .buildSchema();
+```
+   - update operation
+```java
+        firstTableModel1.addColumnValue("newColumn", 122);
+        ormQueryFactory.updateById(firstTableModel1);
+```
+   - select operation
+```java
+        DynamicTableModel firstTableFromDatabase = ormQueryFactory.select().findOne(ormQueryFactory
+                        .buildQuery()
+                        .from(firstTable)
+                        .where(firstTable.getNumberColumnByName("newColumn").eq(122)),
+                firstTable,
+                DynamicTableModel.class);
+```
+   - select operation and put result to cache. Cache record will be evicted if any related table is modified (insert/update/delete operartion)
+```java
+        DynamicTableModel firstTableFromDatabase = ormQueryFactory.selectCache().findOne(ormQueryFactory
+                        .buildQuery()
+                        .from(firstTable)
+                        .where(firstTable.getNumberColumnByName("newColumn").eq(122)),
+                firstTable,
+                DynamicTableModel.class);
+```
+  - get column value from model
+```java
+               String testStringColumnValue = firstTableFromDatabase.getValue("TestStringColumn", String.class);
+```
+  - join queries
+```java
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
+                ormQueryFactory.buildQuery().from(firstTable)
+                        .innerJoin(secondTable).on(
+                        secondTable.getStringColumnByName("linkToFirstTable").eq(
+                                firstTable.getStringColumnByName("Id")))
+                        .where(secondTable.getBooleanColumnByName("isDeleted").eq(false)))
+                .findAll(ArrayUtils.addAll(firstTable.all(), secondTable.all()));
+        RawModel rawModel = rawModels.get(0);
+        DynamicTableModel firstModelFromJoin = rawModel.getDynamicModel(firstTable);
+        DynamicTableModel secondModelFromJoin = rawModel.getDynamicModel(secondTable);
+```
+
+[Full Example](dynamic-orm-core/src/test/java/com/github/vzakharchenko/dynamic/orm/core/QueryAnnotationTest.java#L20-L126):
 
 ```java
 
@@ -170,7 +267,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
  // suspend the current transaction if one exists.
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testQuery() {
-        TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
+               TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
         transactionManager.startTransactionIfNeeded();
         // build schema
         qDynamicTableFactory.buildTable("firstTable")
@@ -183,7 +280,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
                 .addPrimaryStringKey("Id", 255)
                 .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
                 .createBooleanColumn("isDeleted", false)
-                .addSoftDeleteColumn("isDeleted", false, true)
+                .addSoftDeleteColumn("isDeleted", true, false)
                 .createDateTimeColumn("modificationTime", true)
                 .addVersionColumn("modificationTime")
                 .createStringColumn("linkToFirstTable", 255, false)
@@ -249,12 +346,28 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
-        DynamicTableModel dynamicTableModel = tableModels.get(0);
+        DynamicTableModel dynamicTableModel = tableModels.get(1);
         ormQueryFactory.softDeleteById(dynamicTableModel);
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)
         tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
         assertEquals(tableModels.size(), 1);
-    }
+        
+        // select all data from all table
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
+                ormQueryFactory.buildQuery().from(firstTable)
+                        .innerJoin(secondTable).on(
+                        secondTable.getStringColumnByName("linkToFirstTable").eq(
+                                firstTable.getStringColumnByName("Id")))
+                        .where(secondTable.getBooleanColumnByName("isDeleted").eq(false)))
+                .findAll(ArrayUtils.addAll(firstTable.all(), secondTable.all()));
+        
+        assertEquals(rawModels.size(), 1);
+        RawModel rawModel = rawModels.get(0);
+        DynamicTableModel firstModelFromJoin = rawModel.getDynamicModel(firstTable);
+        DynamicTableModel secondModelFromJoin = rawModel.getDynamicModel(secondTable);
+        assertEquals(firstModelFromJoin.getValue("Id"), firstTableFromDatabase.getValue("Id"));
+        assertEquals(secondModelFromJoin.getValue("Id"), secondModel1.getValue("Id"));
 ```
+

@@ -37,6 +37,10 @@
         </developer>
     </developers>
 
+    <name>Dynamic Orm</name>
+    <description>Querying and Managing data on runtime</description>
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

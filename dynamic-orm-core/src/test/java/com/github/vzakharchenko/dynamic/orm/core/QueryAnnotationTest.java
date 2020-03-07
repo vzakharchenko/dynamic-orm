@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.TransactionBuilder;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
@@ -32,7 +33,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
                 .addPrimaryStringKey("Id", 255)
                 .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
                 .createBooleanColumn("isDeleted", false)
-                .addSoftDeleteColumn("isDeleted", false, true)
+                .addSoftDeleteColumn("isDeleted", true, false)
                 .createDateTimeColumn("modificationTime", true)
                 .addVersionColumn("modificationTime")
                 .createStringColumn("linkToFirstTable", 255, false)
@@ -98,13 +99,29 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
-        DynamicTableModel dynamicTableModel = tableModels.get(0);
+        DynamicTableModel dynamicTableModel = tableModels.get(1);
         ormQueryFactory.softDeleteById(dynamicTableModel);
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)
         tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
         assertEquals(tableModels.size(), 1);
+
+        // select all data from all table
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
+                ormQueryFactory.buildQuery().from(firstTable)
+                        .innerJoin(secondTable).on(
+                        secondTable.getStringColumnByName("linkToFirstTable").eq(
+                                firstTable.getStringColumnByName("Id")))
+                        .where(secondTable.getBooleanColumnByName("isDeleted").eq(false)))
+                .findAll(ArrayUtils.addAll(firstTable.all(), secondTable.all()));
+
+        assertEquals(rawModels.size(), 1);
+        RawModel rawModel = rawModels.get(0);
+        DynamicTableModel firstModelFromJoin = rawModel.getDynamicModel(firstTable);
+        DynamicTableModel secondModelFromJoin = rawModel.getDynamicModel(secondTable);
+        assertEquals(firstModelFromJoin.getValue("Id"), firstTableFromDatabase.getValue("Id"));
+        assertEquals(secondModelFromJoin.getValue("Id"), secondModel1.getValue("Id"));
     }
 
 }

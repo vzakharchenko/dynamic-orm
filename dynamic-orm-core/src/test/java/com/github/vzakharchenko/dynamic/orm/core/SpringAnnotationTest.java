@@ -77,7 +77,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 
     @Bean()
     public QDynamicTableFactory dynamicTableFactory() {
-        return new QDynamicTableFactoryImpl(dataSource());
+        return new QDynamicTableFactoryImpl(ormQueryFactory(), dataSource());
     }
 
     @Bean

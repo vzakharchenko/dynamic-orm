@@ -125,6 +125,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
         }
         return this;
     }
+
     // CHECKSTYLE:OFF
     @Override
     public <T extends Number & Comparable<?>> QTableBuilder createNumberColumn(
@@ -304,14 +305,14 @@ public final class QDynamicTableBuilder implements QTableBuilder {
         dynamicTableMap.put(StringUtils.upperCase(
                 qDynamicTable.getTableName()), qDynamicTable);
         dynamicStructureUpdater.update(dynamicTableMap);
-        dynamicTableMap.values().forEach(dynamicContext::registerQTable);
+        dynamicContext.registerQTables(dynamicTableMap.values());
     }
 
     @Override
     public void support() {
         dynamicTableMap.put(StringUtils.upperCase(
                 qDynamicTable.getTableName()), qDynamicTable);
-        dynamicTableMap.values().forEach(dynamicContext::registerQTable);
+        dynamicContext.registerQTables(dynamicTableMap.values());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -18,11 +19,13 @@ public class QDynamicTableFactoryImpl implements QDynamicTableFactory, AccessDyn
 
     private DynamicContext dynamicContext;
 
-    private Database database;
+    private final Database database;
+    private final OrmQueryFactory ormQueryFactory;
 
-
-    public QDynamicTableFactoryImpl(DataSource dataSource) {
+    public QDynamicTableFactoryImpl(OrmQueryFactory ormQueryFactory,
+                                    DataSource dataSource) {
         this.dataSource = dataSource;
+        this.ormQueryFactory = ormQueryFactory;
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {
             this.database = DatabaseFactory.getInstance()
@@ -34,14 +37,9 @@ public class QDynamicTableFactoryImpl implements QDynamicTableFactory, AccessDyn
         }
     }
 
-    public QDynamicTableFactoryImpl(DataSource dataSource, Database database) {
-        this.dataSource = dataSource;
-        this.database = database;
-    }
-
     private DynamicContext getDynamicContext() {
         if (dynamicContext == null) {
-            dynamicContext = new DynamicContext(database);
+            dynamicContext = new DynamicContext(database, ormQueryFactory);
         }
         return dynamicContext;
     }

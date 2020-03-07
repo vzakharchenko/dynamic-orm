@@ -68,7 +68,7 @@ public class QueryContextImpl implements Cloneable, QueryContext {
         return configuration.getTemplates();
     }
 
-
+    @Override
     public TransactionalCache getTransactionCache() {
         return transactionCacheManager.getTransactionalCache(cacheName);
     }

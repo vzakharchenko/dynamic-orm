@@ -32,6 +32,7 @@
 
     <!-- Dynamic database supporting -->
     <bean class="com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactoryImpl">
+        <constructor-arg ref="ormQueryFactory"/>
         <constructor-arg ref="dataSource"/>
     </bean>
 
