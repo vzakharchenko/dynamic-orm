@@ -35,14 +35,6 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j}</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.10.5</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
