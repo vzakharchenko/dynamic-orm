@@ -69,5 +69,3 @@ mvn -Psign clean release:perform -Darguments=-Dgpg.passphrase=${password}
 git pull
 hub release create -m "Dynamic Orm ${tagName}" $tagName
 
-# update version of keycloak-radius
-mvn versions:set -DnewVersion=$tagDevVersion
