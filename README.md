@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.github.vzakharchenko</groupId>
             <artifactId>dynamic-orm-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 ```
@@ -562,7 +562,7 @@ pom.xml
             <plugin>
                 <groupId>com.github.vzakharchenko</groupId>
                 <artifactId>dynamic-orm-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>1.0.0</version>
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
@@ -580,7 +580,7 @@ pom.xml
                     <dependency>
                         <groupId>com.github.vzakharchenko</groupId>
                         <artifactId>example-test-qmodels</artifactId>
-                        <version>${project.version}</version>
+                        <version>1.0.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
