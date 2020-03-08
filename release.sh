@@ -64,10 +64,6 @@ if [[ "x${tagName}" == "x" ]]; then
 fi
 # get perform release
 mvn -Psign clean release:perform -Darguments=-Dgpg.passphrase=${password}
-# update version of keycloak-radius
-mvn versions:set -DnewVersion=$tagVersion
-# build keycloak-radius
-mvn clean install -Dkeycloak-plugin=$tagVersion -Dproduction=true
 
 # create release
 git pull
