@@ -62,7 +62,6 @@ if [[ "x${tagName}" == "x" ]]; then
   echo "tagName is empty"
   exit 1;
 fi
-mvn versions:set -Pexamples -DnewVersion=$tagDevVersion
 
 # get perform release
 mvn -Psign clean release:perform -Darguments=-Dgpg.passphrase=${password}
