@@ -14,9 +14,6 @@ import java.sql.Types;
 import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
 
-/**
- * QSCountryCode is a Querydsl query type for QSCountryCode
- */
 @Generated("com.querydsl.query.sql.codegen.MetaDataSerializer")
 public class QTesttable extends RelationalPathBase<QTesttable> {
 

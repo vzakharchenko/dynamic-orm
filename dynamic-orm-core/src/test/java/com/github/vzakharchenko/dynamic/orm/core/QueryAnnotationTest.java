@@ -99,8 +99,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
-        DynamicTableModel dynamicTableModel = tableModels.get(1);
-        ormQueryFactory.softDeleteById(dynamicTableModel);
+        ormQueryFactory.softDeleteById(secondModel2);
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)

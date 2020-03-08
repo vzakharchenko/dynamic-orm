@@ -44,7 +44,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
     @Bean
     public DataSource dataSource() {
         try {
-            return DataSourceHelper.getDataSourceHsqldbCreateSchema("jdbc:hsqldb:mem:DATABASE_MYSQL;sql.mys=true");
+            return DataSourceHelper.getDataSourceHsqldbCreateSchema("jdbc:hsqldb:mem:DATABASE_ORACLE;sql.syntax_ora=true");
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

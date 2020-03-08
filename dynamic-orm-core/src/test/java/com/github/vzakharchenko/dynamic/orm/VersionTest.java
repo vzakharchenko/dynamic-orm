@@ -118,6 +118,24 @@ public class VersionTest extends OracleTestQueryOrm {
 
     }
 
+    @Test()
+    public void testSelectWithCache() {
+        TestTableVersionAnnotation testTableVersion = new TestTableVersionAnnotation();
+
+        ormQueryFactory.insert(testTableVersion);
+        assertNotNull(testTableVersion.getId());
+        assertNotNull(testTableVersion.getVersion());
+        assertEquals(testTableVersion.getVersion(), Integer.valueOf(0));
+        ormQueryFactory.updateById(testTableVersion);
+        Integer version = ormQueryFactory.selectCache().findOne(
+                ormQueryFactory.buildQuery()
+                        .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                        .where(QTestTableVersionAnnotation.qTestTableVersionAnnotation.id.eq(testTableVersion.getId()))
+                , QTestTableVersionAnnotation.qTestTableVersionAnnotation.version);
+        assertEquals(version, Integer.valueOf(1));
+
+    }
+
     @Test(expectedExceptions = ExecutionException.class)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testConcurrentlyUpdateFail() throws InterruptedException, ExecutionException {

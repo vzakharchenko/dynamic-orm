@@ -3,6 +3,16 @@
 [![Coverage Status](https://coveralls.io/repos/github/vzakharchenko/dynamic-orm/badge.svg?branch=master)](https://coveralls.io/github/vzakharchenko/dynamic-orm?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c587a6e77be5e8cbef0/maintainability)](https://codeclimate.com/github/vzakharchenko/dynamic-orm/maintainability)
 
+# supported database
+ - Oracle
+ - Postgres
+ - MySQL
+ - Hsql
+ - H2
+ - Derby
+ - Firebird
+ - SQLite
+ - MSSQL
 # Features
   - modify database structure on runtime (use Liquibase)
     - create tables
@@ -369,5 +379,212 @@ qDynamicTableFactory.buildTable("firstTable")
         DynamicTableModel secondModelFromJoin = rawModel.getDynamicModel(secondTable);
         assertEquals(firstModelFromJoin.getValue("Id"), firstTableFromDatabase.getValue("Id"));
         assertEquals(secondModelFromJoin.getValue("Id"), secondModel1.getValue("Id"));
+```
+# Static Tables(not Dynamic)
+## - QueryDsl Models (Table Metadata)
+```java
+@Generated("com.querydsl.query.sql.codegen.MetaDataSerializer")
+public class QTestTableVersionAnnotation extends RelationalPathBase<QTestTableVersionAnnotation> {
+
+    public static final QTestTableVersionAnnotation qTestTableVersionAnnotation = new QTestTableVersionAnnotation("TEST_TABLE_VERSION_ANNOTATION");
+
+    public final NumberPath<Integer> id = createNumber("id", Integer.class);
+
+    public final NumberPath<Integer> version = createNumber("version", Integer.class);
+
+    public final PrimaryKey<QTestTableVersionAnnotation> idPk = createPrimaryKey(id);
+
+    public QTestTableVersionAnnotation(String variable) {
+        super(QTestTableVersionAnnotation.class, forVariable(variable), "", "TEST_TABLE_VERSION_ANNOTATION");
+        addMetadata();
+    }
+
+    public QTestTableVersionAnnotation(String variable, String schema, String table) {
+        super(QTestTableVersionAnnotation.class, forVariable(variable), schema, table);
+        addMetadata();
+    }
+
+    public QTestTableVersionAnnotation(Path<? extends QTestTableVersionAnnotation> path) {
+        super(path.getType(), path.getMetadata(), "", "TEST_TABLE_VERSION_ANNOTATION");
+        addMetadata();
+    }
+
+    public QTestTableVersionAnnotation(PathMetadata metadata) {
+        super(QTestTableVersionAnnotation.class, metadata, "", "TEST_TABLE_VERSION_ANNOTATION");
+        addMetadata();
+    }
+
+    public void addMetadata() {
+        addMetadata(id, ColumnMetadata.named("ID").withIndex(1).ofType(Types.INTEGER).withSize(38).notNull());
+        addMetadata(version, ColumnMetadata.named("VERSION").withIndex(2).ofType(Types.INTEGER).withSize(38).notNull());
+    }
+
+}
+```
+## - Static POJO Model
+```java
+@QueryDslModel(qTableClass = QTestTableVersionAnnotation.class, tableName = "TEST_TABLE_VERSION_ANNOTATION", primaryKeyGenerator = PrimaryKeyGenerators.SEQUENCE)
+@SequanceName("TEST_SEQUENCE")
+public class TestTableVersionAnnotation implements DMLModel {
+
+    private Integer id;
+    @Version
+    private Integer version;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+}
+```
+Annotations:
+- **@QueryDslModel** - related QueryDsl model.
+  -  qTableClass - queryDsl class
+  -  tableName - Table name
+  -  primaryKeyGenerator - Primary Key generator
+     -  DEFAULT - does not use PK generator
+     -  INTEGER - integer values
+     -  LONG - long values
+     -  UUID - Universally Unique Identifier values (UUID.randomUUID().toString())
+     -  SEQUENCE - Sql Sequence (if database support)
+- **@SequanceName** - Sequance annotation
+- **@Version** - mark field as Optimistic locking. (Supports only TimeStamp and numeric column)
+
+## Example of Usage
+
+ - insert
+```java
+        TestTableVersionAnnotation testTableVersion = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(testTableVersion);
+```
+ - update
+```java
+        testTableVersion.setSomeColumn("testColumn")
+        ormQueryFactory.updateById(testTableVersion);
+```
+ - select Version column and put result to cache
+```java
+        Integer version = ormQueryFactory.selectCache().findOne(
+                ormQueryFactory.buildQuery()
+                        .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                        .where(QTestTableVersionAnnotation.qTestTableVersionAnnotation.id.eq(testTableVersion.getId()))
+                , QTestTableVersionAnnotation.qTestTableVersionAnnotation.version);
+```
+ - join with dynamic table
+```java
+        TestTableVersionAnnotation staticTable = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(staticTable);
+        // build dynamic Table with foreign Key to Static Table
+        qDynamicTableFactory.buildTable("relatedTable")
+                .addPrimaryStringKey("Id", 255)
+                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .createDateTimeColumn("modificationTime", true)
+                .addVersionColumn("modificationTime")
+                .createNumberColumn("StaticId", Integer.class, null, null, false)
+                .addForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .buildSchema();
+
+        // get dynamic table metadata
+        QDynamicTable relatedTable = qDynamicTableFactory.getQDynamicTableByName("relatedTable");
+
+        // insert to dynamic table
+        DynamicTableModel relatedTableData = new DynamicTableModel(relatedTable);
+        relatedTableData.addColumnValue("StaticId", staticTable.getId());
+
+        ormQueryFactory.insert(relatedTableData);
+
+        // select with join
+        DynamicTableModel tableModel = ormQueryFactory
+                .select()
+                .findOne(ormQueryFactory
+                                .buildQuery().from(relatedTable)
+                                .innerJoin(QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                                .on(relatedTable
+                                        .getNumberColumnByName("StaticId", Integer.class)
+                                        .eq(QTestTableVersionAnnotation
+                                                .qTestTableVersionAnnotation.id))
+                                .where(QTestTableVersionAnnotation
+                                        .qTestTableVersionAnnotation.id.eq(staticTable.getId())),
+                        relatedTable, DynamicTableModel.class);
+        assertNotNull(tableModel);
+        assertEquals(tableModel.getValue("Id"), relatedTableData.getValue("Id"));
+```
+## Generate QueryDslModel
+[Example](dynamic-orm-examples/example-test-qmodels/pom.xml)
+
+pom.xml
+```xml
+            <plugin>
+                <groupId>com.querydsl</groupId>
+                <artifactId>querydsl-maven-plugin</artifactId>
+                <version>${querydsl}</version>
+
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>export</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jdbcDriver>${driver}</jdbcDriver>
+                    <beanPrefix>Q</beanPrefix>
+                    <packageName>${QmodelPackage}</packageName>
+                    <targetFolder>${targetFolder}</targetFolder>
+                    <jdbcUrl>${jdbcUrl}</jdbcUrl>
+                    <jdbcPassword>${jdbcPassword}</jdbcPassword>
+                    <jdbcUser>${jdbcUser}</jdbcUser>
+                    <sourceFolder />
+                </configuration>
+            </plugin>
+```
+
+## Generate Static POJO Models
+[Example](dynamic-orm-examples/example-test-models/pom.xml)
+
+pom.xml
+
+```xml
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.vzakharchenko</groupId>
+                <artifactId>dynamic-orm-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <targetQModelFolder>${targetFolder}</targetQModelFolder>
+                    <modelPackage>${ModelPackage}</modelPackage>
+                    <qmodelPackage>${QmodelPackage}</qmodelPackage>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>modelGenerator</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.vzakharchenko</groupId>
+                        <artifactId>example-test-qmodels</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 ```
 
