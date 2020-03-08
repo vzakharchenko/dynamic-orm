@@ -53,8 +53,6 @@ tagName=`cat $PROPERTY_FILE | grep "scm.tag" | grep -i -v -E "scm.tagNameFormat"
 tagVersion=`cat $PROPERTY_FILE | grep "project.rel.com.github.vzakharchenko..dynamic-orm"  | cut -d'=' -f2`
 tagDevVersion=`cat $PROPERTY_FILE | grep "project.dev.com.github.vzakharchenko..dynamic-orm"  | cut -d'=' -f2`
 
-releaseNotes=`cat ./docs/release/${tagVersion}.txt`;
-
 if [[ "x${tagVersion}" == "x" ]]; then
   echo "tagVersion is empty"
   exit 1;
@@ -73,13 +71,7 @@ mvn clean install -Dkeycloak-plugin=$tagVersion -Dproduction=true
 
 # create release
 git pull
-hub release create -m "Dynamic Orm ${tagName}
-
-releaseNotes:
-<pre>
-$releaseNotes
-</pre>
-" $tagName
+hub release create -m "Dynamic Orm ${tagName}" $tagName
 
 # update version of keycloak-radius
 mvn versions:set -DnewVersion=$tagDevVersion
