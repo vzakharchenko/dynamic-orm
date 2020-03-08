@@ -36,7 +36,7 @@
 
     <name>Dynamic Orm</name>
     <description>Querying and Managing data on runtime</description>
-
+    <url>https://github.com/vzakharchenko/dynamic-orm/releases</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
