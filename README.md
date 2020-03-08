@@ -567,7 +567,7 @@ pom.xml
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
-                    <qmodelPackage>${QmodelPackage}</qmodelPackage>
+                    <qmodelPackage>queryDsl package name</qmodelPackage>
                 </configuration>
                 <executions>
                     <execution>
@@ -577,15 +577,61 @@ pom.xml
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.vzakharchenko</groupId>
-                        <artifactId>example-test-qmodels</artifactId>
-                        <version>1.0.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
 ```
 
+# Audit Database changing
+[Example: Logging Audit](dynamic-orm-examples/example-test-ehcache/src/main/java/orm/query/examples/ehcache/LogAudit.java)
+```java
+@Component
+public class LogAudit implements ApplicationListener<CacheEvent> {
+    @Override
+    public void onApplicationEvent(CacheEvent cacheEvent) {
+        switch (cacheEvent.cacheEventType()) {
+            case INSERT: {
+                for (Serializable pk : cacheEvent.getListIds()) {
+                    System.out.println("insert table " + cacheEvent.getQTable().getTableName()
+                            + " primarykey = " + pk);
+                    DiffColumnModel diffModel = cacheEvent.getDiffModel(pk);
+                    for (Map.Entry<Path<?>, DiffColumn<?>> entry : diffModel.getDiffModels().entrySet()) {
+                        System.out.println(" --- column " + ModelHelper.getColumnRealName(entry.getKey())
+                                + " set " + entry.getValue().getNewValue());
+                    }
+                }
+                break;
+            }
+            case UPDATE: {
+                for (Serializable pk : cacheEvent.getListIds()) {
+                    System.out.println("update table " + cacheEvent.getQTable().getTableName());
+                    DiffColumnModel diffModel = cacheEvent.getDiffModel(pk);
+                    for (Map.Entry<Path<?>, DiffColumn<?>> entry : diffModel.getOnlyChangedColumns().entrySet()) {
+                        System.out.println(" --- column " + ModelHelper.getColumnRealName(entry.getKey())
+                                + " set " + entry.getValue().getNewValue()
+                                + " old value "
+                                + entry.getValue().getOldValue());
+                    }
+                }
+
+                break;
+            }
+            case SOFT_DELETE:
+            case DELETE: {
+                System.out.println("delete into table " + cacheEvent.getQTable().getTableName() + " ids = " + ToStringBuilder.reflectionToString(cacheEvent.getListIds(), ToStringStyle.JSON_STYLE));
+                break;
+            }
+            case BATCH: {
+                List<? extends CacheEvent> transactionHistory = cacheEvent.getTransactionHistory();
+                for (CacheEvent event : transactionHistory) {
+                    onApplicationEvent(event);
+                }
+                break;
+            }
+            default: {
+                throw new IllegalStateException(cacheEvent.cacheEventType() + " is not supported");
+            }
+        }
+    }
+}
+```
