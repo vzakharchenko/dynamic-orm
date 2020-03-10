@@ -96,16 +96,22 @@ public final class QViewUtils {
         return new QSizeColumnImpl(metadata.getName());
     }
 
-    private static Path getPathFromOperation(Operation operation) {
-        List<Expression<?>> expressions = operation.getArgs();
-        for (Expression exp : expressions) {
-            if (exp instanceof Path) {
-                Path column = (Path) exp;
-                if (column.getMetadata().getPathType() == PathType.PROPERTY) {
-                    return column;
-                }
+    private static Path column(Expression exp) {
+        if (exp instanceof Path) {
+            Path column = (Path) exp;
+            if (column.getMetadata().getPathType() == PathType.PROPERTY) {
+                return column;
             }
         }
         return null;
+    }
+
+    private static Path getPathFromOperation(Operation operation) {
+        List<Expression<?>> expressions = operation.getArgs();
+        return expressions.stream().filter(exp -> {
+            Path column = column(exp);
+            return column != null;
+        }).map(expression -> (Path) expression)
+                .findFirst().orElse(null);
     }
 }
