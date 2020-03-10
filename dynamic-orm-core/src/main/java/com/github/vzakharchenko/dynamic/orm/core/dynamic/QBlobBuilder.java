@@ -11,8 +11,10 @@ public class QBlobBuilder extends QSizeColumnBuilderImpl<QSizeColumnImpl,
         QSizeColumnBuilder<QTableColumn, ?>> {
 
 
-    public QBlobBuilder(QTableColumnContext qTableColumn, String columnName) {
-        super(qTableColumn, columnName);
+    public QBlobBuilder(QTableColumnContext qTableColumn,
+                        QDynamicTable dynamicTable,
+                        String columnName) {
+        super(qTableColumn, dynamicTable, columnName);
     }
 
     @Override

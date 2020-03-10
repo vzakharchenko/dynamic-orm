@@ -30,7 +30,7 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
 
         transactionManager.startTransactionIfNeeded();
         // build dynamic Table with foreign Key to Static Table
-        qDynamicTableFactory.buildTable("relatedTable")
+        qDynamicTableFactory.buildTables("relatedTable")
                 .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addNumberColumn("StaticId", Integer.class).create()
                 .addDateTimeColumn("modificationTime").notNull().create()
@@ -38,7 +38,7 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addVersionColumn("modificationTime")
                 .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
-                .buildSchema();
+                .finish().buildSchema();
 
         // get dynamic table metadata
         QDynamicTable relatedTable = qDynamicTableFactory.getQDynamicTableByName("relatedTable");

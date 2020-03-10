@@ -9,14 +9,20 @@ import java.util.Locale;
 
 public class QForeignKeyBuilderImpl implements QForeignKeyBuilder {
 
+    private final QTableBuilder tableBuilder;
+    private final QDynamicTable dynamicTable;
     private final QDynamicBuilderContext dynamicBuilderContext;
 
-    public QForeignKeyBuilderImpl(QDynamicBuilderContext dynamicBuilderContext) {
+    public QForeignKeyBuilderImpl(QTableBuilder tableBuilder,
+                                  QDynamicTable dynamicTable,
+                                  QDynamicBuilderContext dynamicBuilderContext) {
+        this.tableBuilder = tableBuilder;
+        this.dynamicTable = dynamicTable;
         this.dynamicBuilderContext = dynamicBuilderContext;
     }
 
     private QDynamicTable getDynamicTable() {
-        return dynamicBuilderContext.getDynamicTable();
+        return dynamicTable;
     }
 
     @Override
@@ -25,7 +31,7 @@ public class QForeignKeyBuilderImpl implements QForeignKeyBuilder {
             RelationalPath<?> remoteQTable,
             Path remotePrimaryKey) {
         getDynamicTable().addForeignKey(localColumn, remoteQTable, remotePrimaryKey);
-        return dynamicBuilderContext;
+        return tableBuilder;
     }
 
     @Override
@@ -35,13 +41,13 @@ public class QForeignKeyBuilderImpl implements QForeignKeyBuilder {
             Path remotePrimaryKey) {
         getDynamicTable().addForeignKey(
                 localColumnName, remoteQTable, remotePrimaryKey);
-        return dynamicBuilderContext;
+        return tableBuilder;
     }
 
     @Override
     public QTableBuilder buildForeignKey(String localColumnName, RelationalPath<?> remoteQTable) {
         getDynamicTable().addForeignKey(localColumnName, remoteQTable);
-        return dynamicBuilderContext;
+        return tableBuilder;
     }
 
     @Override

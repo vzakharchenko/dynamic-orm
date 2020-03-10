@@ -19,6 +19,7 @@ public interface QDynamicTableFactory {
 
     /**
      * get list of dynamic Tables
+     *
      * @return
      */
     Collection<QDynamicTable> getQDynamicTables();
@@ -30,7 +31,30 @@ public interface QDynamicTableFactory {
      * @return tableBuilder
      * @see QTableBuilder
      */
-    QTableBuilder buildTable(String tableName);
+    QTableBuilder buildTables(String tableName);
 
+    /**
+     * add sequance
+     *
+     * @param sequanceName
+     * @return builder
+     */
+    QSequenceBuilder createSequence(String sequanceName);
 
+    /**
+     * create SQL View (Virtual table)
+     *
+     * @param viewName
+     * @return
+     */
+    QViewBuilder createView(String viewName);
+
+    /**
+     * The construction of the table using ddl queries
+     * <p>
+     * Attention! existing columns are not deleted
+     */
+    void buildSchema();
+
+    void clear();
 }

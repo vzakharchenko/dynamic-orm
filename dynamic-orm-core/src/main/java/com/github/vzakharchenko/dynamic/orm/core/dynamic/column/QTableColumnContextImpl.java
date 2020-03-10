@@ -5,94 +5,91 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QColumnB
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QNumberColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QSizeColumnBuilder;
 
-import javax.sql.DataSource;
-import java.util.Map;
-
 public class QTableColumnContextImpl implements QTableColumnContext {
 
     private final QDynamicBuilderContext builderContext;
+    private final QTableBuilder qTableBuilder;
+    private final QDynamicTable dynamicTable;
 
-    public QTableColumnContextImpl(QDynamicBuilderContext builderContext) {
+    public QTableColumnContextImpl(QDynamicBuilderContext builderContext,
+                                   QTableBuilder qTableBuilder,
+                                   QDynamicTable dynamicTable) {
         this.builderContext = builderContext;
-    }
-
-    @Override
-    public DataSource getDataSource() {
-        return builderContext.getDataSource();
-    }
-
-    @Override
-    public QDynamicTable getDynamicTable() {
-        return builderContext.getDynamicTable();
-    }
-
-    @Override
-    public DynamicContext getDynamicContext() {
-        return builderContext.getDynamicContext();
-    }
-
-    @Override
-    public Map<String, QDynamicTable> getContextTables() {
-        return builderContext.getContextTables();
+        this.qTableBuilder = qTableBuilder;
+        this.dynamicTable = dynamicTable;
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addStringColumn(String columnName) {
-        return new QStringBuilder(this, columnName);
+        return new QStringBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addCharColumn(String columnName) {
-        return new QCharBuilder(this, columnName);
+        return new QCharBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addClobColumn(String columnName) {
-        return new QClobBuilder(this, columnName);
+        return new QClobBuilder(this, dynamicTable,
+                columnName);
     }
 
     @Override
     public QColumnBuilder<QTableColumn, ? extends QColumnBuilder<QTableColumn, ?>>
     addBooleanColumn(String columnName) {
-        return new QBooleanBuilder(this, columnName);
+        return new QBooleanBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addBlobColumn(String columnName) {
-        return new QBlobBuilder(this, columnName);
+        return new QBlobBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public <T extends Number & Comparable<?>>
     QNumberColumnBuilder<QTableColumn, QNumberColumnBuilder<QTableColumn, ?>>
     addNumberColumn(String columnName, Class<T> typeClass) {
-        return new QNumberBuilder(this, columnName, typeClass);
+        return new QNumberBuilder(this,
+                dynamicTable, columnName, typeClass);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addDateColumn(String columnName) {
-        return new QDateBuilder(this, columnName);
+        return new QDateBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addDateTimeColumn(String columnName) {
-        return new QDateTimeBuilder(this, columnName);
+        return new QDateTimeBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addTimeColumn(String columnName) {
-        return new QTimeBuilder(this, columnName);
+        return new QTimeBuilder(this,
+                dynamicTable, columnName);
     }
 
     @Override
     public QTableBuilder finish() {
+        return qTableBuilder;
+    }
+
+    @Override
+    public QDynamicBuilderContext getContext() {
         return builderContext;
     }
 }

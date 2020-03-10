@@ -11,8 +11,10 @@ public class QBooleanBuilder extends QDefaultColumnBuilder<QDefaultColumn,
         QSizeColumnBuilder<QTableColumn, ?>> {
 
 
-    public QBooleanBuilder(QTableColumnContext qTableColumn, String columnName) {
-        super(qTableColumn, columnName);
+    public QBooleanBuilder(QTableColumnContext qTableColumn,
+                           QDynamicTable dynamicTable,
+                           String columnName) {
+        super(qTableColumn, dynamicTable, columnName);
     }
 
     @Override

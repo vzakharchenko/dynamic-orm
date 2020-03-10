@@ -6,79 +6,60 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumnCont
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.fk.QForeignKeyBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.index.QIndexBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.pk.QPrimaryKeyBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureUpdater;
 import com.querydsl.core.types.Path;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
  */
-public final class QDynamicTableBuilder implements QDynamicBuilderContext {
+public final class QDynamicTableBuilder implements QTableBuilder {
 
-    private final DynamicContext dynamicContext;
+    private final QDynamicBuilderContext dynamicContextHolder;
     private final DataSource dataSource;
-    private DynamicStructureUpdater dynamicStructureUpdater;
     private QDynamicTable qDynamicTable;
 
-    private Map<String, QDynamicTable> dynamicTableMap = new HashMap<>();
-
-    private QDynamicTableBuilder(
-            QDynamicTable qDynamicTable, DataSource dataSource,
-            DynamicContext dynamicContext, Map<String, QDynamicTable> dynamicTableMap) {
-        this(qDynamicTable, dataSource, dynamicContext);
-        this.dynamicTableMap = dynamicTableMap;
-    }
 
     private QDynamicTableBuilder(QDynamicTable qDynamicTable,
                                  DataSource dataSource,
-                                 DynamicContext dynamicContext) {
+                                 QDynamicBuilderContext dynamicContextHolder) {
         this.qDynamicTable = qDynamicTable;
-        this.dynamicStructureUpdater = new DynamicStructureSaver(dataSource);
-        this.dynamicContext = dynamicContext;
+        this.dynamicContextHolder = dynamicContextHolder;
         this.dataSource = dataSource;
     }
 
 
-    private static QTableBuilder createBuilder(
+    public static QTableBuilder createBuilder(
             String tableName,
             DataSource dataSource,
-            DynamicContext dynamicContext,
-            Map<String, QDynamicTable> dynamicTableMap) {
+            QDynamicBuilderContext dynamicContextHolder) {
         return new QDynamicTableBuilder(
-                dynamicContext.createQTable(tableName),
-                dataSource, dynamicContext, dynamicTableMap);
-    }
-
-    public static QTableBuilder createBuilder(
-            String tableName, DataSource dataSource, DynamicContext dynamicContext) {
-        return new QDynamicTableBuilder(dynamicContext.createQTable(tableName), dataSource, dynamicContext);
+                dynamicContextHolder.getDynamicContext().createQTable(tableName),
+                dataSource, dynamicContextHolder);
     }
 
 
     @Override
     public QTableColumn addColumns() {
-        return new QTableColumnContextImpl(this);
+        return new QTableColumnContextImpl(dynamicContextHolder,
+                this, qDynamicTable);
     }
 
     @Override
     public QPrimaryKeyBuilder addPrimaryKey() {
-        return new QPrimaryKeyBuilderImpl(this);
+        return new QPrimaryKeyBuilderImpl(this, qDynamicTable);
     }
 
     @Override
     public QForeignKeyBuilder addForeignKey() {
-        return new QForeignKeyBuilderImpl(this);
+        return new QForeignKeyBuilderImpl(this, qDynamicTable, dynamicContextHolder);
     }
 
     @Override
     public QIndexBuilder addIndex() {
-        return new QIndexBuilderImpl(this);
+        return new QIndexBuilderImpl(this, qDynamicTable);
     }
 
     @Override
@@ -101,66 +82,18 @@ public final class QDynamicTableBuilder implements QDynamicBuilderContext {
     }
 
     @Override
-    public QTableBuilder addCustomField(Serializable key, Serializable value) {
-        qDynamicTable = qDynamicTable.registerCustomFields(key, value);
-        return this;
-    }
-
-    @Override
-    public <TYPE extends Serializable> QTableBuilder addSoftDeleteColumn(
-            Path<TYPE> column, TYPE value, TYPE defaultValue) {
-        qDynamicTable = qDynamicTable.addSoftDeleteColumn(column, value, defaultValue);
-        return this;
-    }
-
-    @Override
     public QTableBuilder buildNextTable(String tableName) {
-        dynamicTableMap.put(StringUtils.upperCase(
+        dynamicContextHolder.getContextTables().put(StringUtils.upperCase(
                 qDynamicTable.getTableName()), qDynamicTable);
-        return createBuilder(tableName, dataSource, dynamicContext, dynamicTableMap);
-    }
-
-
-    @Override
-    public void buildSchema() {
-        dynamicTableMap.put(StringUtils.upperCase(
-                qDynamicTable.getTableName()), qDynamicTable);
-        dynamicStructureUpdater.update(dynamicTableMap);
-        dynamicContext.registerQTables(dynamicTableMap.values());
+        return createBuilder(tableName, dataSource, dynamicContextHolder);
     }
 
     @Override
-    public void support() {
-        dynamicTableMap.put(StringUtils.upperCase(
-                qDynamicTable.getTableName()), qDynamicTable);
-        dynamicContext.registerQTables(dynamicTableMap.values());
+    public QDynamicTableFactory finish() {
+        dynamicContextHolder.getContextTables().put(qDynamicTable.getTableName(), qDynamicTable);
+        return dynamicContextHolder;
     }
 
-    @Override
-    public void clear() {
-        dynamicTableMap.clear();
-        dynamicStructureUpdater = new DynamicStructureSaver(dataSource);
-    }
-
-    @Override
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    @Override
-    public QDynamicTable getDynamicTable() {
-        return qDynamicTable;
-    }
-
-    @Override
-    public DynamicContext getDynamicContext() {
-        return dynamicContext;
-    }
-
-    @Override
-    public Map<String, QDynamicTable> getContextTables() {
-        return dynamicTableMap;
-    }
 }
 
 

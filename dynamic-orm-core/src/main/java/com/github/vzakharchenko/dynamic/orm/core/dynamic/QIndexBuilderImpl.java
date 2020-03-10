@@ -5,22 +5,24 @@ import com.querydsl.core.types.Path;
 
 public class QIndexBuilderImpl implements QIndexBuilder {
 
-    private final QDynamicBuilderContext dynamicBuilderContext;
+    private final QTableBuilder tableBuilder;
+    private final QDynamicTable dynamicTable;
 
-    public QIndexBuilderImpl(QDynamicBuilderContext dynamicBuilderContext) {
-        this.dynamicBuilderContext = dynamicBuilderContext;
+    public QIndexBuilderImpl(QTableBuilder tableBuilder,
+                             QDynamicTable dynamicTable) {
+        this.tableBuilder = tableBuilder;
+        this.dynamicTable = dynamicTable;
     }
-
 
     @Override
     public QTableBuilder buildIndex(Path<?> columnName, boolean unique) {
-        dynamicBuilderContext.getDynamicTable().addIndex(columnName, unique);
-        return dynamicBuilderContext;
+        dynamicTable.addIndex(columnName, unique);
+        return tableBuilder;
     }
 
     @Override
     public QTableBuilder buildIndex(String columnName, boolean unique) {
-        dynamicBuilderContext.getDynamicTable().addIndex(columnName, unique);
-        return dynamicBuilderContext;
+        dynamicTable.addIndex(columnName, unique);
+        return tableBuilder;
     }
 }

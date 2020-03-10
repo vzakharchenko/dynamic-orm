@@ -7,31 +7,30 @@ import com.querydsl.core.types.Path;
 
 public class QPrimaryKeyBuilderImpl implements QPrimaryKeyBuilder {
 
-    private final QDynamicBuilderContext dynamicBuilderContext;
+    private final QTableBuilder tableBuilder;
+    private final QDynamicTable dynamicTable;
 
-    public QPrimaryKeyBuilderImpl(QDynamicBuilderContext dynamicBuilderContext) {
-        this.dynamicBuilderContext = dynamicBuilderContext;
+    public QPrimaryKeyBuilderImpl(QTableBuilder tableBuilder,
+                                  QDynamicTable qDynamicTable) {
+        this.tableBuilder = tableBuilder;
+        this.dynamicTable = qDynamicTable;
     }
 
-    private QDynamicTable getDynamicTable() {
-        return dynamicBuilderContext.getDynamicTable();
-    }
 
     @Override
     public QPrimaryKeyBuilder addPrimaryKey(Path path) {
-        getDynamicTable().addPrimaryKey(path);
+        dynamicTable.addPrimaryKey(path);
         return this;
     }
 
     @Override
     public QPrimaryKeyBuilder addPrimaryKey(String columnName) {
-        getDynamicTable().addPrimaryKey(columnName);
+        dynamicTable.addPrimaryKey(columnName);
         return this;
     }
 
     @Override
     public QPrimaryKeyBuilder addPrimaryKeyGenerator(PKGenerator<?> pkGenerator) {
-        QDynamicTable dynamicTable = getDynamicTable();
         if (!ModelHelper.hasPrimaryKey(dynamicTable)) {
             throw new IllegalStateException("First add Primary key to Table " +
                     dynamicTable.getTableName());
@@ -42,6 +41,6 @@ public class QPrimaryKeyBuilderImpl implements QPrimaryKeyBuilder {
 
     @Override
     public QTableBuilder finish() {
-        return dynamicBuilderContext;
+        return tableBuilder;
     }
 }

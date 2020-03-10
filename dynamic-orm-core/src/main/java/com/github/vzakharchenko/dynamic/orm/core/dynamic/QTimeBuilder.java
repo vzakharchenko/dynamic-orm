@@ -11,8 +11,10 @@ public class QTimeBuilder extends QSizeColumnBuilderImpl<QSizeColumnImpl,
         QSizeColumnBuilder<QTableColumn, ?>> {
 
 
-    public QTimeBuilder(QTableColumnContext qTableColumn, String columnName) {
-        super(qTableColumn, columnName);
+    public QTimeBuilder(QTableColumnContext qTableColumn,
+                        QDynamicTable dynamicTable,
+                        String columnName) {
+        super(qTableColumn, dynamicTable, columnName);
     }
 
     @Override

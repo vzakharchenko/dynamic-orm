@@ -4,7 +4,6 @@ import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
-import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.ObjectUtils;
@@ -12,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -20,11 +21,10 @@ import java.util.*;
 public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
 
     public static final String WRONG_COLUMN = "Wrong column ";
-    private final Map<Serializable, Serializable> customFields = new HashMap<>();
+    private final List<IndexData> indexDatas = new ArrayList<>();
     private PKGenerator<?> pkGenerator;
     private Path<?> versionColumn;
     private SoftDelete<?> softDelete;
-    private final List<IndexData> indexDatas = new ArrayList<>();
 
     protected QDynamicTable(String tableName) {
         super(StringUtils.upperCase(tableName));
@@ -157,14 +157,5 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
     protected List<IndexData> getIndexDatas() {
         return Collections
                 .unmodifiableList(indexDatas);
-    }
-
-    protected QDynamicTable registerCustomFields(Serializable key, Serializable value) {
-        customFields.put(key, value);
-        return this;
-    }
-
-    public Map<Serializable, Serializable> getCustomFields() {
-        return ImmutableMap.copyOf(customFields);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QSizeColumnImpl;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumnContext;
@@ -12,8 +13,8 @@ public abstract class QSizeColumnBuilderImpl<COLUMN_TYPE extends QSizeColumnImpl
 
 
     protected QSizeColumnBuilderImpl(QTableColumnContext qTableColumn,
-                                     String columnName) {
-        super(qTableColumn, columnName);
+                                     QDynamicTable dynamicTable, String columnName) {
+        super(qTableColumn, dynamicTable, columnName);
     }
 
     @Override

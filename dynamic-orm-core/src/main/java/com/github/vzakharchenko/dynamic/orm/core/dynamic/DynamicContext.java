@@ -80,4 +80,16 @@ public class DynamicContext {
         QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
         return qDynamicTable != null ? qDynamicTable : new QDynamicTable(tableName);
     }
+
+    public OrmQueryFactory getOrmQueryFactory() {
+        return ormQueryFactory;
+    }
+
+    public void registerViews(Collection<ViewModel> viewModels) {
+        viewModels.forEach(viewModel -> {
+            QDynamicTable qDynamicTable = QViewUtils.transform(database, viewModel);
+            registerQTable(qDynamicTable);
+        });
+
+    }
 }

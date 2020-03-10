@@ -23,7 +23,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
         transactionManager.startTransactionIfNeeded();
         // build schema
-        qDynamicTableFactory.buildTable("firstTable")
+        qDynamicTableFactory.buildTables("firstTable")
                 .addColumns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addStringColumn("TestStringColumn").size(255).create()
@@ -45,7 +45,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
                 .addVersionColumn("modificationTime")
                 .addIndex().buildIndex("uniqValue", true)
                 .addForeignKey().buildForeignKey("linkToFirstTable", "firstTable")
-                .buildSchema();
+                .finish().buildSchema();
         transactionManager.commit();
 
         QDynamicTable firstTable = qDynamicTableFactory.getQDynamicTableByName("firstTable");
@@ -72,9 +72,9 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
 
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
-        qDynamicTableFactory.buildTable("firstTable")
+        qDynamicTableFactory.buildTables("firstTable")
                 .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
-                .buildSchema();
+                .finish().buildSchema();
         transactionManager.commit();
 
 

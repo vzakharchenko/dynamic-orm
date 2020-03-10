@@ -15,11 +15,13 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
         implements QColumnBuilder<QTableColumn, BUILDER_TYPE> {
     protected final COLUMN_TYPE columnType;
     private final QTableColumnContext qTableColumn;
+    private final QDynamicTable qDynamicTable;
 
     protected QDefaultColumnBuilder(QTableColumnContext qTableColumnContext,
-                                    String columnName) {
+                                    QDynamicTable dynamicTable, String columnName) {
         this.columnType = construct(columnName);
         this.qTableColumn = qTableColumnContext;
+        this.qDynamicTable = dynamicTable;
     }
 
     protected abstract COLUMN_TYPE construct(String columnName);
@@ -60,11 +62,12 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
 
 
     private void createColumn() {
-        DataSource dataSource = qTableColumn.getDataSource();
+        DataSource dataSource = qTableColumn.getContext().getDataSource();
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {
-            createColumn(qTableColumn.getDynamicTable(),
-                    qTableColumn.getDynamicContext().getDatabase(connection));
+            createColumn(qDynamicTable,
+                    qTableColumn.getContext()
+                            .getDynamicContext().getDatabase(connection));
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }

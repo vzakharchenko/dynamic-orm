@@ -14,9 +14,11 @@ public class QNumberBuilder
         QNumberColumnBuilder<QTableColumn, ?>> {
 
 
-    public QNumberBuilder(QTableColumnContext qTableColumn, String columnName,
+    public QNumberBuilder(QTableColumnContext qTableColumn,
+                          QDynamicTable dynamicTable,
+                          String columnName,
                           Class<? extends Number> tClass) {
-        super(qTableColumn, columnName);
+        super(qTableColumn, dynamicTable, columnName);
         columnType.setNumberClass(tClass);
     }
 

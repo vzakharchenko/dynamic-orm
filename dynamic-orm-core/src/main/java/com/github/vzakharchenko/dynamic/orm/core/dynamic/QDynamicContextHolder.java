@@ -6,11 +6,11 @@ import java.util.Map;
 public interface QDynamicContextHolder {
     DataSource getDataSource();
 
-    QDynamicTable getDynamicTable();
-
     DynamicContext getDynamicContext();
 
     Map<String, QDynamicTable> getContextTables();
 
+    Map<String, SequanceModel> getContextSequances();
 
+    Map<String, ViewModel> getViewSequances();
 }

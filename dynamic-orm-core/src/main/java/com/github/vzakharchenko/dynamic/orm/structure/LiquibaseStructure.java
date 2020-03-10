@@ -98,6 +98,7 @@ public abstract class LiquibaseStructure implements DBStructure {
         compareTypes.add(StoredProcedure.class);
         compareTypes.add(UniqueConstraint.class);
         compareTypes.add(Index.class);
+        compareTypes.add(View.class);
         if (compareData) {
             compareTypes.add(Data.class);
         }
