@@ -6,10 +6,13 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
+import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersion;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -26,17 +29,16 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testBuildOneTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
-
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).notNull().useAsPrimaryKey().create();
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).nullable().create();
 
         // build foreign Key to table testtable with Primary key ID
         NumberPath<Integer> id = QTesttable.testtable.id;
         testTable1
-                .createNumberColumn("Test_FK", id.getType(), ModelHelper.getColumnSize(id), ModelHelper.getColumnDigitSize(id), false)
-                .addForeignKey("Test_FK", QTesttable.testtable, id);
+                .addColumns().addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
+                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
 
         // validate and create structure
         testTable1.buildSchema();
@@ -58,27 +60,27 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testBuildBatchTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).nullable().useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).nullable().usAsNotPrimaryKey().create();
 
         // build foreign Key to table testtable with Primary key ID
         NumberPath<Integer> id = QTesttable.testtable.id;
-        testTable1
-                .createNumberColumn("Test_FK", id.getType(), ModelHelper.getColumnSize(id), ModelHelper.getColumnDigitSize(id), false)
-                .addForeignKey("Test_FK", QTesttable.testtable, id);
+        testTable1.addColumns()
+                .addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
+                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
 
         // build next table
 
         QTableBuilder testTable2 = testTable1.buildNextTable("dynamicTestTable2");
         // build primary key for table testTable2
-        testTable2.createStringColumn("ID", 18, true).addPrimaryKey("ID");
+        testTable2.addColumns().addStringColumn("ID").size(18).notNull().useAsPrimaryKey().create();
 
-        testTable2.createDateColumn("dateColumn", true);
+        testTable2.addColumns().addDateColumn("dateColumn").notNull().create();
 
-        testTable2.createNumberColumn("testTable1_FK", Integer.class, 18, 0, true).addForeignKey("testTable1_FK", "dynamicTestTable1");
+        testTable2.addColumns().addNumberColumn("testTable1_FK", Integer.class).size(18).decimalDigits(0).notNull().create().finish().addForeignKey().buildForeignKey("testTable1_FK", "dynamicTestTable1");
 
         testTable2.buildSchema();
         QDynamicTable qDynamicTable1 = qDynamicTableFactory.getQDynamicTableByName("dynamicTestTable1");
@@ -114,11 +116,11 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testInsertToTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).notNull().useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).nullable().create();
 
         // validate and create structure
 
@@ -153,12 +155,12 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testSimpleInsertToTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true)
-                .addPrimaryKey("ID").addPrimaryKeyGenerator(PKGeneratorInteger.getInstance());
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).notNull().create().finish()
+                .addPrimaryKey().addPrimaryKey("ID").addPrimaryKeyGenerator(PKGeneratorInteger.getInstance()).finish();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).create();
 
         // validate and create structure
 
@@ -193,11 +195,11 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testDeleteFromTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).nullable().create();
 
         // validate and create structure
 
@@ -240,11 +242,11 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testUpdateTable() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTable("dynamicTestTable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).create();
 
         // validate and create structure
 
@@ -282,6 +284,55 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
 
         assertEquals(tableModel.getValue("ID", Integer.class).intValue(), 1000);
         assertEquals(tableModel.getValue("STRING_Test_FIELD", String.class), "test1234 is new Value");
+
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void testDynamicSchema() {
+        ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        qDynamicTableFactory.buildTable("dynamicTestTable")
+                .addColumns().addNumberColumn("ID", Integer.class).useAsPrimaryKey().create()
+                .addStringColumn("test").create()
+                .addDateTimeColumn("dateTime").create()
+                .addBooleanColumn("b").create()
+                .addDateColumn("date").create()
+                .addBlobColumn("blob").create()
+                .addClobColumn("clob").create()
+                .addCharColumn("c").create()
+                .addTimeColumn("time").create()
+                .addNumberColumn("fk1", Integer.class).create()
+                .addNumberColumn("fk2", Integer.class).create()
+                .addNumberColumn("fk3", Integer.class).create()
+                .finish()
+                .addForeignKey().buildForeignKey("fk2", QTestTableVersion.qTestTableVersion)
+                .buildSchema();
+        ormQueryFactory.transactionManager().commit();
+
+        QDynamicTable dynamicTestTable = qDynamicTableFactory.getQDynamicTableByName("dynamicTestTable");
+
+        ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        qDynamicTableFactory.buildTable("dynamicTestTable")
+                .addForeignKey().buildForeignKey(
+                dynamicTestTable.getNumberColumnByName("fk1"),
+                QTestTableVersion.qTestTableVersion, QTestTableVersion.qTestTableVersion.id
+        ).buildSchema();
+        ormQueryFactory.transactionManager().commit();
+
+        ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        qDynamicTableFactory.buildTable("dynamicTestTable")
+                .addVersionColumn(
+                dynamicTestTable.getDateTimeColumnByName("dateTime")
+        ).buildSchema();
+        ormQueryFactory.transactionManager().commit();
+
+        ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        qDynamicTableFactory.buildTable("dynamicTestTable")
+                .addIndex().buildIndex(
+                dynamicTestTable.getStringColumnByName("test"),
+                true
+        ).buildSchema();
+        ormQueryFactory.transactionManager().commit();
 
     }
 

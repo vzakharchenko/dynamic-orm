@@ -11,22 +11,24 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
     @Test
     public void indexTest() {
         qDynamicTableFactory.buildTable("Test_table_Index")
-                .addPrimaryNumberKey("ID", Integer.class, 18, 0)
-                .addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE"))
-                .createStringColumn("test_column", 200, false)
-                .createNumberColumn("INDEXED_COLUMN", Integer.class, 38, 3, false)
-                .addIndex("INDEXED_COLUMN", false)
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .addIndex().buildIndex("INDEXED_COLUMN", false)
                 .buildSchema();
     }
 
     @Test
     public void indexUniqueTest() {
         qDynamicTableFactory.buildTable("Test_table_Index")
-                .addPrimaryNumberKey("ID", Integer.class, 18, 0)
-                .addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE"))
-                .createStringColumn("test_column", 200, false)
-                .createNumberColumn("INDEXED_COLUMN", Integer.class, 38, 3, false)
-                .addIndex("INDEXED_COLUMN", true)
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .addIndex().buildIndex("INDEXED_COLUMN", true)
                 .buildSchema();
     }
 }

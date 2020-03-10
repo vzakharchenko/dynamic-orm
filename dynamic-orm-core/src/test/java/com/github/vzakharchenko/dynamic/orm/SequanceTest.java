@@ -44,9 +44,11 @@ public class SequanceTest extends OracleTestQueryOrm {
     @Test
     public void insertDynamicModel() {
         qDynamicTableFactory.buildTable("new_test_Dynamic_Table")
-                .addPrimaryNumberKey("ID", Integer.class, 18, 0)
-                .addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE"))
-                .createStringColumn("test_column", 200, false).buildSchema();
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .buildSchema();
 
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("new_test_Dynamic_Table");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(qDynamicTable);

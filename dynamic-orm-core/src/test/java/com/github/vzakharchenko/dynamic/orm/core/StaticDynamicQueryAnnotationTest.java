@@ -31,12 +31,13 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
         transactionManager.startTransactionIfNeeded();
         // build dynamic Table with foreign Key to Static Table
         qDynamicTableFactory.buildTable("relatedTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createDateTimeColumn("modificationTime", true)
+                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .addNumberColumn("StaticId", Integer.class).create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addVersionColumn("modificationTime")
-                .createNumberColumn("StaticId", Integer.class, null, null, false)
-                .addForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
                 .buildSchema();
 
         // get dynamic table metadata

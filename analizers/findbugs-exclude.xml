@@ -66,6 +66,9 @@
         <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
     </Match>
     <Match>
+        <Bug pattern="BC_UNCONFIRMED_CAST"/>
+    </Match>
+    <Match>
         <Class name="com.github.vzakharchenko.dynamic.orm.core.RawModelImpl"/>
         <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
     </Match>
@@ -92,5 +95,9 @@
     <Match>
         <Class name="com.github.vzakharchenko.dynamic.orm.structure.DbStructureServiceImpl"/>
         <Bug pattern="JPAI_NON_PROXIED_TRANSACTION_CALL"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QDefaultColumnBuilder"/>
+        <Bug pattern="PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS"/>
     </Match>
 </FindBugsFilter>
