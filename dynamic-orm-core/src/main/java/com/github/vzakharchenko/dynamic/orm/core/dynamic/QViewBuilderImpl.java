@@ -5,6 +5,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.sql.SQLCommonQuery;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class QViewBuilderImpl implements QViewBuilder {
     private final QDynamicBuilderContext dynamicBuilderContext;
@@ -22,6 +23,13 @@ public class QViewBuilderImpl implements QViewBuilder {
         viewModel.setExpressions(Arrays.asList(columns));
         OrmQueryFactory ormQueryFactory = dynamicBuilderContext.getDynamicContext().getOrmQueryFactory();
         viewModel.setSql(ormQueryFactory.select().showSql(query, columns));
+        return this;
+    }
+
+    @Override
+    public QViewBuilder resultSet(String sql, List<Expression<?>> columns) {
+        viewModel.setExpressions(columns);
+        viewModel.setSql(sql);
         return this;
     }
 

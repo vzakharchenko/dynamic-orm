@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoader;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureUpdater;
@@ -89,6 +90,11 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     @Override
     public void saveSchema(SchemaSaver schemaSaver) {
         dynamicContext.saveSchema(schemaSaver);
+    }
+
+    @Override
+    public void loadSchema(SchemaLoader schemaLoader) {
+        dynamicContext.loadSchema(this, schemaLoader);
     }
 
     @Override

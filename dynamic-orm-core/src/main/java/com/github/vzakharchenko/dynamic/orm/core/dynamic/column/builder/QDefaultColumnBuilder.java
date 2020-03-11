@@ -39,6 +39,11 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
     }
 
     @Override
+    public BUILDER_TYPE nullable(boolean value) {
+        return value ? nullable() : notNull();
+    }
+
+    @Override
     public BUILDER_TYPE useAsPrimaryKey() {
         columnType.setIsPrimaryKey(Boolean.TRUE);
         columnType.setNullable(Boolean.FALSE);

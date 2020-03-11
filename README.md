@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.github.vzakharchenko</groupId>
             <artifactId>dynamic-orm-core</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 ```
@@ -217,6 +217,11 @@ public void testQuery() {
 ```java
         File file = new File(".", "testSchema.json");
         qDynamicTableFactory.saveSchema(SchemaUtils.getFileSaver(file));
+```
+ - load dynamic structure from file
+```java
+        File file = new File(".", "testSchema.json");
+        qDynamicTableFactory.loadSchema(SchemaUtils.getFileLoader(file));
 ```
  - get  table metadata
 ```java
@@ -685,7 +690,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 .finish()
                 .buildSchema();
 ```
-# use SQL View on select queries
+# use SQL View
 
 ```java
         qDynamicTableFactory

@@ -17,7 +17,7 @@ public interface QTableColumn {
 
     QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>> addBlobColumn(String columnName);
 
-    <T extends Number & Comparable<?>> QNumberColumnBuilder<QTableColumn,
+    <T extends Number> QNumberColumnBuilder<QTableColumn,
             QNumberColumnBuilder<QTableColumn, ?>>
     addNumberColumn(
             String columnName,

@@ -9,4 +9,11 @@ public final class SchemaUtils {
     public static SchemaSaver getFileSaver(File file) {
         return new FileSchemaSaver(file);
     }
+
+
+    public static SchemaLoader getFileLoader(File file) {
+        return new FileSchemaLoader(file);
+    }
+
+
 }

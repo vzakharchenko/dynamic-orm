@@ -6,6 +6,8 @@ public interface QColumnBuilder<RETURN_TYPE,
 
     BUILDER_TYPE nullable();
 
+    BUILDER_TYPE nullable(boolean value);
+
     BUILDER_TYPE useAsPrimaryKey();
 
     BUILDER_TYPE usAsNotPrimaryKey();

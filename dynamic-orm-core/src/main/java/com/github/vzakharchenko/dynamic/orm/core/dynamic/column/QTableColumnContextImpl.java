@@ -55,7 +55,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     }
 
     @Override
-    public <T extends Number & Comparable<?>>
+    public <T extends Number>
     QNumberColumnBuilder<QTableColumn, QNumberColumnBuilder<QTableColumn, ?>>
     addNumberColumn(String columnName, Class<T> typeClass) {
         return new QNumberBuilder(this,

@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoader;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 
 /**
@@ -55,6 +56,13 @@ public interface QDynamicTableFactory {
      * @param schemaSaver
      */
     void saveSchema(SchemaSaver schemaSaver);
+
+    /**
+     * load dynamic database structure
+     *
+     * @param schemaLoader
+     */
+    void loadSchema(SchemaLoader schemaLoader);
 
     void clear();
 }

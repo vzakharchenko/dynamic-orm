@@ -2,6 +2,8 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaHelper;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoader;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoaderHelper;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.Schema;
 import liquibase.database.Database;
@@ -47,5 +49,16 @@ public class DynamicContext extends AbstractDynamicContext {
         updateSequences();
         Schema schema = SchemaHelper.transform(dynamicTableMap, viewMap, sequenceModelMap);
         schemaSaver.save(schema);
+    }
+
+    public void loadSchema(QDynamicTableFactory dynamicTableFactory,
+                           SchemaLoader schemaLoader) {
+        updateDynamicTables();
+        updateDynamicViews();
+        updateSequences();
+        Schema schema = schemaLoader.load();
+        SchemaLoaderHelper.loadStructure(dynamicTableFactory, schema);
+        dynamicTableFactory
+                .buildSchema();
     }
 }

@@ -20,25 +20,29 @@ public class QSequenceBuilderImpl implements QSequenceBuilder {
 
     @Override
     public QSequenceBuilder initialValue(Long initialValue) {
-        sequanceModel.setInitial(BigInteger.valueOf(initialValue));
+        sequanceModel.setInitial(getValue(initialValue));
         return this;
+    }
+
+    private BigInteger getValue(Long value) {
+        return value != null ? BigInteger.valueOf(value) : null;
     }
 
     @Override
     public QSequenceBuilder increment(Long incrementValue) {
-        sequanceModel.setIncrement(BigInteger.valueOf(incrementValue));
+        sequanceModel.setIncrement(getValue(incrementValue));
         return this;
     }
 
     @Override
     public QSequenceBuilder min(Long minValue) {
-        sequanceModel.setMin(BigInteger.valueOf(minValue));
+        sequanceModel.setMin(getValue(minValue));
         return this;
     }
 
     @Override
     public QSequenceBuilder max(Long maxValue) {
-        sequanceModel.setMax(BigInteger.valueOf(maxValue));
+        sequanceModel.setMax(getValue(maxValue));
         return this;
     }
 
