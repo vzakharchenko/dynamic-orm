@@ -19,6 +19,10 @@ public interface PKGenerator<TYPE> extends Serializable {
 
     Class<TYPE> getTypedClass();
 
+    PrimaryKeyGenerators getGeneratorType();
+
+    String name();
+
     default void generate(OrmQueryFactory ormQueryFactory,
                           RelationalPath<?> qTable, DMLModel model) {
         ComparableExpressionBase primaryKey = ModelHelper.getPrimaryKey(qTable);

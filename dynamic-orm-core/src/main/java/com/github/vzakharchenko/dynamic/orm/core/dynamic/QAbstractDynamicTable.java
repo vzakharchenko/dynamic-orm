@@ -1,5 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QColumn;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QNumberColumn;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QSizeColumn;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
@@ -11,6 +14,7 @@ import com.querydsl.sql.RelationalPathBase;
 import liquibase.database.Database;
 import liquibase.datatype.DatabaseDataType;
 import liquibase.datatype.core.*;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -33,70 +37,73 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
     protected DYNAMIC_TABLE createStringColumn(
-            Database database, String columnName, int size, boolean notNull) {
+            Database database, QSizeColumn sizeColumn) {
         DatabaseDataType databaseDataType = new VarcharType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createString(columnName),
-                databaseDataType.getType(), size, !notNull));
+        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
+                databaseDataType.getType(), sizeColumn));
     }
 
     protected DYNAMIC_TABLE createCharColumn(
-            Database database, String columnName, int size, boolean notNull) {
+            Database database, QSizeColumn sizeColumn) {
         DatabaseDataType databaseDataType = new CharType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createString(columnName),
-                databaseDataType.getType(), size, !notNull));
+        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
+                databaseDataType.getType(), sizeColumn));
     }
 
     protected DYNAMIC_TABLE createClobColumn(
-            Database database, String columnName, int size, boolean notNull) {
+            Database database, QSizeColumn sizeColumn) {
         DatabaseDataType databaseDataType = new ClobType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createString(columnName),
-                databaseDataType.getType(), size, !notNull));
+        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
+                databaseDataType.getType(), sizeColumn));
     }
 
     protected DYNAMIC_TABLE createBooleanColumn(
-            Database database, String columnName, boolean notNull) {
+            Database database, QColumn column) {
         DatabaseDataType databaseDataType = new BooleanType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createBoolean(columnName),
-                databaseDataType.getType(), 1, !notNull));
+        return addColumn(new SizeColumnMetaDataInfo(createBoolean(column.columnName()),
+                databaseDataType.getType(), 1, column));
     }
 
 
     protected DYNAMIC_TABLE createBlobColumn(
-            Database database, String columnName, int size, boolean notNull) {
+            Database database, QSizeColumn sizeColumn) {
         DatabaseDataType dataType = new BlobType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createSimple(columnName, byte[].class),
-                dataType.getType(), size, !notNull));
+        return addColumn(new SizeColumnMetaDataInfo(
+                createSimple(sizeColumn.columnName(), byte[].class),
+                dataType.getType(), sizeColumn));
     }
 
-    // CHECKSTYLE:OFF
-    protected <T extends Number & Comparable<?>> DYNAMIC_TABLE createNumberColumn(
-            Database database, String columnName, Class<T> typeClass, Integer size,
-            Integer decimalDigits, boolean notNull) {
+    protected DYNAMIC_TABLE createNumberColumn(
+            Database database, QNumberColumn numberColumn) {
         DatabaseDataType databaseDataType = new NumberType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createNumber(columnName, typeClass),
-                databaseDataType.getType(), size, !notNull, decimalDigits));
+        return addColumn(new NumberColumnMetaDataInfo(
+                createNumber(numberColumn.columnName(),
+                        numberColumn.numberClass()),
+                databaseDataType.getType(), numberColumn));
     }
 
-    // CHECKSTYLE:ON
     protected DYNAMIC_TABLE createDateColumn(
-            Database database, String columnName, boolean notNull) {
-        DatabaseDataType databaseDataType = new DateType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createDate(columnName, Date.class),
-                databaseDataType.getType(), null, !notNull));
+            Database database, QSizeColumn sizeColumn) {
+        DatabaseDataType dataType = new DateType().toDatabaseDataType(database);
+        return addColumn(new SizeColumnMetaDataInfo(
+                createDate(sizeColumn.columnName(), Date.class),
+                dataType.getType(), sizeColumn));
     }
 
     protected DYNAMIC_TABLE createDateTimeColumn(
-            Database database, String columnName, boolean notNull) {
-        DatabaseDataType databaseDataType = new TimestampType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createDateTime(columnName, Date.class),
-                databaseDataType.getType(), null, !notNull));
+            Database database, QSizeColumn sizeColumn) {
+        DatabaseDataType dataType = new TimestampType().toDatabaseDataType(database);
+        return addColumn(new SizeColumnMetaDataInfo(
+                createDateTime(sizeColumn.columnName(), Date.class),
+                dataType.getType(), sizeColumn));
     }
 
     protected DYNAMIC_TABLE createTimeColumn(
-            Database database, String columnName, boolean notNull) {
-        DatabaseDataType databaseDataType = new TimeType().toDatabaseDataType(database);
-        return addColumn(new ColumnMetaDataInfo(createTime(columnName, Date.class),
-                databaseDataType.getType(), null, !notNull));
+            Database database, QSizeColumn sizeColumn) {
+        DatabaseDataType dataType = new TimeType().toDatabaseDataType(database);
+        return addColumn(new SizeColumnMetaDataInfo(
+                createTime(sizeColumn.columnName(), Date.class),
+                dataType.getType(), sizeColumn));
     }
 
 
@@ -149,6 +156,9 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         Assert.notNull(columnMetaDataInfo);
         addMetadata(columnMetaDataInfo);
         Path column = columnMetaDataInfo.getColumn();
+        if (BooleanUtils.isTrue(columnMetaDataInfo.isPrimaryKey())) {
+            addPrimaryKey(column);
+        }
         columns.put(ModelHelper.getColumnRealName(column), column);
         columnMetaDataInfoMap.put(column, columnMetaDataInfo);
         Assert.notNull(add(column));

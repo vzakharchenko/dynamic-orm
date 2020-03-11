@@ -2,11 +2,13 @@ package com.github.vzakharchenko.dynamic.orm;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.exception.EmptyBatchException;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableSequence;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableSequence;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -41,12 +43,19 @@ public class SequanceTest extends OracleTestQueryOrm {
         assertEquals(testTableSequence.getTest2(), testTableSequences.get(0).getTest2());
     }
 
+    @Test(expectedExceptions = EmptyBatchException.class)
+    public void insertModelFail() {
+        ormQueryFactory.insert(new ArrayList<>());
+    }
+
     @Test
     public void insertDynamicModel() {
-        qDynamicTableFactory.buildTable("new_test_Dynamic_Table")
-                .addPrimaryNumberKey("ID", Integer.class, 18, 0)
-                .addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE"))
-                .createStringColumn("test_column", 200, false).buildSchema();
+        qDynamicTableFactory.buildTables("new_test_Dynamic_Table")
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .finish().buildSchema();
 
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("new_test_Dynamic_Table");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(qDynamicTable);

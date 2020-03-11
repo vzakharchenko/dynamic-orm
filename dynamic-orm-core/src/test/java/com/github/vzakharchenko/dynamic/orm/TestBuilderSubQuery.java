@@ -110,6 +110,9 @@ public class TestBuilderSubQuery extends OracleTestQueryOrm {
         Long cacheCount2 = unionAll.count();
 
         assertTrue(cacheCount == cacheCount2);
+        unionAll = ormQueryFactory.select().unionAll(ormQueryFactory.buildQuery(), listSubQueries.toArray(new SubQueryExpression[listSubQueries.size()]));
+         count = unionAll.count();
+        assertEquals(count.intValue(), 2);
     }
 
     @Test

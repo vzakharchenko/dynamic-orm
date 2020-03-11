@@ -23,24 +23,29 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
         transactionManager.startTransactionIfNeeded();
         // build schema
-        qDynamicTableFactory.buildTable("firstTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createStringColumn("TestStringColumn", 255, false)
-                .createDateTimeColumn("modificationTime", true)
+        qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addStringColumn("Id")
+                .size(255).useAsPrimaryKey().create()
+                .addStringColumn("TestStringColumn").size(255).create()
+                .addDateColumn("modificationTime").create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .finish()
                 .addVersionColumn("modificationTime")
                 .buildNextTable("secondTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createBooleanColumn("isDeleted", false)
+                .addColumns().addStringColumn("Id")
+                .size(255).useAsPrimaryKey().create()
+                .addBooleanColumn("isDeleted").notNull().create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .addStringColumn("linkToFirstTable").size(255).create()
+                .addStringColumn("uniqValue").size(255).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addSoftDeleteColumn("isDeleted", true, false)
-                .createDateTimeColumn("modificationTime", true)
                 .addVersionColumn("modificationTime")
-                .createStringColumn("linkToFirstTable", 255, false)
-                .createStringColumn("uniqValue", 255, false)
-                .addIndex("uniqValue", true)
-                .addForeignKey("linkToFirstTable", "firstTable")
-                .buildSchema();
+                .addIndex().buildIndex("uniqValue", true)
+                .addForeignKey().buildForeignKey("linkToFirstTable", "firstTable")
+                .finish().buildSchema();
         transactionManager.commit();
 
         QDynamicTable firstTable = qDynamicTableFactory.getQDynamicTableByName("firstTable");
@@ -67,9 +72,9 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
 
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
-        qDynamicTableFactory.buildTable("firstTable")
-                .createNumberColumn("newColumn", Integer.class, null, null, false)
-                .buildSchema();
+        qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .finish().buildSchema();
         transactionManager.commit();
 
 

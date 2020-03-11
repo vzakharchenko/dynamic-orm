@@ -8,54 +8,17 @@ import java.io.Serializable;
 /**
  *
  */
-public class ColumnMetaDataInfo implements Serializable {
+public interface ColumnMetaDataInfo extends Serializable {
 
+    Path getColumn();
 
-    private final Path column;
+    Integer getSize();
 
-    private final Integer size;
+    String getJdbcType();
 
-    private final String jdbcType;
+    Integer getDecimalDigits();
 
-    private Integer decimalDigits;
+    Boolean isNullable();
 
-    private final boolean nullable;
-    // CHECKSTYLE:OFF
-    protected ColumnMetaDataInfo(Path column, String type, Integer size,
-                                 boolean nullable, Integer decimalDigits) {
-        this.column = column;
-        this.jdbcType = type;
-        this.nullable = nullable;
-        this.size = size;
-        this.decimalDigits = decimalDigits;
-    }
-    // CHECKSTYLE:ON
-    protected ColumnMetaDataInfo(Path column, String type,
-                                 Integer size, boolean nullable) {
-        this.column = column;
-        this.jdbcType = type;
-        this.size = size;
-        this.nullable = nullable;
-    }
-
-    public Path getColumn() {
-        return column;
-    }
-
-    public Integer getSize() {
-        return size;
-    }
-
-    public String getJdbcType() {
-        return jdbcType;
-    }
-
-    public Integer getDecimalDigits() {
-        return decimalDigits;
-    }
-
-    public Boolean isNullable() {
-        return nullable;
-    }
-
+    Boolean isPrimaryKey();
 }

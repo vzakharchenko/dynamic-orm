@@ -23,17 +23,17 @@ public class DynamicCacheQueryOrm extends OracleTestQueryOrm {
 
     @Test
     public void testCacheSelect() {
-        QTableBuilder testTable1 = qDynamicTableFactory.buildTable("testtable1");
+        QTableBuilder testTable1 = qDynamicTableFactory.buildTables("testtable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size( 200).create();
 
         // validate and create structure
 
-        testTable1.buildSchema();
+        testTable1.finish().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("testtable1");
         assertNotNull(qDynamicTable);
 
@@ -66,17 +66,17 @@ public class DynamicCacheQueryOrm extends OracleTestQueryOrm {
 
     @Test
     public void testCacheSmartSelect() {
-        QTableBuilder testTable1 = qDynamicTableFactory.buildTable("testtable1");
+        QTableBuilder testTable1 = qDynamicTableFactory.buildTables("testtable1");
         // build primary key
-        testTable1.createNumberColumn("ID", Integer.class, 18, 0, true).addPrimaryKey("ID");
+        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.createStringColumn("STRING_Test_FIELD", 200, false);
+        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).create();
 
         // validate and create structure
 
-        testTable1.buildSchema();
+        testTable1.finish().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("testtable1");
         assertNotNull(qDynamicTable);
 

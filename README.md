@@ -37,6 +37,9 @@
     - cache queries based on Primary Key, Column, and Column and Values
     - synchronization cache with crud operations
   - support clustering( if use distributed cache)
+  - support create Sql sequence on runtime
+  - support create/update View on runtime
+  - save/load dynamic structure
 
 # dependencies
  - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, with)
@@ -51,7 +54,7 @@
         <dependency>
             <groupId>com.github.vzakharchenko</groupId>
             <artifactId>dynamic-orm-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 ```
@@ -198,14 +201,27 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 ```java
 @Transactional()
 public void testQuery() {
-qDynamicTableFactory.buildTable("firstTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createStringColumn("TestStringColumn", 255, false)
-                .createDateTimeColumn("modificationTime", true)
+            qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addStringColumn("Id")
+                .size(255).useAsPrimaryKey().create()
+                .addStringColumn("TestStringColumn").size(255).create()
+                .addDateColumn("modificationTime").create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .finish()
                 .addVersionColumn("modificationTime")
-                .buildSchema();
+                .finish().buildSchema();
 }
+```
+ - save dynamic structure to file
+```java
+        File file = new File(".", "testSchema.json");
+        qDynamicTableFactory.saveSchema(SchemaUtils.getFileSaver(file));
+```
+ - load dynamic structure from file
+```java
+        File file = new File(".", "testSchema.json");
+        qDynamicTableFactory.loadSchema(SchemaUtils.getFileLoader(file));
 ```
  - get  table metadata
 ```java
@@ -220,9 +236,9 @@ qDynamicTableFactory.buildTable("firstTable")
    - modify table metadata
 ```java
   // add integer column to table
- qDynamicTableFactory.buildTable("firstTable")
-                .createNumberColumn("newColumn", Integer.class, null, null, false)
-                .buildSchema();
+        qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .finish().buildSchema();
 ```
    - update operation
 ```java
@@ -278,27 +294,32 @@ qDynamicTableFactory.buildTable("firstTable")
  // suspend the current transaction if one exists.
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testQuery() {
-               TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
+         TransactionBuilder transactionManager = ormQueryFactory.transactionManager();
         transactionManager.startTransactionIfNeeded();
         // build schema
-        qDynamicTableFactory.buildTable("firstTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createStringColumn("TestStringColumn", 255, false)
-                .createDateTimeColumn("modificationTime", true)
+        qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addStringColumn("Id")
+                .size(255).useAsPrimaryKey().create()
+                .addStringColumn("TestStringColumn").size(255).create()
+                .addDateColumn("modificationTime").create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .finish()
                 .addVersionColumn("modificationTime")
                 .buildNextTable("secondTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createBooleanColumn("isDeleted", false)
+                .addColumns().addStringColumn("Id")
+                .size(255).useAsPrimaryKey().create()
+                .addBooleanColumn("isDeleted").notNull().create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .addStringColumn("linkToFirstTable").size(255).create()
+                .addStringColumn("uniqValue").size(255).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addSoftDeleteColumn("isDeleted", true, false)
-                .createDateTimeColumn("modificationTime", true)
                 .addVersionColumn("modificationTime")
-                .createStringColumn("linkToFirstTable", 255, false)
-                .createStringColumn("uniqValue", 255, false)
-                .addIndex("uniqValue", true)
-                .addForeignKey("linkToFirstTable", "firstTable")
-                .buildSchema();
+                .addIndex().buildIndex("uniqValue", true)
+                .addForeignKey().buildForeignKey("linkToFirstTable", "firstTable")
+                .finish().buildSchema();
         transactionManager.commit();
 
         QDynamicTable firstTable = qDynamicTableFactory.getQDynamicTableByName("firstTable");
@@ -325,9 +346,9 @@ qDynamicTableFactory.buildTable("firstTable")
 
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
-        qDynamicTableFactory.buildTable("firstTable")
-                .createNumberColumn("newColumn", Integer.class, null, null, false)
-                .buildSchema();
+        qDynamicTableFactory.buildTables("firstTable")
+                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .finish().buildSchema();
         transactionManager.commit();
 
 
@@ -357,14 +378,13 @@ qDynamicTableFactory.buildTable("firstTable")
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
-        DynamicTableModel dynamicTableModel = tableModels.get(1);
-        ormQueryFactory.softDeleteById(dynamicTableModel);
+        ormQueryFactory.softDeleteById(secondModel2);
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)
         tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
         assertEquals(tableModels.size(), 1);
-        
+
         // select all data from all table
         List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
                 ormQueryFactory.buildQuery().from(firstTable)
@@ -373,13 +393,14 @@ qDynamicTableFactory.buildTable("firstTable")
                                 firstTable.getStringColumnByName("Id")))
                         .where(secondTable.getBooleanColumnByName("isDeleted").eq(false)))
                 .findAll(ArrayUtils.addAll(firstTable.all(), secondTable.all()));
-        
+
         assertEquals(rawModels.size(), 1);
         RawModel rawModel = rawModels.get(0);
         DynamicTableModel firstModelFromJoin = rawModel.getDynamicModel(firstTable);
         DynamicTableModel secondModelFromJoin = rawModel.getDynamicModel(secondTable);
         assertEquals(firstModelFromJoin.getValue("Id"), firstTableFromDatabase.getValue("Id"));
         assertEquals(secondModelFromJoin.getValue("Id"), secondModel1.getValue("Id"));
+    }
 ```
 # Static Tables(not Dynamic)
 ## - QueryDsl Models (Table Metadata)
@@ -487,14 +508,15 @@ Annotations:
         TestTableVersionAnnotation staticTable = new TestTableVersionAnnotation();
         ormQueryFactory.insert(staticTable);
         // build dynamic Table with foreign Key to Static Table
-        qDynamicTableFactory.buildTable("relatedTable")
-                .addPrimaryStringKey("Id", 255)
-                .addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .createDateTimeColumn("modificationTime", true)
+        qDynamicTableFactory.buildTables("relatedTable")
+                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .addNumberColumn("StaticId", Integer.class).create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addVersionColumn("modificationTime")
-                .createNumberColumn("StaticId", Integer.class, null, null, false)
-                .addForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
-                .buildSchema();
+                .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .finish().buildSchema();
 
         // get dynamic table metadata
         QDynamicTable relatedTable = qDynamicTableFactory.getQDynamicTableByName("relatedTable");
@@ -563,7 +585,7 @@ pom.xml
             <plugin>
                 <groupId>com.github.vzakharchenko</groupId>
                 <artifactId>dynamic-orm-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.1.0</version>
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
@@ -582,7 +604,7 @@ pom.xml
     </build>
 ```
 
-# Audit Database changing
+# Audit database changes
 [Example: Logging Audit](dynamic-orm-examples/example-test-ehcache/src/main/java/orm/query/examples/ehcache/LogAudit.java)
 ```java
 @Component
@@ -634,4 +656,61 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
         }
     }
 }
+```
+# Create Dynamic Table With Sequence Primary Key Generator
+```java
+        qDynamicTableFactory.
+                .createSequence("dynamicTestTableSequance1")
+                .initialValue(1000L)
+                .increment(10L)
+                .min(1000L)
+                .max(10000L)
+                .finish()
+                .buildSchema();
+```
+
+# Create SQL Sequence on runtime
+```java
+        qDynamicTableFactory.buildTables("dynamicTestTable")
+                .addColumns().addNumberColumn("ID", Integer.class).useAsPrimaryKey().create()
+                .addStringColumn("testColumn").size(100).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence("dynamicTestTableSequance1")).finish()
+                .finish()
+                .createSequence("dynamicTestTableSequance1")
+                .initialValue(1000L)
+                .finish()
+                .buildSchema();
+```
+# Create SQL View on runtime
+```java
+        qDynamicTableFactory
+                .createView("testView").resultSet(ormQueryFactory.buildQuery()
+                .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation), QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .finish()
+                .buildSchema();
+```
+# use SQL View
+
+```java
+        qDynamicTableFactory
+                .createView("testView").resultSet(ormQueryFactory.buildQuery()
+                .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation), QTestTableVersionAnnotation.qTestTableVersionAnnotation.id).finish()
+                .buildSchema();
+
+        QDynamicTable testView = qDynamicTableFactory.getQDynamicTableByName("testView");
+        assertNotNull(testView);
+
+        TestTableVersionAnnotation testTableVersionAnnotation = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(testTableVersionAnnotation);
+
+        // select from table
+        TestTableVersionAnnotation versionAnnotation = ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery(), TestTableVersionAnnotation.class);
+        assertNotNull(versionAnnotation);
+        
+        // select from View
+        DynamicTableModel dynamicTableModel = ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+        assertNotNull(dynamicTableModel);
 ```

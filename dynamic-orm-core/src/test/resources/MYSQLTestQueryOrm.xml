@@ -14,4 +14,6 @@
           class="com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManagerImpl">
         <constructor-arg name="targetCacheManager" ref="cacheManager"/>
     </bean>
+
+    <bean class="com.github.vzakharchenko.dynamic.orm.core.LogAudit"/>
 </beans>

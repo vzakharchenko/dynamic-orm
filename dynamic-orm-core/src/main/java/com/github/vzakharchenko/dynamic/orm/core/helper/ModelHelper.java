@@ -11,9 +11,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Operation;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
-import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
@@ -102,25 +100,25 @@ public abstract class ModelHelper {
         return (ComparableExpressionBase) primaryKey.getLocalColumns().get(0);
     }
 
-    public static BooleanExpression getWherePart(RelationalPath<?> qTable, DMLModel model) {
-        ComparableExpressionBase primaryKey = getPrimaryKey(qTable);
-
-        if (primaryKey != null) {
-            return primaryKey.eq(getPrimaryKeyValue(model, qTable));
-        }
-
-        List<Path<?>> columns = qTable.getColumns();
-        BooleanExpression where = null;
-        for (Path<?> column : columns) {
-            if (where == null) {
-                where = ((SimpleExpression) column).eq(getValueFromModelByColumn(model, column));
-            } else {
-                where = where.and(((SimpleExpression) column)
-                        .eq(getValueFromModelByColumn(model, column)));
-            }
-        }
-        return where;
-    }
+//    public static BooleanExpression getWherePart(RelationalPath<?> qTable, DMLModel model) {
+//        ComparableExpressionBase primaryKey = getPrimaryKey(qTable);
+//
+//        if (primaryKey != null) {
+//            return primaryKey.eq(getPrimaryKeyValue(model, qTable));
+//        }
+//
+//        List<Path<?>> columns = qTable.getColumns();
+//        BooleanExpression where = null;
+//        for (Path<?> column : columns) {
+//            if (where == null) {
+//                where = ((SimpleExpression) column).eq(getValueFromModelByColumn(model, column));
+//            } else {
+//                where = where.and(((SimpleExpression) column)
+//                        .eq(getValueFromModelByColumn(model, column)));
+//            }
+//        }
+//        return where;
+//    }
 
 
     public static Path getPrimaryKeyColumn(RelationalPath qTable) {

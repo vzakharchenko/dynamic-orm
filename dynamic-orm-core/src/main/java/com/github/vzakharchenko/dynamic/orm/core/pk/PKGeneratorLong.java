@@ -31,4 +31,14 @@ public final class PKGeneratorLong implements PKGenerator<Long> {
     public Class<Long> getTypedClass() {
         return Long.class;
     }
+
+    @Override
+    public PrimaryKeyGenerators getGeneratorType() {
+        return PrimaryKeyGenerators.LONG;
+    }
+
+    @Override
+    public String name() {
+        return null;
+    }
 }

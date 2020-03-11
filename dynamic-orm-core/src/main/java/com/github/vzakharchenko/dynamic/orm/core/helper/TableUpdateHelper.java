@@ -20,18 +20,13 @@ public abstract class TableUpdateHelper {
     public static Map<Path<?>, Object> buildSetsValueForQModelAsMap(DMLModel staticModel,
                                                                     RelationalPath<?> qModel,
                                                                     Path... ignore) {
-        try {
-            Map<Path<?>, Object> map = new HashMap<>();
-            List<? extends Path<?>> columns = qModel.getColumns();
-            columns.stream().filter(path -> !ArrayUtils.contains(ignore, path)).forEach(path -> {
-                Object value = ModelHelper.getValueFromModelByColumn(staticModel, path);
-                map.put(path, value);
-            });
-            return map;
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex.getMessage(), ex);
-        }
-
+        Map<Path<?>, Object> map = new HashMap<>();
+        List<? extends Path<?>> columns = qModel.getColumns();
+        columns.stream().filter(path -> !ArrayUtils.contains(ignore, path)).forEach(path -> {
+            Object value = ModelHelper.getValueFromModelByColumn(staticModel, path);
+            map.put(path, value);
+        });
+        return map;
     }
 
 

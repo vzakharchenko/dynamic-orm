@@ -15,14 +15,14 @@ public final class PKGeneratorSequence<NUMBER extends Number>
         implements PKGenerator<NUMBER> {
 
     private static final PKGeneratorSequence INSTANCE = new PKGeneratorSequence();
-    private String sequanceName;
+    private String sequenceName;
 
     private PKGeneratorSequence() {
         super();
     }
 
     public PKGeneratorSequence(String sequanceName) {
-        this.sequanceName = sequanceName;
+        this.sequenceName = sequanceName;
     }
 
     public static PKGeneratorSequence getInstance() {
@@ -33,8 +33,8 @@ public final class PKGeneratorSequence<NUMBER extends Number>
     public NUMBER generateNewValue(OrmQueryFactory ormQueryFactory,
                                    RelationalPath<?> qTable, DMLModel model) {
         String sequanceName0;
-        if (StringUtils.isNotEmpty(this.sequanceName)) {
-            sequanceName0 = this.sequanceName;
+        if (StringUtils.isNotEmpty(this.sequenceName)) {
+            sequanceName0 = this.sequenceName;
         } else {
             sequanceName0 = ModelHelper.getSequanceNameFromModel(model.getClass());
         }
@@ -48,5 +48,15 @@ public final class PKGeneratorSequence<NUMBER extends Number>
     @Override
     public Class<NUMBER> getTypedClass() {
         return (Class<NUMBER>) Number.class;
+    }
+
+    @Override
+    public PrimaryKeyGenerators getGeneratorType() {
+        return PrimaryKeyGenerators.SEQUENCE;
+    }
+
+    @Override
+    public String name() {
+        return sequenceName;
     }
 }

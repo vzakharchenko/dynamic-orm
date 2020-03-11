@@ -58,13 +58,6 @@ public abstract class AbstractShowSqlBuilder
     }
 
     @Override
-    public String showSql(SQLCommonQuery<?> sqlQuery, Expression expression) {
-        SQLQuery<?> clone = DBHelper.castProjectionQueryToSqlQuery(sqlQuery).clone();
-        clone.setUseLiterals(true);
-        return clone.select(expression).getSQL().getSQL();
-    }
-
-    @Override
     public <MODEL extends DMLModel> String showSql(SQLCommonQuery<?> sqlQuery,
                                                    RelationalPath<?> qTable,
                                                    Class<MODEL> modelClass) {
@@ -80,4 +73,10 @@ public abstract class AbstractShowSqlBuilder
         return showSql(sqlQuery, qTableFromModel, modelClass);
     }
 
+    @Override
+    public String showSql(SQLCommonQuery<?> sqlQuery, Expression<?>... expressions) {
+        SQLQuery<?> clone = DBHelper.castProjectionQueryToSqlQuery(sqlQuery).clone();
+        clone.setUseLiterals(true);
+        return clone.select(expressions).getSQL().getSQL();
+    }
 }

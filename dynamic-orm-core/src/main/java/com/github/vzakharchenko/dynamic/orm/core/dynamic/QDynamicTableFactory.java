@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
-import java.util.Collection;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoader;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 
 /**
  * Build and supports dynamic tables at runtime
@@ -18,19 +19,50 @@ public interface QDynamicTableFactory {
     QDynamicTable getQDynamicTableByName(String tableName);
 
     /**
-     * get list of dynamic Tables
-     * @return
-     */
-    Collection<QDynamicTable> getQDynamicTables();
-
-    /**
      * build a table
      *
      * @param tableName
      * @return tableBuilder
      * @see QTableBuilder
      */
-    QTableBuilder buildTable(String tableName);
+    QTableBuilder buildTables(String tableName);
 
+    /**
+     * add sequance
+     *
+     * @param sequanceName
+     * @return builder
+     */
+    QSequenceBuilder createSequence(String sequanceName);
 
+    /**
+     * create SQL View (Virtual table)
+     *
+     * @param viewName
+     * @return
+     */
+    QViewBuilder createView(String viewName);
+
+    /**
+     * The construction of the table using ddl queries
+     * <p>
+     * Attention! existing columns are not deleted
+     */
+    void buildSchema();
+
+    /**
+     * save dynamic database structure
+     *
+     * @param schemaSaver
+     */
+    void saveSchema(SchemaSaver schemaSaver);
+
+    /**
+     * load dynamic database structure
+     *
+     * @param schemaLoader
+     */
+    void loadSchema(SchemaLoader schemaLoader);
+
+    void clear();
 }

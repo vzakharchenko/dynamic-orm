@@ -1,11 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure;
 
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshot;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.DynamicDatabaseSnapshotFactory;
 import com.github.vzakharchenko.dynamic.orm.structure.SimpleDbStructure;
 import com.github.vzakharchenko.dynamic.orm.structure.exception.UpdateException;
-import com.google.common.collect.Maps;
 import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.diff.DiffGeneratorFactory;
@@ -21,7 +19,6 @@ import liquibase.structure.DatabaseObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -33,7 +30,10 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  *
@@ -104,7 +104,7 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
     }
 
     private void update0(Connection connection,
-                         Map<String, QDynamicTable> qDynamicMap) throws IOException,
+                         LiquibaseHolder liquibaseHolder) throws IOException,
             DatabaseException,
             InvalidExampleException,
             UpdateException {
@@ -112,7 +112,7 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
         Database referenceDatabase = currentDataBase(connection);
         // generate snapshot database for definition
         DynamicDatabaseSnapshot databaseSnapshot = DynamicDatabaseSnapshotFactory
-                .build(referenceDatabase, qDynamicMap.values());
+                .build(referenceDatabase, liquibaseHolder);
         // create snapshot for current database
         Set<Class<? extends DatabaseObject>> compareTypes = getCompareTypes();
         DatabaseSnapshot referenceSnapshot = SnapshotGeneratorFactory.getInstance()
@@ -127,10 +127,10 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
     }
 
     @Override
-    public void update(Map<String, QDynamicTable> qDynamicMap) {
+    public void update(LiquibaseHolder liquibaseHolder) {
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {
-            update0(connection, qDynamicMap);
+            update0(connection, liquibaseHolder);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception ex) {
@@ -138,21 +138,6 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
-    }
-
-    @Override
-    public void update(QDynamicTable qDynamicTable) {
-        update(Collections.singletonList(qDynamicTable));
-    }
-
-    @Override
-    public void update(Collection<QDynamicTable> qDynamicTables) {
-        Map<String, QDynamicTable> tableMap = Maps
-                .newHashMapWithExpectedSize(qDynamicTables.size());
-        for (QDynamicTable qDynamicTable : qDynamicTables) {
-            tableMap.put(StringUtils.upperCase(qDynamicTable.getTableName()), qDynamicTable);
-        }
-        update(tableMap);
     }
 
     protected void createTempDir() throws IOException {

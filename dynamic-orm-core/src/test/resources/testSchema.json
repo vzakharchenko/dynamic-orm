@@ -1,0 +1,401 @@
+{
+  "version": "1.0.1",
+  "tables": [
+    {
+      "name": "TABLE",
+      "columns": [
+        {
+          "name": "string1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": 255,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": false
+        },
+        {
+          "name": "string2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": 255,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "time1",
+          "aType": "java.util.Date",
+          "className": "TimePath",
+          "size": null,
+          "jdbcType": "time",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "time2",
+          "aType": "java.util.Date",
+          "className": "TimePath",
+          "size": null,
+          "jdbcType": "time",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "char1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": 255,
+          "jdbcType": "CHAR",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "char2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": 255,
+          "jdbcType": "CHAR",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "clob1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "CLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "clob2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "CLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "blob1",
+          "aType": "ARRAY",
+          "className": "SimplePath",
+          "size": null,
+          "jdbcType": "BLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "blob2",
+          "aType": "ARRAY",
+          "className": "SimplePath",
+          "size": null,
+          "jdbcType": "BLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "date1",
+          "aType": "java.util.Date",
+          "className": "DatePath",
+          "size": null,
+          "jdbcType": "date",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "date2",
+          "aType": "java.util.Date",
+          "className": "DatePath",
+          "size": null,
+          "jdbcType": "date",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "datetime1",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "datetime2",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "boolean1",
+          "aType": "java.lang.Boolean",
+          "className": "BooleanPath",
+          "size": 1,
+          "jdbcType": "BOOLEAN",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "boolean2",
+          "aType": "java.lang.Boolean",
+          "className": "BooleanPath",
+          "size": 1,
+          "jdbcType": "BOOLEAN",
+          "decimalDigits": null,
+          "nullable": true
+        }
+      ],
+      "primaryKeys": [
+        {
+          "column": "string1"
+        }
+      ],
+      "foreignKeys": [],
+      "indices": [],
+      "primaryGeneratorType": "UUID",
+      "sequanceName": null,
+      "versionColumn": "datetime1",
+      "softDeleteColumn": {
+        "column": "boolean1",
+        "deletedValue": true,
+        "defaultValue": false
+      }
+    },
+    {
+      "name": "TESTTABLE",
+      "columns": [
+        {
+          "name": "Id",
+          "aType": "java.lang.Integer",
+          "className": "NumberPath",
+          "size": 37,
+          "jdbcType": "numeric",
+          "decimalDigits": null,
+          "nullable": false
+        },
+        {
+          "name": "exIdt",
+          "aType": "java.lang.Integer",
+          "className": "NumberPath",
+          "size": null,
+          "jdbcType": "numeric",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "exIdt2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": 255,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        }
+      ],
+      "primaryKeys": [
+        {
+          "column": "Id"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "localColumns": [
+            "exIdt"
+          ],
+          "remoteColumns": [
+            "id"
+          ],
+          "dynamicRemote": false,
+          "table": "com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation"
+        },
+        {
+          "localColumns": [
+            "exIdt2"
+          ],
+          "remoteColumns": [
+            "string1"
+          ],
+          "dynamicRemote": true,
+          "table": "TABLE"
+        }
+      ],
+      "indices": [
+        {
+          "columns": [
+            "exIdt"
+          ],
+          "uniq": true
+        }
+      ],
+      "primaryGeneratorType": null,
+      "sequanceName": null,
+      "versionColumn": null,
+      "softDeleteColumn": null
+    }
+  ],
+  "sequences": [
+    {
+      "name": "SEQUENCE",
+      "initial": null,
+      "increment": null,
+      "min": null,
+      "max": null
+    }
+  ],
+  "views": [
+    {
+      "name": "TESTVIEW",
+      "columns": [
+        {
+          "name": "string1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "string2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "time1",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "time2",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "date1",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "date2",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "datetime1",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "datetime2",
+          "aType": "java.util.Date",
+          "className": "DateTimePath",
+          "size": null,
+          "jdbcType": "TIMESTAMP",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "char1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "char2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "clob1",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "clob2",
+          "aType": "java.lang.String",
+          "className": "StringPath",
+          "size": null,
+          "jdbcType": "VARCHAR2",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "blob1",
+          "aType": "ARRAY",
+          "className": "SimplePath",
+          "size": null,
+          "jdbcType": "BLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "blob2",
+          "aType": "ARRAY",
+          "className": "SimplePath",
+          "size": null,
+          "jdbcType": "BLOB",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "boolean1",
+          "aType": "java.lang.Boolean",
+          "className": "BooleanPath",
+          "size": 1,
+          "jdbcType": "BOOLEAN",
+          "decimalDigits": null,
+          "nullable": true
+        },
+        {
+          "name": "boolean2",
+          "aType": "java.lang.Boolean",
+          "className": "BooleanPath",
+          "size": 1,
+          "jdbcType": "BOOLEAN",
+          "decimalDigits": null,
+          "nullable": true
+        }
+      ],
+      "sql": "select \"TABLE\".\"STRING1\", \"TABLE\".\"STRING2\" as \"someString\", \"TABLE\".\"TIME1\", \"TABLE\".\"TIME2\" as \"someTime\", \"TABLE\".\"DATE1\", \"TABLE\".\"DATE2\" as \"someDate\", \"TABLE\".\"DATETIME1\", \"TABLE\".\"DATETIME2\" as \"someDateTime\", \"TABLE\".\"CHAR1\", \"TABLE\".\"CHAR2\" as \"someChar\", \"TABLE\".\"CLOB1\", \"TABLE\".\"CLOB2\" as \"someClob\", \"TABLE\".\"BLOB1\", \"TABLE\".\"BLOB2\" as \"someBlob\", \"TABLE\".\"BOOLEAN1\", \"TABLE\".\"BOOLEAN2\" as \"someBoolean\"\nfrom \"TABLE\" \"TABLE\""
+    }
+  ]
+}
