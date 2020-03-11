@@ -14,7 +14,8 @@ public class CachedColumnTest {
         CachedColumn cachedColumn1 = new CachedColumn(QTesttable.testtable.id);
         CachedColumn cachedColumn2 = new CachedColumn("TESTTABLE", "ID");
         assertEquals(cachedColumn1, cachedColumn2);
-
+        CachedColumnWithValue cachedColumnWithValue = new CachedColumnWithValue();
+        cachedColumnWithValue = new CachedColumnWithValue("T","T","T");
 
     }
 }

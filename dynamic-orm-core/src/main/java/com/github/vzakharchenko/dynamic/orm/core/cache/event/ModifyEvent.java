@@ -162,10 +162,10 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         return cacheEventType0;
     }
 
-    public final boolean isOneOf(RelationalPath... qTables) {
-        int indexOf = ArrayUtils.indexOf(qTables, qTable);
-        return indexOf > -1;
-    }
+//    public final boolean isOneOf(RelationalPath... qTables) {
+//        int indexOf = ArrayUtils.indexOf(qTables, qTable);
+//        return indexOf > -1;
+//    }
 
     public final RelationalPath<?> getQTable() {
         return qTable;
