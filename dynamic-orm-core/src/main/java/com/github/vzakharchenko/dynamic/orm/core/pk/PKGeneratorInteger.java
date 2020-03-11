@@ -26,4 +26,9 @@ public final class PKGeneratorInteger extends PKGeneratorUUID<Integer> {
     public Class<Integer> getTypedClass() {
         return Integer.class;
     }
+
+    @Override
+    public PrimaryKeyGenerators getGeneratorType() {
+        return PrimaryKeyGenerators.INTEGER;
+    }
 }

@@ -31,4 +31,14 @@ public final class UUIDPKGenerator implements PKGenerator<String> {
     public Class<String> getTypedClass() {
         return String.class;
     }
+
+    @Override
+    public PrimaryKeyGenerators getGeneratorType() {
+        return PrimaryKeyGenerators.UUID;
+    }
+
+    @Override
+    public String name() {
+        return null;
+    }
 }

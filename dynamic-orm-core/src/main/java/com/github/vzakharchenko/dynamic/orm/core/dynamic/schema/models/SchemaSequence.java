@@ -1,25 +1,21 @@
-package com.github.vzakharchenko.dynamic.orm.core.dynamic;
-
-import org.apache.commons.lang3.StringUtils;
+package com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Locale;
 
-public class SequanceModel implements Serializable {
-
-    private final String name;
+public class SchemaSequence implements Serializable {
+    private String name;
     private BigInteger initial;
     private BigInteger increment;
     private BigInteger min;
     private BigInteger max;
 
-    public SequanceModel(String name) {
-        this.name = StringUtils.upperCase(name, Locale.US);
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public BigInteger getInitial() {

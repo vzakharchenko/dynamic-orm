@@ -39,6 +39,7 @@
   - support clustering( if use distributed cache)
   - support create Sql sequence on runtime
   - support create/update View on runtime
+  - save/load dynamic structure
 
 # dependencies
  - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, with)
@@ -211,6 +212,11 @@ public void testQuery() {
                 .addVersionColumn("modificationTime")
                 .finish().buildSchema();
 }
+```
+ - save dynamic structure to file
+```java
+        File file = new File(".", "testSchema.json");
+        qDynamicTableFactory.saveSchema(SchemaUtils.getFileSaver(file));
 ```
  - get  table metadata
 ```java

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  *
  */
-public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
+public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
 
     public static final String WRONG_COLUMN = "Wrong column ";
     private final List<IndexData> indexDatas = new ArrayList<>();
@@ -142,19 +142,19 @@ public final class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
                 StringUtils.upperCase(columnName)), unique);
     }
 
-    protected PKGenerator<?> getPkGenerator() {
+    public PKGenerator<?> getPkGenerator() {
         return pkGenerator;
     }
 
-    protected Path<?> getVersionColumn() {
+    public Path<?> getVersionColumn() {
         return versionColumn;
     }
 
-    protected SoftDelete<?> getSoftDelete() {
+    public SoftDelete<?> getSoftDelete() {
         return softDelete;
     }
 
-    protected List<IndexData> getIndexDatas() {
+    public List<IndexData> getIndexDatas() {
         return Collections
                 .unmodifiableList(indexDatas);
     }

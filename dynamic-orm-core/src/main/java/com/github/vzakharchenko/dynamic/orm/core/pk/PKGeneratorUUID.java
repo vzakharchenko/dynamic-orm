@@ -28,4 +28,8 @@ public abstract class PKGeneratorUUID<NUMBER extends Number> implements PKGenera
         return generateUniqueId();
     }
 
+    @Override
+    public String name() {
+        return null;
+    }
 }

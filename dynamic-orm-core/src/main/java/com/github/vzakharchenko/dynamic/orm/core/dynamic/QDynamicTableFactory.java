@@ -1,6 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
-import java.util.Collection;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 
 /**
  * Build and supports dynamic tables at runtime
@@ -16,13 +16,6 @@ public interface QDynamicTableFactory {
      * @return
      */
     QDynamicTable getQDynamicTableByName(String tableName);
-
-    /**
-     * get list of dynamic Tables
-     *
-     * @return
-     */
-    Collection<QDynamicTable> getQDynamicTables();
 
     /**
      * build a table
@@ -55,6 +48,13 @@ public interface QDynamicTableFactory {
      * Attention! existing columns are not deleted
      */
     void buildSchema();
+
+    /**
+     * save dynamic database structure
+     *
+     * @param schemaSaver
+     */
+    void saveSchema(SchemaSaver schemaSaver);
 
     void clear();
 }

@@ -1,51 +1,35 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaHelper;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.Schema;
 import liquibase.database.Database;
 import liquibase.database.jvm.JdbcConnection;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  */
-public class DynamicContext {
-    public static final String DYNAMIC_METADATA = "DYNAMIC_METADATA";
-    private final Map<String, QDynamicTable> dynamicTableMap = new ConcurrentHashMap<>();
+public class DynamicContext extends AbstractDynamicContext {
 
-    private final Database database;
-    private final OrmQueryFactory ormQueryFactory;
 
     public DynamicContext(Database database, OrmQueryFactory queryFactory) {
-        this.database = database;
-        this.ormQueryFactory = queryFactory;
+        super(database, queryFactory);
     }
 
-
     public QDynamicTable getQTable(String tableName) {
+        updateDynamicTables();
+        updateDynamicViews();
         QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
-        if (qDynamicTable == null) {
+        ViewDataHolder qViewTable = viewMap.get(StringUtils.upperCase(tableName));
+        if (qDynamicTable == null && qViewTable == null) {
             throw new IllegalStateException("dynamic table with name " + tableName +
                     " is not found. May be you should Build this table first ");
         }
-        return qDynamicTable;
-    }
-
-    private void registerQTable(QDynamicTable qDynamicTable) {
-        dynamicTableMap.put(StringUtils.upperCase(qDynamicTable.getTableName()), qDynamicTable);
-    }
-
-    public void registerQTables(Collection<QDynamicTable> qDynamicTables) {
-        for (QDynamicTable qDynamicTable : qDynamicTables) {
-            dynamicTableMap.put(StringUtils.upperCase(
-                    qDynamicTable.getTableName()), qDynamicTable);
-        }
-        updateCache();
+        return qDynamicTable != null ? qDynamicTable : qViewTable.getDynamicTable();
     }
 
     public Database getDatabase(Connection connection) {
@@ -57,39 +41,11 @@ public class DynamicContext {
         dynamicTableMap.clear();
     }
 
-    public Collection<QDynamicTable> getQTables() {
-        return dynamicTableMap.values();
-    }
-
-    private void updateCache() {
-        CacheStorageImpl cacheStorage = new CacheStorageImpl();
-        cacheStorage.setDynamicTables(new ArrayList<>(dynamicTableMap.values()));
-        ormQueryFactory.getContext().getTransactionCache().putToCache(DYNAMIC_METADATA, cacheStorage);
-    }
-
-    private void updateDynamicTables() {
-        CacheStorage cacheStorage = ormQueryFactory.getContext().getTransactionCache()
-                .getFromCache(DYNAMIC_METADATA, CacheStorage.class);
-        if (cacheStorage != null) {
-            cacheStorage.getDynamicTables().forEach(this::registerQTable);
-        }
-    }
-
-    public QDynamicTable createQTable(String tableName) {
+    public void saveSchema(SchemaSaver schemaSaver) {
         updateDynamicTables();
-        QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
-        return qDynamicTable != null ? qDynamicTable : new QDynamicTable(tableName);
-    }
-
-    public OrmQueryFactory getOrmQueryFactory() {
-        return ormQueryFactory;
-    }
-
-    public void registerViews(Collection<ViewModel> viewModels) {
-        viewModels.forEach(viewModel -> {
-            QDynamicTable qDynamicTable = QViewUtils.transform(database, viewModel);
-            registerQTable(qDynamicTable);
-        });
-
+        updateDynamicViews();
+        updateSequences();
+        Schema schema = SchemaHelper.transform(dynamicTableMap, viewMap, sequenceModelMap);
+        schemaSaver.save(schema);
     }
 }

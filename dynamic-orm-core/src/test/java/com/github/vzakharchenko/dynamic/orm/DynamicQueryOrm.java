@@ -3,9 +3,11 @@ package com.github.vzakharchenko.dynamic.orm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
+import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersion;
@@ -14,11 +16,13 @@ import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
-import com.querydsl.core.types.dsl.Wildcard;
+import org.apache.commons.io.FileUtils;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -371,6 +375,7 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
                 .finish()
                 .buildSchema();
     }
+
     @Test
     public void testViewTest() {
         qDynamicTableFactory
@@ -378,6 +383,7 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
                 .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation), QTestTableVersionAnnotation.qTestTableVersionAnnotation.id).finish()
                 .buildSchema();
     }
+
     @Test(expectedExceptions = Exception.class)
     public void testViewTestUnsupported() {
         qDynamicTableFactory
@@ -406,7 +412,7 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
     public void testViewAlias() {
         qDynamicTableFactory
                 .createView("testView").resultSet(ormQueryFactory.buildQuery()
-                .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation),
+                        .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation),
                 QTestTableVersionAnnotation.qTestTableVersionAnnotation.id.as("id"),
                 QTestTableVersionAnnotation.qTestTableVersionAnnotation.version.as("version")
         ).finish()
@@ -462,6 +468,70 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
 
         QDynamicTable testView = qDynamicTableFactory.getQDynamicTableByName("testView");
         assertNotNull(testView);
+
+    }
+
+    @Test
+    public void testFileSaver() throws IOException {
+        qDynamicTableFactory.buildTables("table")
+                .addColumns().addStringColumn("string1").useAsPrimaryKey().create()
+                .addStringColumn("string2").create()
+                .addTimeColumn("time1").create()
+                .addTimeColumn("time2").create()
+                .addCharColumn("char1").create()
+                .addCharColumn("char2").create()
+                .addClobColumn("clob1").create()
+                .addClobColumn("clob2").create()
+                .addBlobColumn("blob1").create()
+                .addBlobColumn("blob2").create()
+                .addDateColumn("date1").create()
+                .addDateColumn("date2").create()
+                .addDateTimeColumn("datetime1").create()
+                .addDateTimeColumn("datetime2").create()
+                .addBooleanColumn("boolean1").create()
+                .addBooleanColumn("boolean2").create()
+                .finish()
+                .addVersionColumn("datetime1")
+                .addSoftDeleteColumn("boolean1", true, false)
+                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
+                .finish()
+                .buildSchema();
+        QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("table");
+
+        qDynamicTableFactory.createView("testView").resultSet(
+                ormQueryFactory.buildQuery().from(qDynamicTable),
+                qDynamicTable.getStringColumnByName("string1"),
+                qDynamicTable.getStringColumnByName("string2").as("someString"),
+                qDynamicTable.getTimeColumnByName("time1"),
+                qDynamicTable.getTimeColumnByName("time2").as("someTime"),
+                qDynamicTable.getDateColumnByName("date1"),
+                qDynamicTable.getDateColumnByName("date2").as("someDate"),
+                qDynamicTable.getDateTimeColumnByName("datetime1"),
+                qDynamicTable.getDateTimeColumnByName("datetime2").as("someDateTime"),
+                qDynamicTable.getCharColumnByName("char1"),
+                qDynamicTable.getCharColumnByName("char2").as("someChar"),
+                qDynamicTable.getClobColumnByName("clob1"),
+                qDynamicTable.getClobColumnByName("clob2").as("someClob"),
+                qDynamicTable.getBlobColumnByName("blob1"),
+                qDynamicTable.getBlobColumnByName("blob2").as("someBlob"),
+                qDynamicTable.getBooleanColumnByName("boolean1"),
+                qDynamicTable.getBooleanColumnByName("boolean2").as("someBoolean")
+        ).finish()
+                .buildTables("testTable").addColumns()
+                .addNumberColumn("Id", Integer.class).size(37).useAsPrimaryKey().create()
+                .addNumberColumn("exIdt", Integer.class).create()
+                .addStringColumn("exIdt2").create()
+                .finish()
+                .addIndex().buildIndex("exIdt", true)
+                .addForeignKey().buildForeignKey("exIdt", QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                .addForeignKey().buildForeignKey("exIdt2", qDynamicTable.getTableName())
+                .finish()
+                .createSequence("sequence").finish()
+                .buildSchema();
+        File file = new File("./target/", "testSchema.json");
+        qDynamicTableFactory.saveSchema(SchemaUtils.getFileSaver(file));
+        byte[] bytes = FileUtils.readFileToByteArray(file);
+        assertNotNull(bytes);
 
     }
 }

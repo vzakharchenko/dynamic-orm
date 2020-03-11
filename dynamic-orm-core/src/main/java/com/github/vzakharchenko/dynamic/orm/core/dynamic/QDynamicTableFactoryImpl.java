@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureUpdater;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.LiquibaseHolder;
@@ -12,7 +13,6 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,11 +59,6 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
         return getDynamicContext().getQTable(tableName);
     }
 
-    @Override
-    public Collection<QDynamicTable> getQDynamicTables() {
-        return getDynamicContext().getQTables();
-    }
-
 
     @Override
     public QTableBuilder buildTables(String tableName) {
@@ -87,7 +82,13 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
                 sequenceModelMap, viewModelMap));
         dynamicContext.registerQTables(dynamicTableMap.values());
         dynamicContext.registerViews(viewModelMap.values());
+        dynamicContext.registerSequences(sequenceModelMap);
         clear();
+    }
+
+    @Override
+    public void saveSchema(SchemaSaver schemaSaver) {
+        dynamicContext.saveSchema(schemaSaver);
     }
 
     @Override

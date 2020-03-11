@@ -19,7 +19,6 @@ public class QViewBuilderImpl implements QViewBuilder {
 
     @Override
     public QViewBuilder resultSet(SQLCommonQuery<?> query, Expression<?>... columns) {
-        viewModel.setQuery(query);
         viewModel.setExpressions(Arrays.asList(columns));
         OrmQueryFactory ormQueryFactory = dynamicBuilderContext.getDynamicContext().getOrmQueryFactory();
         viewModel.setSql(ormQueryFactory.select().showSql(query, columns));
