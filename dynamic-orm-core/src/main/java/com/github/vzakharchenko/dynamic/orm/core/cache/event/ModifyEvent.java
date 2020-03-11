@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.context.ApplicationEvent;
 
@@ -27,9 +26,9 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
 
     public static final String IS_NOT_FOUND = " is not found: ";
     private final RelationalPath<?> qTable;
+    private final String resourceName;
     protected List<EVENT> transactionHistory = new ArrayList<>();
     private Class<? extends DMLModel> modelClass0;
-    private final String resourceName;
     private DMLModel oldModel;
     private DMLModel newModel;
     private Map<Serializable, DiffColumnModel> diffColumnModelMap0;
