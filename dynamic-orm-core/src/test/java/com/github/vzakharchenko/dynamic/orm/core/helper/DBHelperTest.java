@@ -38,6 +38,7 @@ public class DBHelperTest {
         } catch (NoActionExeption actionExeption) {
             assertEquals(actionExeption.getRowsExpected(), 2);
             assertEquals(actionExeption.getRowsAffected(), 1);
+            assertEquals(actionExeption, new NoActionExeption(1, 2));
         }
     }
 }
