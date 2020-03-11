@@ -8,18 +8,6 @@ package com.github.vzakharchenko.dynamic.orm.structure.exception;
  */
 public class DropAllException extends Exception {
 
-    public DropAllException() {
-        super();
-    }
-
-    public DropAllException(String message) {
-        super(message);
-    }
-
-    public DropAllException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public DropAllException(Throwable cause) {
         super(cause);
     }

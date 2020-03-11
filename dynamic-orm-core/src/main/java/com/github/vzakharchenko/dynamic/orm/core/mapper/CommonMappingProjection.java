@@ -14,10 +14,6 @@ public abstract class CommonMappingProjection<TYPE> extends MappingProjection<TY
         super(type, args);
     }
 
-    public CommonMappingProjection(Class<? super TYPE> type, Expression<?>[]... args) {
-        super(type, args);
-    }
-
     @Override
     public abstract TYPE map(Tuple row);
 }

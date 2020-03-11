@@ -21,10 +21,6 @@ import java.util.Map;
  */
 public abstract class CacheHelper {
 
-    public static PrimaryKeyCacheKey buildKey(Serializable key, RelationalPath<?> qTable) {
-        return buildPrimaryKeyCacheKey(key, qTable);
-    }
-
     public static void checkModelIsDeleted(
             QueryContextImpl queryContext, DMLModel model, RelationalPath<?> qTable) {
         PrimaryKeyCacheKey primaryKeyCacheKey = buildPrimaryKeyCacheModel(model, qTable);

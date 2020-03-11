@@ -1,7 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.exception;
 
-import java.util.Objects;
-
 /**
  *
  */
@@ -22,23 +20,5 @@ public class NoActionExeption extends RuntimeException {
 
     public long getRowsExpected() {
         return rowsExpected;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        NoActionExeption that = (NoActionExeption) o;
-        return rowsAffected == that.rowsAffected &&
-                rowsExpected == that.rowsExpected;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(rowsAffected, rowsExpected);
     }
 }

@@ -2,11 +2,13 @@ package com.github.vzakharchenko.dynamic.orm;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.exception.EmptyBatchException;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableSequence;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableSequence;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -39,6 +41,11 @@ public class SequanceTest extends OracleTestQueryOrm {
         assertEquals(testTableSequence.getId(), testTableSequences.get(0).getId());
         assertEquals(testTableSequence.getTest2().intValue(), 88);
         assertEquals(testTableSequence.getTest2(), testTableSequences.get(0).getTest2());
+    }
+
+    @Test(expectedExceptions = EmptyBatchException.class)
+    public void insertModelFail() {
+        ormQueryFactory.insert(new ArrayList<>());
     }
 
     @Test
