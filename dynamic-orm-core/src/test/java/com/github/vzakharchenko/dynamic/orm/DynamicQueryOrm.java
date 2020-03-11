@@ -396,11 +396,10 @@ public class DynamicQueryOrm extends OracleTestQueryOrm {
                 .findOne(ormQueryFactory.buildQuery(), TestTableVersionAnnotation.class);
         assertNotNull(versionAnnotation);
 
-
         // select from View
-        Object[] one = ormQueryFactory.select()
-                .findOne(ormQueryFactory.buildQuery().from(testView), Wildcard.all);
-        assertNotNull(one);
+        DynamicTableModel dynamicTableModel = ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+        assertNotNull(dynamicTableModel);
     }
 
     @Test
