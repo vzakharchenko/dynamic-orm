@@ -585,7 +585,7 @@ pom.xml
             <plugin>
                 <groupId>com.github.vzakharchenko</groupId>
                 <artifactId>dynamic-orm-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>1.1.0</version>
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
