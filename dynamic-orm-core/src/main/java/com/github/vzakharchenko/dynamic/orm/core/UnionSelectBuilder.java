@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.sql.SQLCommonQuery;
 
@@ -17,8 +18,8 @@ public interface UnionSelectBuilder {
      * @param subQueries union subqueries
      * @return union query builder
      */
-    com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder union(SQLCommonQuery<?> sqlQuery,
-                                                                       SubQueryExpression<?>... subQueries);
+    UnionBuilder union(SQLCommonQuery<?> sqlQuery,
+                       SubQueryExpression<?>... subQueries);
 
     /**
      * union query
@@ -27,8 +28,8 @@ public interface UnionSelectBuilder {
      * @param subQueries union subqueries
      * @return union query builder
      */
-    com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder union(SQLCommonQuery<?> sqlQuery,
-                                                                       List<SubQueryExpression<?>> subQueries);
+    UnionBuilder union(SQLCommonQuery<?> sqlQuery,
+                       List<SubQueryExpression<?>> subQueries);
 
     /**
      * unionAll query
@@ -37,8 +38,8 @@ public interface UnionSelectBuilder {
      * @param subQueries union subqueries
      * @return union query builder
      */
-    com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
-                                                                          SubQueryExpression<?>... subQueries);
+    UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
+                          SubQueryExpression<?>... subQueries);
 
     /**
      * unionAll query
@@ -47,8 +48,8 @@ public interface UnionSelectBuilder {
      * @param subQueries union subqueries
      * @return union query builder
      */
-    com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
-                                                                          List<SubQueryExpression<?>> subQueries);
+    UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
+                          List<SubQueryExpression<?>> subQueries);
 
 
 }

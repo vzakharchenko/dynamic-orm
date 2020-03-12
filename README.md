@@ -14,6 +14,7 @@
  - Firebird
  - SQLite
  - MSSQL
+ - DB2
 # Features
   - modify database structure on runtime (use Liquibase)
     - create tables

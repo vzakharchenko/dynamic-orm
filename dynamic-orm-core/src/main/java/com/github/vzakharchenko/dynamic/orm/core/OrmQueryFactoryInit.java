@@ -48,6 +48,18 @@ public final class OrmQueryFactoryInit implements OrmQueryFactoryBuilder {
     }
 
     @Override
+    public OrmQueryFactoryBuilder debug() {
+        ormQueryFactory.setDebugSql(true);
+        return this;
+    }
+
+    @Override
+    public OrmQueryFactoryBuilder cacheRegion(String cacheName) {
+        ormQueryFactory.setCacheName(cacheName);
+        return this;
+    }
+
+    @Override
     public OrmQueryFactoryBuilder transactionManager(
             PlatformTransactionManager transactionManager) {
         Assert.notNull(transactionManager);
