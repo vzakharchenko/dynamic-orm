@@ -1,13 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.util.Assert;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,30 +21,30 @@ public abstract class MapModelFactory {
         return new MapModel(qTable, model);
     }
 
-    public static MapModel mergeMapModels(
-            RelationalPath<?> qTable, MapModel origin, MapModel merge) {
-        Map<Path<?>, Object> mapModels = new HashMap<>();
-        if (origin != null) {
-            mapModels.putAll(origin.getDiffModel());
-        }
-        Assert.notNull(merge);
-        mapModels.putAll(merge.getDiffModel());
-        return buildMapModel(qTable, mapModels);
-    }
-
-    //todo
-    public static MapModel onlyDiffModels(
-            RelationalPath<?> qTable, MapModel origin, MapModel merge) {
-        Assert.notNull(origin);
-        Assert.notNull(merge);
-        Map<Path<?>, Object> mapModels = new HashMap<>();
-        origin.getDiffModel().entrySet().stream().filter(entry -> merge.contains(entry.getKey())
-                && ObjectUtils.notEqual(merge
-                .getColumnValue(entry.getKey(), Object.class), entry.getValue())
-                && !ModelHelper.isPrimaryKey(entry.getKey())).forEach(entry -> {
-            mapModels.put(entry.getKey(), merge.getColumnValue(entry.getKey(), Object.class));
-        });
-
-        return buildMapModel(qTable, mapModels);
-    }
+//    public static MapModel mergeMapModels(
+//            RelationalPath<?> qTable, MapModel origin, MapModel merge) {
+//        Map<Path<?>, Object> mapModels = new HashMap<>();
+//        if (origin != null) {
+//            mapModels.putAll(origin.getDiffModel());
+//        }
+//        Assert.notNull(merge);
+//        mapModels.putAll(merge.getDiffModel());
+//        return buildMapModel(qTable, mapModels);
+//    }
+//
+//    //todo
+//    public static MapModel onlyDiffModels(
+//            RelationalPath<?> qTable, MapModel origin, MapModel merge) {
+//        Assert.notNull(origin);
+//        Assert.notNull(merge);
+//        Map<Path<?>, Object> mapModels = new HashMap<>();
+//        origin.getDiffModel().entrySet().stream().filter(entry -> merge.contains(entry.getKey())
+//                && ObjectUtils.notEqual(merge
+//                .getColumnValue(entry.getKey(), Object.class), entry.getValue())
+//                && !ModelHelper.isPrimaryKey(entry.getKey())).forEach(entry -> {
+//            mapModels.put(entry.getKey(), merge.getColumnValue(entry.getKey(), Object.class));
+//        });
+//
+//        return buildMapModel(qTable, mapModels);
+//    }
 }

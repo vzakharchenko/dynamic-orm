@@ -51,4 +51,10 @@ public abstract class PredicateFactory {
         return new OrderSpecifier(order, Expressions
                 .stringTemplate(Objects.toString(position)));
     }
+
+    public static OrderSpecifier getOrderSpecifierbyName(Order order,
+                                                         String name) {
+        return new OrderSpecifier(order, Expressions
+                .stringTemplate(name));
+    }
 }
