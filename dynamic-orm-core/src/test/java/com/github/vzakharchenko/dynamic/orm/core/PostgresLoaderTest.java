@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.PostgresTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import org.springframework.core.io.Resource;
@@ -11,7 +12,7 @@ import java.io.IOException;
 
 import static org.testng.Assert.assertNotNull;
 
-public class PostgresLoaderTestQueryOrm extends PostgresTestQueryOrm {
+public class PostgresLoaderTest extends PostgresTestQueryOrm {
 
     private ResourceLoader resourceLoader = new PathMatchingResourcePatternResolver();
 

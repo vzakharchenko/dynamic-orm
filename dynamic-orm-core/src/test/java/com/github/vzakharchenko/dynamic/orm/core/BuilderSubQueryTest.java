@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.Range;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
@@ -26,7 +27,7 @@ import static org.testng.Assert.assertTrue;
 /**
  *
  */
-public class TestBuilderSubQuery extends OracleTestQueryOrm {
+public class BuilderSubQueryTest extends OracleTestQueryOrm {
 
     @Test
     public void testSimpleSubQueryQuery() {

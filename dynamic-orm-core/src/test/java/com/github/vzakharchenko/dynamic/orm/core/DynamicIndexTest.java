@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import org.testng.annotations.Test;
 

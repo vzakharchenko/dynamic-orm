@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.MSSQLTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import org.springframework.core.io.Resource;
@@ -11,7 +12,7 @@ import java.io.IOException;
 
 import static org.testng.Assert.assertNotNull;
 
-public class MySqlLoaderTestQueryOrm extends MYSQLTestQueryOrm {
+public class MSSqlLoaderTest extends MSSQLTestQueryOrm {
 
     private ResourceLoader resourceLoader = new PathMatchingResourcePatternResolver();
 
@@ -21,5 +22,7 @@ public class MySqlLoaderTestQueryOrm extends MYSQLTestQueryOrm {
         qDynamicTableFactory.loadSchema(SchemaUtils.getFileLoader(resource.getFile()));
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("TABLE");
         assertNotNull(table);
+        QDynamicTable view = qDynamicTableFactory.getQDynamicTableByName("TESTVIEW");
+        assertNotNull(view);
     }
 }

@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.exception.IsNotActiveTransaction;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
@@ -24,7 +25,7 @@ import static org.testng.Assert.*;
  *
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-public class TestCacheBuilderQueryOrm extends OracleTestQueryOrm {
+public class CacheBuilderTest extends OracleTestQueryOrm {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -93,7 +94,7 @@ public class TestCacheBuilderQueryOrm extends OracleTestQueryOrm {
         ormQueryFactory.transactionManager().commit();
     }
 
-    @Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "(Elsewhere is initiated transaction com.github.vzakharchenko.dynamic.orm.TestCacheBuilderQueryOrm.testTransactionCommitFail)")
+    @Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "(Elsewhere is initiated transaction com.github.vzakharchenko.dynamic.orm.core.CacheBuilderTest.testTransactionCommitFail)")
     @Transactional
     public void testTransactionCommitFail() {
         assertTrue(TransactionSynchronizationManager.isSynchronizationActive());

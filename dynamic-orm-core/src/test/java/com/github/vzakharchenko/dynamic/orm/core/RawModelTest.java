@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableCache;
@@ -18,7 +19,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  *
  */
-public class TestRawModel extends OracleTestQueryOrm {
+public class RawModelTest extends OracleTestQueryOrm {
 
     @Test
     public void testJoinColumns() {

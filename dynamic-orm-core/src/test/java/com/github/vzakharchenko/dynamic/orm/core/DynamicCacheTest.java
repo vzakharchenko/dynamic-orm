@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
@@ -18,7 +19,7 @@ import static org.testng.Assert.*;
  *
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-public class DynamicCacheQueryOrm extends OracleTestQueryOrm {
+public class DynamicCacheTest extends OracleTestQueryOrm {
 
 
     @Test

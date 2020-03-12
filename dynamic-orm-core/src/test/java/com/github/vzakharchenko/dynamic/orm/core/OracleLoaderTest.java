@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import org.springframework.core.io.Resource;
@@ -11,17 +12,17 @@ import java.io.IOException;
 
 import static org.testng.Assert.assertNotNull;
 
-public class MSSqlLoaderTestQueryOrm extends MSSQLTestQueryOrm {
+public class OracleLoaderTest extends OracleTestQueryOrm {
 
     private ResourceLoader resourceLoader = new PathMatchingResourcePatternResolver();
 
-    @Test
+    @Test()
     public void testLoad() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:testSchema.json");
         qDynamicTableFactory.loadSchema(SchemaUtils.getFileLoader(resource.getFile()));
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("TABLE");
         assertNotNull(table);
-        QDynamicTable view = qDynamicTableFactory.getQDynamicTableByName("TESTVIEW");
-        assertNotNull(view);
+        QDynamicTable testview = qDynamicTableFactory.getQDynamicTableByName("TESTVIEW");
+        assertNotNull(testview);
     }
 }

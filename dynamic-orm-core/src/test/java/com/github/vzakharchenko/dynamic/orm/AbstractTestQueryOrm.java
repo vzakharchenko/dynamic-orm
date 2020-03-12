@@ -4,7 +4,6 @@ import com.github.vzakharchenko.dynamic.orm.core.AccessQueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.AccessDynamicContext;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
 import com.github.vzakharchenko.dynamic.orm.dataSource.DBFacade;
 import com.github.vzakharchenko.dynamic.orm.structure.DbStructureService;
 import org.apache.commons.collections4.MapUtils;
@@ -19,7 +18,6 @@ import org.springframework.test.context.testng.AbstractTransactionalTestNGSpring
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 
 import javax.sql.DataSource;
@@ -61,7 +59,7 @@ public abstract class AbstractTestQueryOrm
     protected QDynamicTableFactory qDynamicTableFactory;
 
     @BeforeMethod
-    public void loadSchema() throws Exception {
+    public void loadSchema() {
         dropSchema();
 
 
@@ -84,7 +82,7 @@ public abstract class AbstractTestQueryOrm
     }
 
     @AfterMethod
-    public void dropSchema() throws Exception {
+    public void dropSchema() {
         Collection<String> cacheNames = cacheManager.getCacheNames();
         for (String cacheName : cacheNames) {
             Cache cache = cacheManager.getCache(cacheName);
@@ -101,12 +99,12 @@ public abstract class AbstractTestQueryOrm
         for (DbStructureService dbStructureService : dbStructureServices) {
             dbStructureService.clear();
         }
-
+        checkConnectionLeaks();
 
     }
 
-    @AfterMethod()
-    public void testConnectionLeaks() {
+
+    public void checkConnectionLeaks() {
         if (DBFacade.getDBConnectionsInUse() > 0) {
             if (!TransactionSynchronizationManager.isSynchronizationActive()) {
                 DBFacade.printUsedConnections();

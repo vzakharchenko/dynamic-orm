@@ -1,5 +1,6 @@
-package com.github.vzakharchenko.dynamic.orm;
+package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
@@ -16,7 +17,7 @@ import static org.testng.Assert.*;
 /**
  *
  */
-public class TestBuilderQueryOrm extends OracleTestQueryOrm {
+public class BuilderTest extends OracleTestQueryOrm {
 
 
     @Test
