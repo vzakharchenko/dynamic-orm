@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.AnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
+import com.github.vzakharchenko.dynamic.orm.core.predicate.PredicateFactory;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import org.testng.annotations.BeforeMethod;
@@ -72,10 +73,15 @@ public class SelectTest extends AnnotationTestQueryOrm {
         TestTableVersionAnnotation value5 = new TestTableVersionAnnotation();
         ormQueryFactory.insert(value1, value2, value3, value4, value5);
 
-        List<TestTableVersionAnnotation> limit = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().limit(3), TestTableVersionAnnotation.class);
-        assertEquals(limit.size(), 3);
+        List<TestTableVersionAnnotation> limit = ormQueryFactory.select()
+                .findAll(ormQueryFactory.buildQuery().limit(3),
+                        TestTableVersionAnnotation.class);
 
-        List<TestTableVersionAnnotation> offset = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().limit(3).offset(3), TestTableVersionAnnotation.class);
+        List<TestTableVersionAnnotation> offset = ormQueryFactory.select()
+                .findAll(ormQueryFactory.buildQuery().limit(3).offset(3),
+                        TestTableVersionAnnotation.class);
+
+        assertEquals(limit.size(), 3);
         assertEquals(offset.size(), 2);
 
 
@@ -88,6 +94,39 @@ public class SelectTest extends AnnotationTestQueryOrm {
         return dynamicTableModel;
     }
 
+    @Test
+    public void alwaysFalseQuery() {
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        DynamicTableModel value1 = createDynamicModel("1");
+        DynamicTableModel value2 = createDynamicModel("2");
+        DynamicTableModel value3 = createDynamicModel("3");
+        DynamicTableModel value4 = createDynamicModel("4");
+        DynamicTableModel value5 = createDynamicModel("5");
+        PredicateFactory.alwaysFalsePredicate();
+
+        assertTrue(ormQueryFactory.select().notExist(ormQueryFactory
+                .buildQuery()
+                .from(dynamicTable)
+                .where(PredicateFactory.alwaysFalsePredicate())));
+
+    }
+    @Test
+    public void wrapWhere() {
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        DynamicTableModel value1 = createDynamicModel("1");
+        DynamicTableModel value2 = createDynamicModel("2");
+        DynamicTableModel value3 = createDynamicModel("3");
+        DynamicTableModel value4 = createDynamicModel("4");
+        DynamicTableModel value5 = createDynamicModel("5");
+        PredicateFactory.alwaysFalsePredicate();
+
+        assertTrue(ormQueryFactory.select().notExist(ormQueryFactory
+                .buildQuery()
+                .from(dynamicTable)
+                .where(PredicateFactory
+                        .wrapPredicate(PredicateFactory.alwaysFalsePredicate().and(dynamicTable.getStringColumnByName("TestColumn").isNotNull())))));
+
+    }
     @Test
     public void limitOffsetDynamicTest() {
 
@@ -105,7 +144,7 @@ public class SelectTest extends AnnotationTestQueryOrm {
 
         List<DynamicTableModel> offset = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().limit(3).offset(3), dynamicTable, DynamicTableModel.class);
         assertEquals(offset.size(), 2);
-
-
     }
+
+
 }

@@ -293,6 +293,16 @@ how it works:
                 firstTable,
                 DynamicTableModel.class);
 ```
+ - limit and offset
+```java
+    ormQueryFactory.selectCache().findOne(ormQueryFactory
+                        .buildQuery()
+                        .from(firstTable).limit(3).offset(3)
+                        .where(firstTable.getNumberColumnByName("newColumn").eq(122)),
+                firstTable,
+                DynamicTableModel.class);
+```
+
   - get column value from model
 ```java
                String testStringColumnValue = firstTableFromDatabase.getValue("TestStringColumn", String.class);
