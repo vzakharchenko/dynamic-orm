@@ -74,23 +74,21 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
                             " has empty Primary Key : " + model);
                 }
                 CacheHelper.checkModelIsDeleted(queryContext, model, qTable);
-
-                if (versionColumn != null) {
-                    Serializable currentVersion = VersionHelper.getCurrentVersion(
-                            versionColumn, model);
-                    if (currentVersion == null) {
-                        VersionHelper.setInitialVersion((Path) versionColumn, model);
-                    }
+            }
+            if (versionColumn != null) {
+                Serializable currentVersion = VersionHelper.getCurrentVersion(
+                        versionColumn, model);
+                if (currentVersion == null) {
+                    VersionHelper.setInitialVersion((Path) versionColumn, model);
                 }
+            }
 
-                if (softDelete != null
-                        && softDelete.getDefaultValue() != null
-                        && ModelHelper.getValueFromModelByColumn(model,
-                        softDelete.getColumn()) == null) {
-                    ModelHelper.setColumnValue(model, softDelete.getColumn(),
-                            softDelete.getDefaultValue());
-                }
-
+            if (softDelete != null
+                    && softDelete.getDefaultValue() != null
+                    && ModelHelper.getValueFromModelByColumn(model,
+                    softDelete.getColumn()) == null) {
+                ModelHelper.setColumnValue(model, softDelete.getColumn(),
+                        softDelete.getDefaultValue());
             }
         }
 

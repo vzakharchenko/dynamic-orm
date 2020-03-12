@@ -101,11 +101,6 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
     }
 
     @Override
-    public Long updateModelsById(MODEL... models) {
-        return updateModelsById(Arrays.asList(models));
-    }
-
-    @Override
     public Long updateModelsById(List<MODEL> models) {
         if (CollectionUtils.isEmpty(models)) {
             return 0L;

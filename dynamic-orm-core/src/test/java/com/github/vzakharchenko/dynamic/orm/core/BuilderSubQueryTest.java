@@ -1,8 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
-import com.github.vzakharchenko.dynamic.orm.core.Range;
-import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableCache;
 import com.github.vzakharchenko.dynamic.orm.model.Testtable;
@@ -54,7 +52,7 @@ public class BuilderSubQueryTest extends OracleTestQueryOrm {
     }
 
     @Test
-    public void testUnionQuery() {
+    public void testUnionAllQuery() {
 
         Testtable testtable1 = new Testtable();
         testtable1.setId(0);
@@ -117,6 +115,69 @@ public class BuilderSubQueryTest extends OracleTestQueryOrm {
     }
 
     @Test
+    public void testUnionQuery() {
+
+        Testtable testtable1 = new Testtable();
+        testtable1.setId(0);
+        testtable1.setTest2(2456);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable1);
+
+        TestTableCache testtable2 = new TestTableCache();
+        testtable2.setId(0);
+        testtable2.setTest2(4546);
+        ormQueryFactory.modify(QTestTableCache.testTableCache, TestTableCache.class).insert(testtable2);
+
+        SubQueryExpression<Tuple> listSubQuery1 = SQLExpressions.select(QTestTableCache.testTableCache.test2, QTesttable.testtable.id)
+                .from(QTesttable.testtable)
+                .distinct()
+                .fullJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.test2));
+        SubQueryExpression<Tuple> listSubQuery2 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.test2)
+                .from(QTesttable.testtable)
+                .leftJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.test2));
+        List<SubQueryExpression<?>> listSubQueries = Arrays.asList(listSubQuery1, listSubQuery2);
+        UnionBuilder union = ormQueryFactory.select().union(ormQueryFactory.buildQuery(), listSubQueries);
+        String showSql = union.showSql();
+
+        assertEquals(showSql, "select \"TEST2\", \"ID\"\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"TEST2\", \"TESTTABLE\".\"ID\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)\n" +
+                "union\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)) as \"union\"");
+
+        assertEquals(union.showCountSql(), "select count(*)\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"TEST2\", \"TESTTABLE\".\"ID\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)\n" +
+                "union\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)) as \"union\"");
+        List<RawModel> rawModels = union.findAll();
+        Long count = union.count();
+        assertEquals(count.intValue(), 2);
+        Long cacheCount = union.count();
+        Long cacheCount2 = union.count();
+
+        assertTrue(cacheCount == cacheCount2);
+        union = ormQueryFactory.select().union(ormQueryFactory.buildQuery(), listSubQueries.toArray(new SubQueryExpression[listSubQueries.size()]));
+        count = union.count();
+        assertEquals(count.intValue(), 2);
+    }
+
+    @Test
     public void testUnionQueryWithLimit() {
         SubQueryExpression<Tuple> listSubQuery1 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.id)
                 .from(QTesttable.testtable)
@@ -161,6 +222,58 @@ public class BuilderSubQueryTest extends OracleTestQueryOrm {
                 "order by \"TEST_TABLE_CACHE\".\"ID\" desc)) as \"union\"\n" +
                 "limit 1000\n" +
                 "offset 0");
+        List<RawModel> rawModels = unionAll.findAll();
+        Long count = unionAll.count();
+        assertEquals(count.intValue(), 0);
+        Long cacheCount = unionAll.count();
+        Long cacheCount2 = unionAll.count();
+
+        assertTrue(cacheCount == cacheCount2);
+    }
+
+    @Test
+    public void testUnionQueryWithLimit2() {
+        SubQueryExpression<Tuple> listSubQuery1 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.id)
+                .from(QTesttable.testtable)
+                .distinct()
+                .fullJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.id));
+        SubQueryExpression<Tuple> listSubQuery2 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.id)
+                .from(QTesttable.testtable)
+                .leftJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.id));
+        List<SubQueryExpression<?>> listSubQueries = Arrays.asList(listSubQuery1, listSubQuery2);
+        UnionBuilder unionAll = ormQueryFactory.select().unionAll(ormQueryFactory.buildQuery(), listSubQueries);
+        unionAll = unionAll.limit(new Range(1000));
+        String showSql = unionAll.showSql();
+
+        assertEquals(showSql, "select \"ID\"\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"ID\" as \"col__ID1\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"ID\" desc)\n" +
+                "union all\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"ID\" as \"col__ID1\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"ID\" desc)) as \"union\"\n" +
+                "limit 1000");
+
+        assertEquals(unionAll.showCountSql(), "select count(*)\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"ID\" as \"col__ID1\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"ID\" desc)\n" +
+                "union all\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"ID\" as \"col__ID1\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"ID\" desc)) as \"union\"\n" +
+                "limit 1000");
         List<RawModel> rawModels = unionAll.findAll();
         Long count = unionAll.count();
         assertEquals(count.intValue(), 0);

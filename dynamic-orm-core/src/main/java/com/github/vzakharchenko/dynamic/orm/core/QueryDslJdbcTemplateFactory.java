@@ -56,6 +56,9 @@ public abstract class QueryDslJdbcTemplateFactory {
             return new SQLiteTemplates(quote);
         } else if (database instanceof MSSQLDatabase) {
             return new SQLServerTemplates(quote);
+        } else if (database instanceof DB2Database ||
+                database instanceof Db2zDatabase) {
+            return new DB2Templates(quote);
         } else {
             throw new InvalidDataAccessResourceUsageException(database
                     .getDatabaseProductName() + " is an unsupported database");

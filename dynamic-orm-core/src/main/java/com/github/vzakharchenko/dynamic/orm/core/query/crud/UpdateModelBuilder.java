@@ -22,8 +22,6 @@ public interface UpdateModelBuilder<MODEL extends DMLModel> {
 
     UpdateModelBuilder<MODEL> batch();
 
-    Long updateModelsById(MODEL... models);
-
     Long updateModelsById(List<MODEL> models);
 
     UpdateBuilder<MODEL> updateModel(MODEL model);

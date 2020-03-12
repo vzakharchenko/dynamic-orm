@@ -113,7 +113,9 @@ public class UnionBuilderImpl implements UnionBuilder {
     @Override
     public UnionBuilder limit(Range range) {
         sqlQuery.limit(range.getLimit());
-        sqlQuery.offset(range.getOffset());
+        if (range.getOffset() != null) {
+            sqlQuery.offset(range.getOffset());
+        }
         return this;
     }
 
@@ -137,6 +139,7 @@ public class UnionBuilderImpl implements UnionBuilder {
         MappingProjection<RawModel> simpleRawMapper = createRawModelExpression();
         return clone.select(simpleRawMapper).getSQL().getSQL();
     }
+
     // CHECKSTYLE:OFF
     private List<Expression<?>> getExpressions() {
         List<Expression<?>> columns = new ArrayList<>();
@@ -170,6 +173,7 @@ public class UnionBuilderImpl implements UnionBuilder {
         }
         return columns;
     }
+
     // CHECKSTYLE:ON
     @Override
     public String showCountSql() {

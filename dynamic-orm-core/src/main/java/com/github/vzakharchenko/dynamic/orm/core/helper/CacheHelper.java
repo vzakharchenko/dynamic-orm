@@ -39,10 +39,6 @@ public abstract class CacheHelper {
         return new CachedAllData(qTable);
     }
 
-    public static CachedAllData buildAllDataCache(String tableName) {
-        return new CachedAllData(tableName);
-    }
-
     public static <TYPE extends Serializable> CachedColumnWithValue buildCachedColumnWithValue(
             Path<TYPE> column, TYPE value) {
         return new CachedColumnWithValue(column, value);

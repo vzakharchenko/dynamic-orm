@@ -12,8 +12,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.*;
 
 /**
  *
@@ -151,6 +150,7 @@ public class RawModelTest extends OracleTestQueryOrm {
         assertNotNull(model);
         assertNotNull(model.getId());
         assertNotNull(model.getTest2());
+        assertNull(rawModel.getValueByColumnName("notExistsColumn",Integer.class));
     }
 
     @Test
@@ -173,6 +173,29 @@ public class RawModelTest extends OracleTestQueryOrm {
         assertNotNull(rawModel.getColumns());
         assertNotNull(rawModel.getRawMap());
         Integer id = rawModel.getValueByColumnName("TEST_ID", Integer.class);
+        assertNotNull(id);
+    }
+
+    @Test
+    public void testRawModelCountAlias() {
+        Testtable testtable1 = new Testtable();
+        testtable1.setId(0);
+        testtable1.setTest2(2);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable1);
+
+        Testtable testtable2 = new Testtable();
+        testtable2.setId(1);
+        testtable2.setTest2(4);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable2);
+
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(ormQueryFactory.buildQuery().from(QTesttable.testtable)).findAll(
+                Wildcard.count.as("COUNT"));
+        assertNotNull(rawModels);
+        assertEquals(rawModels.size(), 1);
+        RawModel rawModel = rawModels.get(0);
+        assertNotNull(rawModel.getColumns());
+        assertNotNull(rawModel.getRawMap());
+        Long id = rawModel.getValueByColumnName("COUNT", Long.class);
         assertNotNull(id);
     }
 }
