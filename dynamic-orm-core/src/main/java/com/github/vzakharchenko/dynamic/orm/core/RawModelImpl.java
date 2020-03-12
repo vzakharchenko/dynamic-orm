@@ -3,7 +3,6 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
@@ -67,7 +66,7 @@ public class RawModelImpl implements RawModel {
             if (expression instanceof Path) {
                 return getPathValue(columnName, expression, pathObjectEntry);
             } else if (expression instanceof Operation) {
-                getOperationValue(columnName, expression, pathObjectEntry);
+                return getOperationValue(columnName, expression, pathObjectEntry);
             } else {
                 throw new IllegalArgumentException(expression + " is not supported");
             }
@@ -99,15 +98,6 @@ public class RawModelImpl implements RawModel {
     }
 
     public List<Object> getValues() {
-        if (values == null) {
-            values = new ArrayList<>(rawMap.size());
-            values.addAll(rawMap.entrySet().stream()
-                    .map(Map.Entry::getValue).collect(Collectors.toList()));
-        }
-        return values;
-    }
-
-    public List<Object> getKeys() {
         if (values == null) {
             values = new ArrayList<>(rawMap.size());
             values.addAll(rawMap.entrySet().stream()
@@ -155,17 +145,6 @@ public class RawModelImpl implements RawModel {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    @Override
-    public <T extends DMLModel> T getModel(Class<T> modelClass, QueryContext queryContext) {
-        RelationalPath<?> qModel = queryContext.getQModel(modelClass);
-        return getModel(qModel, modelClass);
-    }
-
-    @Override
-    public <T extends DMLModel> T getModel(Class<T> modelClass, OrmQueryFactory ormQueryFactory) {
-        return getModel(modelClass, ormQueryFactory.getContext());
     }
 
     @Override

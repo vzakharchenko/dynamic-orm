@@ -2,7 +2,6 @@ package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
@@ -35,10 +34,6 @@ public interface RawModel extends Serializable {
     DynamicTableModel getDynamicModel(QDynamicTable qDynamicTable);
 
     <T extends DMLModel> T getModel(RelationalPath<?> qModel, Class<T> modelClass);
-
-    <T extends DMLModel> T getModel(Class<T> modelClass, QueryContext queryContext);
-
-    <T extends DMLModel> T getModel(Class<T> modelClass, OrmQueryFactory ormQueryFactory);
 
     List<Expression<?>> getColumns();
 }

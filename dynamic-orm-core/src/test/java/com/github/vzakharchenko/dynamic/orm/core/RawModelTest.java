@@ -1,7 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
-import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableCache;
 import com.github.vzakharchenko.dynamic.orm.model.Testtable;
@@ -72,7 +71,7 @@ public class RawModelTest extends OracleTestQueryOrm {
         assertEquals(rawModel1.getAliasValue(QTestTableCache.testTableCache.test2), Integer.valueOf(22));
         assertEquals(rawModel1.getColumnValue(QTestTableCache.testTableCache.test2), Integer.valueOf(22));
         assertEquals(rawModel1.getAliasValue(Wildcard.count), Long.valueOf(1));
-
+        assertEquals(rawModel1.getValueByColumnName("test2", Integer.class), Integer.valueOf(22));
         assertEquals(rawModel2.getAliasValue(QTestTableCache.testTableCache.test2), Integer.valueOf(44));
         assertEquals(rawModel2.getColumnValue(QTestTableCache.testTableCache.test2), Integer.valueOf(44));
         assertEquals(rawModel2.getValueByPosition(0), Integer.valueOf(44));
@@ -127,5 +126,53 @@ public class RawModelTest extends OracleTestQueryOrm {
         assertEquals(rawModel.getAliasValue(QTestTableCache.testTableCache.test2.min()), Integer.valueOf(22));
         assertEquals(rawModel.getValueByPosition(1), Integer.valueOf(22));
 
+    }
+
+    @Test
+    public void testRawModel() {
+        Testtable testtable1 = new Testtable();
+        testtable1.setId(0);
+        testtable1.setTest2(2);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable1);
+
+        Testtable testtable2 = new Testtable();
+        testtable2.setId(1);
+        testtable2.setTest2(4);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable2);
+
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(ormQueryFactory.buildQuery().from(QTesttable.testtable)).findAll(
+                QTesttable.testtable.id, QTesttable.testtable.test2);
+        assertNotNull(rawModels);
+        assertEquals(rawModels.size(), 2);
+        RawModel rawModel = rawModels.get(0);
+        assertNotNull(rawModel.getColumns());
+        assertNotNull(rawModel.getRawMap());
+        Testtable model = rawModel.getModel(QTesttable.testtable, Testtable.class);
+        assertNotNull(model);
+        assertNotNull(model.getId());
+        assertNotNull(model.getTest2());
+    }
+
+    @Test
+    public void testRawModelAlias() {
+        Testtable testtable1 = new Testtable();
+        testtable1.setId(0);
+        testtable1.setTest2(2);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable1);
+
+        Testtable testtable2 = new Testtable();
+        testtable2.setId(1);
+        testtable2.setTest2(4);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable2);
+
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(ormQueryFactory.buildQuery().from(QTesttable.testtable)).findAll(
+                QTesttable.testtable.id.as("TEST_ID"));
+        assertNotNull(rawModels);
+        assertEquals(rawModels.size(), 2);
+        RawModel rawModel = rawModels.get(0);
+        assertNotNull(rawModel.getColumns());
+        assertNotNull(rawModel.getRawMap());
+        Integer id = rawModel.getValueByColumnName("TEST_ID", Integer.class);
+        assertNotNull(id);
     }
 }

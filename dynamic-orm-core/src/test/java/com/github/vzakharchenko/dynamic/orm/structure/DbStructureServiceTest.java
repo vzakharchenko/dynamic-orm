@@ -1,10 +1,14 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import java.util.Comparator;
+
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -41,6 +45,34 @@ public class DbStructureServiceTest extends AbstractTestNGSpringContextTests {
     public void testSQl() {
         String sql = dbStructureService.generateSql();
         assertNotNull(sql);
+    }
+
+    @Test
+    public void testSimpleDbStructure() {
+        SimpleDbStructure simpleDbStructure = new SimpleDbStructure();
+        simpleDbStructure.setResourceAccessor(null);
+        simpleDbStructure.setPathToSaveChangeSets("target");
+        simpleDbStructure.setFileNameComporator(mock(Comparator.class));
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSimpleDbStructureNull() {
+        SimpleDbStructure simpleDbStructure = new SimpleDbStructure();
+        simpleDbStructure.setPathToSaveChangeSets(null);
+    }
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSimpleDbStructureFail1() {
+        SimpleDbStructure simpleDbStructure = new SimpleDbStructure();
+        simpleDbStructure.setPathToSaveChangeSets("");
+    }
+
+    @Test
+    public void testSpringResourceOpener(){
+        SpringResourceOpener springResourceOpener = new SpringResourceOpener();
+        Resource resource = springResourceOpener.getResource("classpath:testSchema.json");
+        assertNotNull(resource);
+        springResourceOpener.toClassLoader();
+
     }
 
 }
