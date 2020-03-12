@@ -46,15 +46,4 @@ public abstract class PredicateFactory {
         return Expressions.booleanTemplate("1 < 0"); // true == false
     }
 
-    public static OrderSpecifier getOrderSpecifierbyPosition(Order order,
-                                                             Integer position) {
-        return new OrderSpecifier(order, Expressions
-                .stringTemplate(Objects.toString(position)));
-    }
-
-    public static OrderSpecifier getOrderSpecifierbyName(Order order,
-                                                         String name) {
-        return new OrderSpecifier(order, Expressions
-                .stringTemplate(name));
-    }
 }

@@ -4,18 +4,12 @@ import com.github.vzakharchenko.dynamic.orm.core.statistic.resolver.QueryResolve
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLQuery;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
  *
  */
 public abstract class QueryStatisticFactory {
-
-
-    public static QueryStatistic buildStatistic(SQLQuery sqlQuery, RelationalPath... qTables) {
-        return buildStatistic(sqlQuery, Arrays.asList(qTables));
-    }
 
     public static QueryStatistic buildStatistic(SQLQuery sqlQuery,
                                                 Collection<RelationalPath> qTables) {

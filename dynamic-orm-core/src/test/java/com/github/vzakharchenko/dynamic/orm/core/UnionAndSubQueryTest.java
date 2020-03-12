@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
-import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
-import com.github.vzakharchenko.dynamic.orm.core.predicate.PredicateFactory;
+import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
+import com.github.vzakharchenko.dynamic.orm.core.predicate.OrderSpecifierFactory;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableCache;
 import com.github.vzakharchenko.dynamic.orm.model.Testtable;
@@ -25,7 +25,7 @@ import static org.testng.Assert.*;
 /**
  *
  */
-public class BuilderSubQueryTest extends OracleTestQueryOrm {
+public class UnionAndSubQueryTest extends DebugAnnotationTestQueryOrm {
 
     @Test
     public void testSimpleSubQueryQuery() {
@@ -233,7 +233,7 @@ public class BuilderSubQueryTest extends OracleTestQueryOrm {
         assertEquals(count.intValue(), 1);
         RawModel rawModel = union.findOne();
         assertNotNull(rawModel);
-        assertEquals(rawModel.getValueByColumnName("TEST2",Integer.class),Integer.valueOf(2456));
+        assertEquals(rawModel.getValueByColumnName("TEST2", Integer.class), Integer.valueOf(2456));
         Long cacheCount = union.count();
         Long cacheCount2 = union.count();
 
@@ -267,7 +267,7 @@ public class BuilderSubQueryTest extends OracleTestQueryOrm {
                 .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.test2));
         List<SubQueryExpression<?>> listSubQueries = Arrays.asList(listSubQuery1, listSubQuery2);
         UnionBuilder union = ormQueryFactory.select().unionAll(ormQueryFactory.buildQuery(), listSubQueries)
-                .orderBy(PredicateFactory.getOrderSpecifierbyName(Order.DESC, "ID"));
+                .orderBy(OrderSpecifierFactory.getOrderSpecifierbyName(Order.DESC, "ID"));
         String showSql = union.showSql();
 
         assertEquals(showSql, "select \"ID\", \"TEST2\"\n" +

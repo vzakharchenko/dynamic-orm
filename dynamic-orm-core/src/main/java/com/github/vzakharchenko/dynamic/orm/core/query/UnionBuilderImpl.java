@@ -18,7 +18,10 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -95,6 +98,14 @@ public class UnionBuilderImpl implements UnionBuilder {
     }
 
     @Override
+    public UnionBuilder groupBy(String... columns) {
+        boolean useQuotes = queryContext.getDialect().isUseQuotes();
+        return groupBy(Arrays.stream(columns).map((Function<String, Expression>)
+                s -> Expressions.stringTemplate(useQuotes ? "\"" + s + "\"" : s))
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public UnionBuilder groupBy(List<Expression> columns) {
         return groupBy(columns.toArray(new Expression[columns.size()]));
     }
@@ -108,6 +119,11 @@ public class UnionBuilderImpl implements UnionBuilder {
     public UnionBuilder orderBy(OrderSpecifier... orderSpecifiers) {
         sqlQuery = (SQLQuery) sqlQuery.orderBy(orderSpecifiers);
         return this;
+    }
+
+    @Override
+    public OrderByBuilder orderBy(String columnName) {
+        return new OrderByBuilderImpl(columnName, queryContext, this);
     }
 
     @Override
