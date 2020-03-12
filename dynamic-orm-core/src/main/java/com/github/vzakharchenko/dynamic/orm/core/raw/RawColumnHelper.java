@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public final class RawColumnFactory {
+public final class RawColumnHelper {
 
     private static final List<RawColumn> RAW_COLUMNS = new ArrayList<>();
 
@@ -17,7 +17,7 @@ public final class RawColumnFactory {
         RAW_COLUMNS.add(new TemplateRawColumn());
     }
 
-    private RawColumnFactory() {
+    private RawColumnHelper() {
     }
 
     private static RawColumn getValidRawModel(Expression expression) {

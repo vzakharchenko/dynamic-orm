@@ -3,7 +3,7 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.raw.RawColumnFactory;
+import com.github.vzakharchenko.dynamic.orm.core.raw.RawColumnHelper;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
@@ -32,7 +32,7 @@ public class RawModelImpl implements RawModel {
 
     @Override
     public <TYPE> TYPE getValueByColumnName(String columnName, Class<TYPE> columnType) {
-        return (TYPE) RawColumnFactory.getValue(this, columnName);
+        return (TYPE) RawColumnHelper.getValue(this, columnName);
     }
 
     @Override
