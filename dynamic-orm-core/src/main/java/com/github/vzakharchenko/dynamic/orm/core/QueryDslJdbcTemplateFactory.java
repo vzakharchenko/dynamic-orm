@@ -36,7 +36,7 @@ public abstract class QueryDslJdbcTemplateFactory {
         }
     }
 
-
+    // CHECKSTYLE:OFF
     public static SQLTemplates getDialect(Database database, boolean quote) {
         if (database instanceof OracleDatabase) {
             return new OracleTemplates(quote);
@@ -63,6 +63,6 @@ public abstract class QueryDslJdbcTemplateFactory {
             throw new InvalidDataAccessResourceUsageException(database
                     .getDatabaseProductName() + " is an unsupported database");
         }
-
     }
+    // CHECKSTYLE:ON
 }
