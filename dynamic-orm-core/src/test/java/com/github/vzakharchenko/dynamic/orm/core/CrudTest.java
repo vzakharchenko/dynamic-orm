@@ -133,4 +133,30 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
 
+
+    @Test
+    public void testDeleteWithoutPrimaryKey() {
+
+        qDynamicTableFactory.buildTables("DynamicTable2")
+                .addColumns()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .addStringColumn("TestColumn").size(255).create()
+                .finish()
+                .addVersionColumn("modificationTime")
+                .finish()
+                .buildSchema();
+
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
+        dynamicTableModel.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel);
+        ormQueryFactory.modify(dynamicTable, DynamicTableModel.class)
+                .delete(dynamicTableModel).delete();
+
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        assertNull(tableModel2);
+    }
+
+
+
 }

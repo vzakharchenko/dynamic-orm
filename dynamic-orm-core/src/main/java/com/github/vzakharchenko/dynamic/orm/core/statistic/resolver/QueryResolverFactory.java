@@ -21,6 +21,8 @@ public abstract class QueryResolverFactory {
     private static final OperationResolver OPERATION_RESOLVER = new OperationResolver();
     private static final PathResolver PATH_RESOLVER = new PathResolver();
     private static final SubQueryResolver SUB_QUERY_RESOLVER = new SubQueryResolver();
+    private static final TupleQueryResolver TUPLE_QUERY_RESOLVER = new TupleQueryResolver();
+
     private static final TemplateExpressionResolver TEMPLATE_EXPRESSION_RESOLVER =
             new TemplateExpressionResolver();
 
@@ -30,7 +32,7 @@ public abstract class QueryResolverFactory {
         fillStatistic(queryStatistic, metadata);
     }
 
-
+    // CHECKSTYLE:OFF
     public static void fillStatistic(QueryStatisticRegistrator queryStatistic, Object object) {
         if (object instanceof QueryMetadata) {
             QUERY_METADATA_RESOLVER.resolve(queryStatistic, (QueryMetadata) object);
@@ -48,10 +50,12 @@ public abstract class QueryResolverFactory {
             PATH_METADATA_RESOLVER.resolve(queryStatistic, (PathMetadata) object);
         } else if (object instanceof Constant) {
             CONSTANT_QUERY_RESOLVER.resolve(queryStatistic, (Constant) object);
+        } else if (object instanceof QTuple) {
+            TUPLE_QUERY_RESOLVER.resolve(queryStatistic, (QTuple) object);
         } else {
             throw new UnsupportedOperationException("Unsupport " + object);
         }
     }
-
+    // CHECKSTYLE:ON
 
 }

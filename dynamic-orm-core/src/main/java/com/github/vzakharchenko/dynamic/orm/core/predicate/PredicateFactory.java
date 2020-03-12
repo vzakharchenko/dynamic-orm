@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.predicate;
 
-import com.querydsl.core.types.*;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-
-import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,15 +46,4 @@ public abstract class PredicateFactory {
         return Expressions.booleanTemplate("1 < 0"); // true == false
     }
 
-    public static OrderSpecifier getOrderSpecifierbyPosition(Order order,
-                                                             Integer position) {
-        return new OrderSpecifier(order, Expressions
-                .stringTemplate(Objects.toString(position)));
-    }
-
-    public static OrderSpecifier getOrderSpecifierbyName(Order order,
-                                                         String name) {
-        return new OrderSpecifier(order, Expressions
-                .stringTemplate(name));
-    }
 }

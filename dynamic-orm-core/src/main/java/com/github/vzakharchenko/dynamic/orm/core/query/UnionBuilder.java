@@ -42,12 +42,15 @@ public interface UnionBuilder {
      */
     UnionBuilder groupBy(Expression... columns);
 
+    UnionBuilder groupBy(String... columns);
+
     UnionBuilder groupBy(List<Expression> columns);
 
     UnionBuilder orderBy(List<OrderSpecifier> orderSpecifiers);
 
     UnionBuilder orderBy(OrderSpecifier... orderSpecifiers);
 
+    OrderByBuilder orderBy(String columnName);
 
     /**
      * limit
