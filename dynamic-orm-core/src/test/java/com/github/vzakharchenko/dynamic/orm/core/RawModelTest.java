@@ -76,6 +76,8 @@ public class RawModelTest extends OracleTestQueryOrm {
         assertEquals(rawModel2.getValueByPosition(0), Integer.valueOf(44));
         assertEquals(rawModel2.getAliasValue(Wildcard.count), Long.valueOf(1));
         assertEquals(rawModel2.getValueByPosition(1), Long.valueOf(1));
+        assertFalse(rawModel2.isEmpty());
+        assertTrue(rawModel2.isNotEmpty());
     }
 
     @Test

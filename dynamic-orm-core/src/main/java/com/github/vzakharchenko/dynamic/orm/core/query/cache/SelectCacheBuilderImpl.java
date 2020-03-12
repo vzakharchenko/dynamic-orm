@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.cache.ModelLazyListFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.SQLBuilderHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
@@ -110,6 +111,8 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     @Override
     public UnionBuilder unionAll(SQLCommonQuery<?> sqlQuery,
                                  List<SubQueryExpression<?>> subQueries) {
+        SQLBuilderHelper.subQueryWrapper(subQueries);
+
         return new UnionCacheBuilderImpl(DBHelper
                 .castProjectionQueryToSqlQuery(sqlQuery).clone(),
                 subQueries, true, queryContext, queryCacheContext);
