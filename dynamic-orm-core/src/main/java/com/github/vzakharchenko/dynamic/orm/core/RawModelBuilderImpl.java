@@ -138,7 +138,7 @@ public class RawModelBuilderImpl implements RawModelBuilder {
     private boolean isWildcardFetch(List<Expression<?>> columns) {
         Expression<?> wildcard = columns.stream().filter(expr ->
                 expr.equals(Wildcard.all)).findFirst().orElse(null);
-        if (columns.size() > 1 && wildcard != null) {
+        if (wildcard != null && columns.size() > 1) {
             throw new IllegalStateException("wildcard should be one");
         }
         return wildcard != null;
