@@ -88,12 +88,6 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     }
 
     @Override
-    public SelectCacheBuilder registerRelatedTables(RelationalPath... qTables) {
-        queryCacheContext.registerRelatedTables(qTables);
-        return this;
-    }
-
-    @Override
     public SelectCacheBuilder registerRelatedTables(Collection<RelationalPath> qTables) {
         queryCacheContext.registerRelatedTables(qTables);
         return this;

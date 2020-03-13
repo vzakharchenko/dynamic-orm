@@ -1,6 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -28,5 +31,13 @@ public abstract class FormatHelper {
         } catch (Exception e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
+    }
+
+    public static Serializable transformObjectValue(Object value) {
+        if (value instanceof Timestamp) {
+            Timestamp timestamp = (Timestamp) value;
+            return new Date(timestamp.getTime());
+        }
+        return (Serializable) value;
     }
 }

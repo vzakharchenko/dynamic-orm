@@ -6,16 +6,21 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.core.types.dsl.Wildcard;
+import com.querydsl.sql.ProjectableSQLQuery;
 import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.SQLQuery;
+import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
+import static org.testng.Assert.*;
 
 public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
 
@@ -93,7 +98,7 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
                 "from \"UNIONTABLE2\" \"UNIONTABLE2\"\n" +
                 "where \"UNIONTABLE2\".\"TESTCOLUMN2_2\" = 'data2')");
 
-        // get data
+        // fetch data
         DynamicTableModel tableModel = ormQueryFactory.select().findOne(
                 ormQueryFactory.buildQuery().from(unionTable1)
                         .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
@@ -282,6 +287,172 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
         assertTrue(count1 == count2);
         assertEquals(count3, Long.valueOf(3L));
 
+    }
+
+    @Test
+    public void testWithAndUnionQuery() {
+
+        // inserts
+        insert1("same", "data1");
+        insert1("same", "data2");
+        // get unionTable1 Metadata
+        QDynamicTable unionTable1 = qDynamicTableFactory.getQDynamicTableByName("UnionTable1");
+        // get column from unionTable1
+        StringPath testColumn11 = unionTable1.getStringColumnByName("TestColumn1_1");
+        StringPath testColumn12 = unionTable1.getStringColumnByName("TestColumn1_2");
+
+        SimplePath<String> column1 = Expressions.simplePath(String.class, "column1");
+        SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
+
+        // prepare with operator
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+        SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
+                withSubquery,
+                column1,
+                column2
+        ).as(SQLExpressions
+                .select(testColumn11.as("column1"), testColumn12.as("column2"))
+                .from(unionTable1));
+
+        // first union subquery
+        SQLQuery<Tuple> query1 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data1"));
+        // second union subquery
+        SQLQuery<Tuple> query2 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data2"));
+
+        // create UnionBuilder
+        UnionBuilder unionBuilder = ormQueryFactory.select()
+                .unionAll(ormQueryFactory.buildQuery(), query1, query2);
+        // result order by
+        unionBuilder
+                .orderBy("column1").desc().orderBy("column2").asc();
+        // offset and limit (offset = 0, limit = 4 )
+        unionBuilder.limit(new Range(0, 4));
+        // group by result
+        unionBuilder.groupBy("column1", "column2");
+
+        // build union query with "with" operator
+
+        SQLQuery unionSubQuery = unionBuilder.getUnionSubQuery();
+        ProjectableSQLQuery sqlQuery = withQuery.select(column1, column2)
+                .from(unionSubQuery.select(column1, column2));
+
+        // show the final SQL
+        assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(column1, column2),
+                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                        "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
+                        "select \"column1\", \"column2\"\n" +
+                        "from (select \"column1\", \"column2\"\n" +
+                        "from ((select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data1')\n" +
+                        "union all\n" +
+                        "(select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data2')) as \"union\"\n" +
+                        "group by \"column1\", \"column2\"\n" +
+                        "order by \"column1\" desc, \"column2\" asc\n" +
+                        "limit 4\n" +
+                        "offset 0)");
+        // fetch data (if you want cache the result you can use selectCache() instead of select() )
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(sqlQuery).findAll(column1, column2);
+        RawModel rawModel = rawModels.get(0);
+        String column1Value = rawModel.getColumnValue(column1);
+        String column2Value = rawModel.getColumnValue(column2);
+        assertEquals(column1Value, "same");
+        assertEquals(column2Value, "data1");
+        assertNotNull(rawModels);
+        assertEquals(rawModels.size(), 2);
+    }
+
+    @Test
+    public void testWithAndUnionQueryCache() {
+        // inserts
+        insert1("same", "data1");
+        insert1("same", "data2");
+        // get unionTable1 Metadata
+        QDynamicTable unionTable1 = qDynamicTableFactory.getQDynamicTableByName("UnionTable1");
+        // get column from unionTable1
+        StringPath testColumn11 = unionTable1.getStringColumnByName("TestColumn1_1");
+        StringPath testColumn12 = unionTable1.getStringColumnByName("TestColumn1_2");
+
+        SimplePath<String> column1 = Expressions.simplePath(String.class, "column1");
+        SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
+
+
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+
+        SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
+                withSubquery,
+                column1,
+                column2
+        ).as(SQLExpressions
+                .select(testColumn11.as("column1"), testColumn12.as("column2"))
+                .from(unionTable1));
+
+        // first subquery
+        SQLQuery<Tuple> query1 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data1"));
+        // second subquery
+        SQLQuery<Tuple> query2 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data2"));
+
+        // create UnionBuilder
+        UnionBuilder unionBuilder = ormQueryFactory.select()
+                .unionAll(ormQueryFactory.buildQuery(), query1, query2);
+        // result order by
+        unionBuilder
+                .orderBy("column1").desc().orderBy("column2").asc();
+        // offset and limit (offset = 0, limit = 2 )
+        unionBuilder.limit(new Range(0, 4));
+        // group by result
+        unionBuilder.groupBy("column1", "column2");
+
+        SQLQuery unionSubQuery = unionBuilder.getUnionSubQuery();
+        ProjectableSQLQuery sqlQuery = withQuery.select(column1, column2)
+                .from(unionSubQuery.select(column1, column2));
+
+        assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(Wildcard.count),
+                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                        "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
+                        "select count(*)\n" +
+                        "from (select \"column1\", \"column2\"\n" +
+                        "from ((select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data1')\n" +
+                        "union all\n" +
+                        "(select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data2')) as \"union\"\n" +
+                        "group by \"column1\", \"column2\"\n" +
+                        "order by \"column1\" desc, \"column2\" asc\n" +
+                        "limit 4\n" +
+                        "offset 0)");
+
+        //fetch data and put result to the cache
+        RawModel rawModel = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+
+        Long countValue = rawModel.getAliasValue(Wildcard.count);
+
+        //fetch data from the cache
+        RawModel rawModelFromCache = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+        Long countValueCache = rawModelFromCache.getAliasValue(Wildcard.count);
+
+        // insert to unionTable1
+        insert1("newValue", "data1"); // ormQueryFactory.insert(dynamicTableModel);
+        // cache is automatically evicted then get a new value and result put to the cache
+        RawModel rawModelAndPutNewCache = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+        Long newCountValue = rawModelAndPutNewCache.getAliasValue(Wildcard.count);
+
+        
+        assertEquals(countValueCache, Long.valueOf(2));
+        assertEquals(newCountValue, Long.valueOf(3));
+        assertEquals(countValue, Long.valueOf(2));
     }
 
 }

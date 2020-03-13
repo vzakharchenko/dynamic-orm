@@ -15,14 +15,14 @@ import com.querydsl.core.types.dsl.Expressions;
 public abstract class PredicateFactory {
 
 
-    public static Predicate and(Predicate... predicates) {
-        BooleanExpression[] booleanExpressions = new BooleanExpression[predicates.length];
-
-        for (int i = 0; i < predicates.length; i++) {
-            booleanExpressions[i] = (BooleanExpression) predicates[i];
-        }
-        return and(booleanExpressions);
-    }
+//    public static Predicate and(Predicate... predicates) {
+//        BooleanExpression[] booleanExpressions = new BooleanExpression[predicates.length];
+//
+//        for (int i = 0; i < predicates.length; i++) {
+//            booleanExpressions[i] = (BooleanExpression) predicates[i];
+//        }
+//        return and(booleanExpressions);
+//    }
 
     public static Predicate and(BooleanExpression... predicates) {
         BooleanExpression booleanExpression = null;
@@ -35,10 +35,10 @@ public abstract class PredicateFactory {
     }
 
     public static BooleanExpression wrapPredicate(Predicate predicate) {
-        return Expressions.booleanOperation(Ops.WRAPPED, predicate);
+        return wrapExpressionPredicate(predicate);
     }
 
-    public static BooleanExpression wrapPredicate(Expression expression) {
+    public static BooleanExpression wrapExpressionPredicate(Expression expression) {
         return Expressions.booleanOperation(Ops.WRAPPED, expression);
     }
 

@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.querydsl.sql.RelationalPath;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -12,11 +11,6 @@ import java.util.Collection;
  */
 public class QueryCacheContext implements Cloneable, CacheSupport<QueryCacheContext> {
     private Collection<RelationalPath> qRelatedTables = new ArrayList<>();
-
-    @Override
-    public QueryCacheContext registerRelatedTables(RelationalPath... qTables) {
-        return registerRelatedTables(Arrays.asList(qTables));
-    }
 
     @Override
     public QueryCacheContext registerRelatedTables(Collection<RelationalPath> qTables) {

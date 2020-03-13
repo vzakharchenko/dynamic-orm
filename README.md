@@ -246,7 +246,7 @@ public void testQuery() {
         firstTableModel1.addColumnValue("newColumn", 122);
         ormQueryFactory.updateById(firstTableModel1);
 ```
-   - select operation
+   - fetch data
 ```java
         DynamicTableModel firstTableFromDatabase = ormQueryFactory.select().findOne(ormQueryFactory
                         .buildQuery()
@@ -255,7 +255,23 @@ public void testQuery() {
                 firstTable,
                 DynamicTableModel.class);
 ```
-   - select operation and put result to the cache. Cache record will be evicted if any related table is modified (insert/update/delete operartion)
+   - fetch data with Wildcard
+```java
+        StringPath testColumn = dynamicTable.getStringColumnByName("TestColumn");
+
+        // fetch all data from all table
+        // if you want cache the result you can use selectCache() instead of select() 
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
+                ormQueryFactory.buildQuery().from(dynamicTable)
+                        .orderBy(testColumn.asc())).findAll(Wildcard.all);
+        
+        RawModel rawModel = rawModels.get(0);
+        Object columnValue1 = rawModel.getValueByPosition(0);
+        Object columnValue2 = rawModel.getValueByPosition(1);
+        Object columnValue3 = rawModel.getValueByPosition(2);
+```
+
+   - fetch data and put result to the cache. Cache record will be evicted if any related table is modified (insert/update/delete operartion)
 ```java
         DynamicTableModel firstTableFromDatabase = ormQueryFactory.selectCache().findOne(ormQueryFactory
                         .buildQuery()
@@ -266,7 +282,7 @@ public void testQuery() {
 ```
 how it works:
 ```java
-        // get data and put result to cache
+        // fetch data and put result to cache
         DynamicTableModel firstTableFromDatabase = ormQueryFactory.selectCache().findOne(ormQueryFactory
                         .buildQuery()
                         .from(firstTable)
@@ -274,7 +290,7 @@ how it works:
                 firstTable,
                 DynamicTableModel.class);
 
-        // get result from the cache
+        // fetch result from the cache
         firstTableFromDatabase = ormQueryFactory.selectCache().findOne(ormQueryFactory
                         .buildQuery()
                         .from(firstTable)
@@ -285,7 +301,7 @@ how it works:
         // any "firstTable" modification will evict the query result from the cache 
         ormQueryFactory.insert(new DynamicTableModel(firstTable));
         
-        // get data and put result to the cache
+        // fetch data and put result to the cache
         DynamicTableModel firstTableFromDatabase = ormQueryFactory.selectCache().findOne(ormQueryFactory
                         .buildQuery()
                         .from(firstTable)
@@ -309,6 +325,7 @@ how it works:
 ```
   - join queries
 ```java
+        // fetch data (if you want cache the result you can use selectCache() instead of select() )
         List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
                 ormQueryFactory.buildQuery().from(firstTable)
                         .innerJoin(secondTable).on(
@@ -425,7 +442,8 @@ how it works:
         tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
         assertEquals(tableModels.size(), 1);
 
-        // select all data from all table
+        // fetch all data from all table
+        // if you want cache the result you can use selectCache() instead of select() 
         List<RawModel> rawModels = ormQueryFactory.select().rawSelect(
                 ormQueryFactory.buildQuery().from(firstTable)
                         .innerJoin(secondTable).on(
@@ -558,7 +576,7 @@ Annotations:
                 .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
                 .finish().buildSchema();
 
-        // get dynamic table metadata
+        // fetch dynamic table metadata
         QDynamicTable relatedTable = qDynamicTableFactory.getQDynamicTableByName("relatedTable");
 
         // insert to dynamic table
@@ -567,7 +585,8 @@ Annotations:
 
         ormQueryFactory.insert(relatedTableData);
 
-        // select with join
+        // fetch with join
+         // if you want cache the result you can use selectCache() instead of select()
         DynamicTableModel tableModel = ormQueryFactory
                 .select()
                 .findOne(ormQueryFactory
@@ -731,7 +750,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 .buildSchema();
 ```
 # use SQL View
-
+if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         qDynamicTableFactory
                 .createView("testView").resultSet(ormQueryFactory.buildQuery()
@@ -744,16 +763,24 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
         TestTableVersionAnnotation testTableVersionAnnotation = new TestTableVersionAnnotation();
         ormQueryFactory.insert(testTableVersionAnnotation);
 
-        // select from table
+        // fetch data from table
+         // if you want cache the result you can use selectCache() instead of select()
         TestTableVersionAnnotation versionAnnotation = ormQueryFactory.select()
                 .findOne(ormQueryFactory.buildQuery(), TestTableVersionAnnotation.class);
         assertNotNull(versionAnnotation);
         
-        // select from View
+        // fetch data from View
         DynamicTableModel dynamicTableModel = ormQueryFactory.select()
                 .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
         assertNotNull(dynamicTableModel);
+        
+          // fetch data from View with cache (need manually register related tables with query)
+        DynamicTableModel dynamicTableModel2 = ormQueryFactory.selectCache().registerRelatedTables(
+                Collections.singletonList(QTestTableVersionAnnotation.qTestTableVersionAnnotation))
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+        assertNotNull(dynamicTableModel2);
 ```
+
 
 # SQL subquery (SQL query nested inside a larger query.)
 
@@ -795,7 +822,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 .select(testColumn21)
                 .from(unionTable2).where(testColumn22.eq("data2"));
 
-        // generate sql
+         // show the final SQL
         String sql = ormQueryFactory.select().showSql(ormQueryFactory.buildQuery().from(unionTable1)
                 .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
 
@@ -805,7 +832,8 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 "from \"UNIONTABLE2\" \"UNIONTABLE2\"\n" +
                 "where \"UNIONTABLE2\".\"TESTCOLUMN2_2\" = 'data2')");
 
-        // get data
+        // fetch data
+         // if you want cache the result you can use selectCache() instead of select()
         DynamicTableModel tableModel = ormQueryFactory.select().findOne(
                 ormQueryFactory.buildQuery().from(unionTable1)
                         .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
@@ -857,6 +885,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 .from(unionTable2).where(testColumn22.eq("data2"));
 
         // create UnionBuilder
+         // if you want cache the result you can use selectCache() instead of select()
         UnionBuilder unionBuilder = ormQueryFactory.select()
                 .unionAll(ormQueryFactory.buildQuery(), query1, query2);
         
@@ -870,7 +899,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
         // group by result
         unionBuilder.groupBy("column1", "column2");
         
-        // generateSql
+         // show final SQL
         String sql = unionBuilder.showSql();
         
         assertEquals(sql, "select \"column1\", \"column2\"\n" +
@@ -886,7 +915,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 "limit 2\n" +
                 "offset 0");
 
-        // get result
+        // fetch result
         List<RawModel> rawModels = unionBuilder.findAll();
         
         // get first record
@@ -947,7 +976,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
 
         // unionBuilder.groupBy("column1", "column2");
 
-        // generateSql
+         // show final SQL
         String sql = unionBuilder.showCountSql();
         assertEquals(sql, "select count(*)\n" +
                 "from ((select \"UNIONTABLE1\".\"ID1\"\n" +
@@ -956,7 +985,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                 "(select \"UNIONTABLE2\".\"ID2\"\n" +
                 "from \"UNIONTABLE2\" \"UNIONTABLE2\")) as \"union\"");
 
-        // get result
+        // fetch result
         Long count1 = unionBuilder.count();
         // result from cache
         Long count2 = unionBuilder.count();
@@ -964,4 +993,181 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
         insert2("someData", "data3"); //   ormQueryFactory.insert(unionTable2);
         // cache is evicted and get a new value
         Long count3 = unionBuilder.count();
+```
+#  operator "With" with Union query
+
+```java
+        // create database schema
+        qDynamicTableFactory.buildTables("UnionTable1")
+                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .addDateTimeColumn("modificationTime1").notNull().create()
+                .addStringColumn("TestColumn1_1").size(255).create()
+                .addStringColumn("TestColumn1_2").size(255).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
+                .addVersionColumn("modificationTime1)
+                .finish()
+                .buildSchema();
+
+        // get unionTable1 Metadata
+        QDynamicTable unionTable1 = qDynamicTableFactory.getQDynamicTableByName("UnionTable1");
+        // get column from unionTable1
+        StringPath testColumn11 = unionTable1.getStringColumnByName("TestColumn1_1");
+        StringPath testColumn12 = unionTable1.getStringColumnByName("TestColumn1_2");
+
+        SimplePath<String> column1 = Expressions.simplePath(String.class, "column1");
+        SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
+
+        // prepare with operator
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+        SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
+                withSubquery,
+                column1,
+                column2
+        ).as(SQLExpressions
+                .select(testColumn11.as("column1"), testColumn12.as("column2"))
+                .from(unionTable1));
+
+        // first union subquery
+        SQLQuery<Tuple> query1 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data1"));
+        // second union subquery
+        SQLQuery<Tuple> query2 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data2"));
+
+        // create UnionBuilder
+         // if you want cache the result you can use selectCache() instead of select()
+        UnionBuilder unionBuilder = ormQueryFactory.select()
+                .unionAll(ormQueryFactory.buildQuery(), query1, query2);
+        // result order by
+        unionBuilder
+                .orderBy("column1").desc().orderBy("column2").asc();
+        // offset and limit (offset = 0, limit = 2 )
+        unionBuilder.limit(new Range(0, 2));
+        // group by result
+        unionBuilder.groupBy("column1", "column2");
+
+        // build union query with "with" operator
+
+        SQLQuery unionSubQuery = unionBuilder.getUnionSubQuery();
+        ProjectableSQLQuery sqlQuery = withQuery.select(column1, column2)
+                .from(unionSubQuery.select(column1, column2));
+
+        // show final SQL
+        assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(column1, column2),
+                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                        "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
+                        "select \"column1\", \"column2\"\n" +
+                        "from (select \"column1\", \"column2\"\n" +
+                        "from ((select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data1')\n" +
+                        "union all\n" +
+                        "(select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data2')) as \"union\"\n" +
+                        "group by \"column1\", \"column2\"\n" +
+                        "order by \"column1\" desc, \"column2\" asc\n" +
+                        "limit 2\n" +
+                        "offset 0)");
+        // fetch data (if you want cache the result you can use selectCache() instead of select() )
+        List<RawModel> rawModels = ormQueryFactory.select().rawSelect(sqlQuery).findAll(column1, column2);
+        RawModel rawModel = rawModels.get(0);
+        String column1Value = rawModel.getColumnValue(column1);
+        String column2Value = rawModel.getColumnValue(column2);
+```
+#  count operator "with" (cacheable)
+
+```java
+        // create database schema
+        qDynamicTableFactory.buildTables("UnionTable1")
+                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .addDateTimeColumn("modificationTime1").notNull().create()
+                .addStringColumn("TestColumn1_1").size(255).create()
+                .addStringColumn("TestColumn1_2").size(255).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
+                .addVersionColumn("modificationTime1)
+                .finish()
+                .buildSchema();
+
+       // get unionTable1 Metadata
+        QDynamicTable unionTable1 = qDynamicTableFactory.getQDynamicTableByName("UnionTable1");
+        // get column from unionTable1
+        StringPath testColumn11 = unionTable1.getStringColumnByName("TestColumn1_1");
+        StringPath testColumn12 = unionTable1.getStringColumnByName("TestColumn1_2");
+
+        SimplePath<String> column1 = Expressions.simplePath(String.class, "column1");
+        SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
+
+
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+
+        SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
+                withSubquery,
+                column1,
+                column2
+        ).as(SQLExpressions
+                .select(testColumn11.as("column1"), testColumn12.as("column2"))
+                .from(unionTable1));
+
+        // first subquery
+        SQLQuery<Tuple> query1 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data1"));
+        // second subquery
+        SQLQuery<Tuple> query2 = SQLExpressions
+                .select(column1, column2)
+                .from(withSubquery).where(column2.eq("data2"));
+
+        // create UnionBuilder
+        UnionBuilder unionBuilder = ormQueryFactory.select()
+                .unionAll(ormQueryFactory.buildQuery(), query1, query2);
+        // result order by
+        unionBuilder
+                .orderBy("column1").desc().orderBy("column2").asc();
+        // offset and limit (offset = 0, limit = 2 )
+        unionBuilder.limit(new Range(0, 4));
+        // group by result
+        unionBuilder.groupBy("column1", "column2");
+
+        SQLQuery unionSubQuery = unionBuilder.getUnionSubQuery();
+        ProjectableSQLQuery sqlQuery = withQuery.select(column1, column2)
+                .from(unionSubQuery.select(column1, column2));
+
+        assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(Wildcard.count),
+                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                        "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
+                        "select count(*)\n" +
+                        "from (select \"column1\", \"column2\"\n" +
+                        "from ((select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data1')\n" +
+                        "union all\n" +
+                        "(select \"column1\", \"column2\"\n" +
+                        "from \"WITH_SUBQUERY\"\n" +
+                        "where \"column2\" = 'data2')) as \"union\"\n" +
+                        "group by \"column1\", \"column2\"\n" +
+                        "order by \"column1\" desc, \"column2\" asc\n" +
+                        "limit 4\n" +
+                        "offset 0)");
+
+        //fetch data and put result to the cache
+        RawModel rawModel = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+        Long countValue = rawModel.getAliasValue(Wildcard.count);
+
+        //fetch data from the cache
+        RawModel rawModelFromCache = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+        Long countValueCache = rawModelFromCache.getAliasValue(Wildcard.count);
+
+        // insert to unionTable1
+        insert1("newValue", "data1"); // ormQueryFactory.insert(dynamicTableModel);
+        
+        // cache is automatically evicted then get a new value and result put to the cache
+        RawModel rawModelAndPutNewCache = ormQueryFactory.selectCache().rawSelect(sqlQuery).findOne(Wildcard.count);
+        Long newCountValue = rawModelAndPutNewCache.getAliasValue(Wildcard.count);
+
+        
 ```

@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.core.Range;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.sql.SQLQuery;
 
 import java.util.List;
 
@@ -61,6 +62,12 @@ public interface UnionBuilder {
     UnionBuilder limit(Range range);
 
     /**
+     * get result as subquery
+     * @return subquery
+     */
+    SQLQuery getUnionSubQuery();
+
+    /**
      * create sql query string
      *
      * @return
@@ -74,5 +81,6 @@ public interface UnionBuilder {
      * @return
      */
     String showCountSql();
+
 
 }

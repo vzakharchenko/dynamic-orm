@@ -8,6 +8,7 @@ import com.querydsl.core.JoinExpression;
 import com.querydsl.core.QueryException;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.MappingProjection;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.sql.SQLQuery;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -94,7 +97,8 @@ public class RawModelBuilderImpl implements RawModelBuilder {
                     LOGGER.debug("execute: " + selectBuilder
                             .showSql(sqlQuery, rawModelExpression));
                 }
-                return sqlQuery.clone(connection).select(rawModelExpression).fetch();
+                return isWildcardFetch(columns) ? fetchWildCard(connection) :
+                        sqlQuery.clone(connection).select(rawModelExpression).fetch();
 
             } finally {
                 DataSourceUtils.releaseConnection(connection, queryContext.getDataSource());
@@ -103,6 +107,13 @@ public class RawModelBuilderImpl implements RawModelBuilder {
             throw new QueryException("Sql error: " + selectBuilder
                     .showSql(sqlQuery, rawModelExpression), qe);
         }
+    }
+
+    private List<RawModel> fetchWildCard(Connection connection) {
+        List<Object[]> fetch = sqlQuery.clone(connection).select(Wildcard.all).fetch();
+        return fetch.stream().map(
+                (Function<Object[], RawModel>) data ->
+                        new RawModelImpl(data, Wildcard.all)).collect(Collectors.toList());
     }
 
     protected MappingProjection<RawModel> createRawModelExpression(SQLQuery query,
@@ -122,5 +133,14 @@ public class RawModelBuilderImpl implements RawModelBuilder {
         }
 
         return mappingProjection;
+    }
+
+    private boolean isWildcardFetch(List<Expression<?>> columns) {
+        Expression<?> wildcard = columns.stream().filter(expr ->
+                expr.equals(Wildcard.all)).findFirst().orElse(null);
+        if (columns.size() > 1 && wildcard != null) {
+            throw new IllegalStateException("wildcard should be one");
+        }
+        return wildcard != null;
     }
 }
