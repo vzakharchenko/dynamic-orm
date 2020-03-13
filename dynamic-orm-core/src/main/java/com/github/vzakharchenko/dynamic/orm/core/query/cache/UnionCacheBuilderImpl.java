@@ -51,7 +51,7 @@ public class UnionCacheBuilderImpl extends UnionBuilderImpl {
     @Override
     public Long count() {
         QueryStatistic queryStatistic = QueryStatisticFactory
-                .buildStatistic(getUnionQuery(), queryCacheContext.getqRelatedTables());
+                .buildStatistic(getUnionSubQuery(), queryCacheContext.getqRelatedTables());
         String sqlString = showCountSql();
         queryContext.getCacheContext().register(sqlString, queryStatistic);
         TransactionalCache transactionCache = queryContext.getTransactionCache();

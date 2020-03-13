@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.testng.Assert.*;
@@ -407,6 +408,31 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         DynamicTableModel dynamicTableModel = ormQueryFactory.select()
                 .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
         assertNotNull(dynamicTableModel);
+    }
+
+    @Test(expectedExceptions = Exception.class)
+    public void testViewSelectCacheTestUnsupported() {
+        qDynamicTableFactory
+                .createView("testView").resultSet(ormQueryFactory.buildQuery()
+                .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation), QTestTableVersionAnnotation.qTestTableVersionAnnotation.id).finish()
+                .buildSchema();
+
+        QDynamicTable testView = qDynamicTableFactory.getQDynamicTableByName("testView");
+        assertNotNull(testView);
+
+        TestTableVersionAnnotation testTableVersionAnnotation = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(testTableVersionAnnotation);
+
+        // select from table
+        TestTableVersionAnnotation versionAnnotation = ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery(), TestTableVersionAnnotation.class);
+        assertNotNull(versionAnnotation);
+
+        // fetch from View with cache (need manually register related tables with query)
+        DynamicTableModel dynamicTableModel2 = ormQueryFactory.selectCache().registerRelatedTables(
+                Collections.singletonList(QTestTableVersionAnnotation.qTestTableVersionAnnotation))
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+        assertNotNull(dynamicTableModel2);
     }
 
     @Test

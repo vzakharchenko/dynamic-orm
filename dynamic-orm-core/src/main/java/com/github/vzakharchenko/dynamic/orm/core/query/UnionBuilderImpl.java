@@ -66,7 +66,7 @@ public class UnionBuilderImpl implements UnionBuilder {
     @Override
     public List<RawModel> findAll() {
         Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
-        SQLQuery query = getUnionQuery().clone(connection);
+        SQLQuery query = getUnionSubQuery().clone(connection);
         MappingProjection<RawModel> simpleRawMapper = createRawModelExpression();
         try {
             if (queryContext.isDebugSql()) {
@@ -83,7 +83,7 @@ public class UnionBuilderImpl implements UnionBuilder {
     public Long count() {
         Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
         try {
-            SQLQuery query = getUnionQuery().clone(connection);
+            SQLQuery query = getUnionSubQuery().clone(connection);
             return query.fetchCount();
         } finally {
             DataSourceUtils.releaseConnection(connection, queryContext.getDataSource());
@@ -135,7 +135,8 @@ public class UnionBuilderImpl implements UnionBuilder {
         return this;
     }
 
-    protected SQLQuery getUnionQuery() {
+    @Override
+    public SQLQuery getUnionSubQuery() {
         AbstractSQLQuery query = this.sqlQuery.clone();
         SimplePath<Void> alias = Expressions.path(Void.class, "union");
         SubQueryExpression[] listSubQueries0 = this.listSubQueries.toArray(
@@ -150,7 +151,7 @@ public class UnionBuilderImpl implements UnionBuilder {
 
     @Override
     public String showSql() {
-        SQLQuery clone = getUnionQuery();
+        SQLQuery clone = getUnionSubQuery();
         clone.setUseLiterals(true);
         MappingProjection<RawModel> simpleRawMapper = createRawModelExpression();
         return clone.select(simpleRawMapper).getSQL().getSQL();
@@ -193,7 +194,7 @@ public class UnionBuilderImpl implements UnionBuilder {
     // CHECKSTYLE:ON
     @Override
     public String showCountSql() {
-        SQLQuery clone = getUnionQuery();
+        SQLQuery clone = getUnionSubQuery();
         clone.setUseLiterals(true);
         return clone.select(Wildcard.count).getSQL().getSQL();
     }
