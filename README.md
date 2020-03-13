@@ -29,6 +29,7 @@
     - support optimistic locking (Version column)
   - quering to dynamic structures
     - select
+    - CTE
     - subqueries
     - union
     - join
@@ -43,7 +44,7 @@
   - save/load dynamic structure
 
 # dependencies
- - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, with)
+ - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, CTE)
  - [Spring transaction manager](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/transaction.html) - transaction manager
  - [Spring cache abstraction](https://docs.spring.io/spring-framework/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/cache.html) - Cache abstraction
  - [Liquibase](https://www.liquibase.org/get_started/index.html) - support dynamic structure
@@ -994,7 +995,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         // cache is evicted and get a new value
         Long count3 = unionBuilder.count();
 ```
-#  operator "With" with Union query
+#  CTE with Union query
 
 ```java
         // create database schema
@@ -1019,7 +1020,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
 
         // prepare with operator
-        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "CTE_SUBQUERY");
         SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
                 withSubquery,
                 column1,
@@ -1057,16 +1058,16 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 
         // show final SQL
         assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(column1, column2),
-                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                "with \"CTE_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
                         "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
                         "select \"column1\", \"column2\"\n" +
                         "from (select \"column1\", \"column2\"\n" +
                         "from ((select \"column1\", \"column2\"\n" +
-                        "from \"WITH_SUBQUERY\"\n" +
+                        "from \"CTE_SUBQUERY\"\n" +
                         "where \"column2\" = 'data1')\n" +
                         "union all\n" +
                         "(select \"column1\", \"column2\"\n" +
-                        "from \"WITH_SUBQUERY\"\n" +
+                        "from \"CTE_SUBQUERY\"\n" +
                         "where \"column2\" = 'data2')) as \"union\"\n" +
                         "group by \"column1\", \"column2\"\n" +
                         "order by \"column1\" desc, \"column2\" asc\n" +
@@ -1078,7 +1079,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         String column1Value = rawModel.getColumnValue(column1);
         String column2Value = rawModel.getColumnValue(column2);
 ```
-#  count operator "with" (cacheable)
+#  count CTE operator (cacheable)
 
 ```java
         // create database schema
@@ -1103,7 +1104,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         SimplePath<String> column2 = Expressions.simplePath(String.class, "column2");
 
 
-        SimplePath<Void> withSubquery = Expressions.path(Void.class, "WITH_SUBQUERY");
+        SimplePath<Void> withSubquery = Expressions.path(Void.class, "CTE_SUBQUERY");
 
         SQLQuery withQuery = (SQLQuery) ormQueryFactory.buildQuery().with(
                 withSubquery,
@@ -1138,16 +1139,16 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
                 .from(unionSubQuery.select(column1, column2));
 
         assertEquals(ormQueryFactory.select().rawSelect(sqlQuery).showSql(Wildcard.count),
-                "with \"WITH_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
+                "with \"CTE_SUBQUERY\" (\"column1\", \"column2\") as (select \"UNIONTABLE1\".\"TESTCOLUMN1_1\" as \"column1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\" as \"column2\"\n" +
                         "from \"UNIONTABLE1\" \"UNIONTABLE1\")\n" +
                         "select count(*)\n" +
                         "from (select \"column1\", \"column2\"\n" +
                         "from ((select \"column1\", \"column2\"\n" +
-                        "from \"WITH_SUBQUERY\"\n" +
+                        "from \"CTE_SUBQUERY\"\n" +
                         "where \"column2\" = 'data1')\n" +
                         "union all\n" +
                         "(select \"column1\", \"column2\"\n" +
-                        "from \"WITH_SUBQUERY\"\n" +
+                        "from \"CTE_SUBQUERY\"\n" +
                         "where \"column2\" = 'data2')) as \"union\"\n" +
                         "group by \"column1\", \"column2\"\n" +
                         "order by \"column1\" desc, \"column2\" asc\n" +
