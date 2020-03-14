@@ -17,7 +17,7 @@ public abstract class AbstractMappingProjection<MODEL>
 
     protected MODEL createModel() {
         try {
-            return this.getType().newInstance();
+            return this.getType().getConstructor().newInstance();
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

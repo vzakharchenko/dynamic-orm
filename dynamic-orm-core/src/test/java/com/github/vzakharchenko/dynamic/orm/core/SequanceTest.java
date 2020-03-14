@@ -67,7 +67,7 @@ public class SequanceTest extends OracleTestQueryOrm {
         List<DynamicTableModel> testTableSequances = ormQueryFactory.select()
                 .findAll(ormQueryFactory.buildQuery().from(qDynamicTable)
                         , qDynamicTable
-                        , DynamicTableModel.class);
+                        );
         assertNotNull(testTableSequances);
         assertEquals(testTableSequances.size(), 1);
         assertNotNull(dynamicTableModel.getValue("ID"));

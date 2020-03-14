@@ -427,12 +427,12 @@ how it works:
         assertEquals(testStringColumnValue, "testValue");
 
         // get value  from secondTable and put it to cache
-        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(secondTable);
         assertEquals(tableModels.size(), 2);
         transactionManager.commit();
 
         // get value from cache
-        ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        ormQueryFactory.selectCache().findAll(secondTable);
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
@@ -440,7 +440,7 @@ how it works:
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)
-        tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        tableModels = ormQueryFactory.selectCache().findAll(secondTable);
         assertEquals(tableModels.size(), 1);
 
         // fetch all data from all table
@@ -599,7 +599,7 @@ Annotations:
                                                 .qTestTableVersionAnnotation.id))
                                 .where(QTestTableVersionAnnotation
                                         .qTestTableVersionAnnotation.id.eq(staticTable.getId())),
-                        relatedTable, DynamicTableModel.class);
+                        relatedTable);
         assertNotNull(tableModel);
         assertEquals(tableModel.getValue("Id"), relatedTableData.getValue("Id"));
 ```
@@ -772,13 +772,13 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         
         // fetch data from View
         DynamicTableModel dynamicTableModel = ormQueryFactory.select()
-                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView);
         assertNotNull(dynamicTableModel);
         
           // fetch data from View with cache (need manually register related tables with query)
         DynamicTableModel dynamicTableModel2 = ormQueryFactory.selectCache().registerRelatedTables(
                 Collections.singletonList(QTestTableVersionAnnotation.qTestTableVersionAnnotation))
-                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView);
         assertNotNull(dynamicTableModel2);
 ```
 
@@ -825,7 +825,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 
          // show the final SQL
         String sql = ormQueryFactory.select().showSql(ormQueryFactory.buildQuery().from(unionTable1)
-                .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
+                .where(testColumn11.in(query)), unionTable1);
 
         assertEquals(sql, "select \"UNIONTABLE1\".\"ID1\", \"UNIONTABLE1\".\"MODIFICATIONTIME1\", \"UNIONTABLE1\".\"TESTCOLUMN1_1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\"\n" +
                 "from \"UNIONTABLE1\" \"UNIONTABLE1\"\n" +
@@ -837,7 +837,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
          // if you want cache the result you can use selectCache() instead of select()
         DynamicTableModel tableModel = ormQueryFactory.select().findOne(
                 ormQueryFactory.buildQuery().from(unionTable1)
-                        .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
+                        .where(testColumn11.in(query)), unionTable1);
 ```
 
 # Union query with groupBy, orderBy, offset and limit

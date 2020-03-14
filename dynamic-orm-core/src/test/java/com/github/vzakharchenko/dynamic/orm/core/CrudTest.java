@@ -3,6 +3,7 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
@@ -34,6 +35,7 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @Test
     public void testInsertDynamicTest() {
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        assertTrue(ModelHelper.isPrimaryKey(dynamicTable.getStringColumnByName("Id")));
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
@@ -56,10 +58,10 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         tableModel.addColumnValue("TestColumn", "newValue");
         ormQueryFactory.updateById(tableModel);
-        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
 
@@ -69,9 +71,9 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         ormQueryFactory.deleteById(tableModel);
-        assertNull(ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class));
+        assertNull(ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable));
     }
 
     @Test
@@ -80,14 +82,14 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
-        ormQueryFactory.modify(dynamicTable, DynamicTableModel.class)
+        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
+        ormQueryFactory.modify(dynamicTable)
                 .updateBuilder()
                 .set(dynamicTable.getStringColumnByName("TestColumn"), "newValue")
                 .set(dynamicTable.getStringColumnByName("Id"), dynamicTableModel.getValue("Id", String.class))
                 .byId().update();
 
-        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
 
@@ -97,14 +99,14 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
-        ormQueryFactory.modify(dynamicTable, DynamicTableModel.class)
+        DynamicTableModel tableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
+        ormQueryFactory.modify(dynamicTable)
                 .updateBuilder()
                 .set(dynamicTable.getStringColumnByName("TestColumn"), "newValue")
                 .set(dynamicTable.getStringColumnByName("Id"), dynamicTableModel.getValue("Id", String.class))
                 .where(dynamicTable.getStringColumnByName("TestColumn").eq("testData")).update();
 
-        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
 
@@ -124,12 +126,12 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        ormQueryFactory.modify(dynamicTable, DynamicTableModel.class)
+        ormQueryFactory.modify(dynamicTable)
                 .updateBuilder()
                 .set(dynamicTable.getStringColumnByName("TestColumn"), "newValue")
                 .where(dynamicTable.getStringColumnByName("TestColumn").eq("testData")).update();
 
-        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
 
@@ -150,13 +152,110 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);
-        ormQueryFactory.modify(dynamicTable, DynamicTableModel.class)
+        ormQueryFactory.modify(dynamicTable)
                 .delete(dynamicTableModel).delete();
 
-        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable, DynamicTableModel.class);
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertNull(tableModel2);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testGetColumnTypeFailed() {
+
+
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        dynamicTable.getNumberColumnByName("Id");
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testGetColumnFailed() {
+
+
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        dynamicTable.getNumberColumnByName("NotExist");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed1() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addStringColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed2() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addDateTimeColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed3() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addNumberColumn(null, null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed4() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addNumberColumn("dsfs", null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed5() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addDateColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed6() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addDateTimeColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed7() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addBooleanColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed8() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addClobColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed9() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addBlobColumn(null).create();
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed10() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+                .addColumns().addTimeColumn(null).create();
+    }
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed11() {
+        qDynamicTableFactory.buildTables("DynamicTable")
+               .addPrimaryKey().addPrimaryKeyGenerator(null);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed12() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+               .addPrimaryKey().addPrimaryKey((String) null);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddFailed13() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+               .addPrimaryKey().addPrimaryKey((String) null);
+    }
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testAddFailed14() {
+        qDynamicTableFactory.buildTables("DynamicTable1")
+               .addVersionColumn((String) null);
+    }
 
 
 }

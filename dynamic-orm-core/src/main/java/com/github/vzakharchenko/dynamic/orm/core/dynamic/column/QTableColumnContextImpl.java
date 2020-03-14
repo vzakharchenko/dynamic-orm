@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.*;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QNumberColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QSizeColumnBuilder;
+import org.springframework.util.Assert;
 
 public class QTableColumnContextImpl implements QTableColumnContext {
 
@@ -22,6 +23,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addStringColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QStringBuilder(this,
                 dynamicTable, columnName);
     }
@@ -29,6 +31,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addCharColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QCharBuilder(this,
                 dynamicTable, columnName);
     }
@@ -36,6 +39,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addClobColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QClobBuilder(this, dynamicTable,
                 columnName);
     }
@@ -43,6 +47,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QColumnBuilder<QTableColumn, ? extends QColumnBuilder<QTableColumn, ?>>
     addBooleanColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QBooleanBuilder(this,
                 dynamicTable, columnName);
     }
@@ -50,6 +55,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addBlobColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QBlobBuilder(this,
                 dynamicTable, columnName);
     }
@@ -58,6 +64,8 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     public <T extends Number>
     QNumberColumnBuilder<QTableColumn, QNumberColumnBuilder<QTableColumn, ?>>
     addNumberColumn(String columnName, Class<T> typeClass) {
+        Assert.notNull(columnName);
+        Assert.notNull(typeClass);
         return new QNumberBuilder(this,
                 dynamicTable, columnName, typeClass);
     }
@@ -65,6 +73,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addDateColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QDateBuilder(this,
                 dynamicTable, columnName);
     }
@@ -72,6 +81,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addDateTimeColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QDateTimeBuilder(this,
                 dynamicTable, columnName);
     }
@@ -79,6 +89,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addTimeColumn(String columnName) {
+        Assert.notNull(columnName);
         return new QTimeBuilder(this,
                 dynamicTable, columnName);
     }

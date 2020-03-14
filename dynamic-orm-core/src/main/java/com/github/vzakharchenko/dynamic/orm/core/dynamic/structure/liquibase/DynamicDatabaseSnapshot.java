@@ -1,7 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase;
 
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.change.ChangeDatabaseObjectFactory;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase.change.ChangeMissedDatabaseObject;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
@@ -39,15 +37,15 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         return getDatabaseObjectCollection(this);
     }
 
-    public <DATABASEOBJECT extends DatabaseObject> DATABASEOBJECT changeDatabaseForMissedObject(
-            DATABASEOBJECT databaseObject, Class<DATABASEOBJECT> databaseObjectClass) {
-        ChangeMissedDatabaseObject changeMissedDatabaseObject = ChangeDatabaseObjectFactory
-                .changeMissedObject(databaseObject);
-        if (changeMissedDatabaseObject != null) {
-            return (DATABASEOBJECT) changeMissedDatabaseObject.change(databaseObject);
-        }
-        return null;
-    }
+//    public <DATABASEOBJECT extends DatabaseObject> DATABASEOBJECT changeDatabaseForMissedObject(
+//            DATABASEOBJECT databaseObject, Class<DATABASEOBJECT> databaseObjectClass) {
+//        ChangeMissedDatabaseObject changeMissedDatabaseObject = ChangeDatabaseObjectFactory
+//                .changeMissedObject(databaseObject);
+//        if (changeMissedDatabaseObject != null) {
+//            return (DATABASEOBJECT) changeMissedDatabaseObject.change(databaseObject);
+//        }
+//        return null;
+//    }
 
     public void addDatabaseObject(DatabaseObject databaseObject) {
         getDatabaseObjectCollection().add(databaseObject);

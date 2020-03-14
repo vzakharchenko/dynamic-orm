@@ -20,13 +20,7 @@ public abstract class DynamicDatabaseSnapshotFactory {
 
     public static DynamicDatabaseSnapshot build(
             Database databaseType, LiquibaseHolder liquibaseHolder) {
-        try {
-            return createDatabaseObject(databaseType, liquibaseHolder);
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+        return createDatabaseObject(databaseType, liquibaseHolder);
     }
 
     private static void addTables(DynamicDatabaseSnapshot databaseSnapshot,

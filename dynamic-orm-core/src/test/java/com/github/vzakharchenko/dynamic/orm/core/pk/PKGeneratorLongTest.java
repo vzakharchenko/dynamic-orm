@@ -17,7 +17,7 @@ public class PKGeneratorLongTest extends AnnotationTestQueryOrm {
         QDynamicTable testTable = qDynamicTableFactory.getQDynamicTableByName("testTable");
         DynamicTableModel newDynamicTableModel = new DynamicTableModel(testTable);
         ormQueryFactory.insert(newDynamicTableModel);
-        DynamicTableModel dynamicTableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), testTable, DynamicTableModel.class);
+        DynamicTableModel dynamicTableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), testTable);
         assertEquals(dynamicTableModel.getValue("Id", Long.class), newDynamicTableModel.getValue("Id", Long.class));
     }
 }

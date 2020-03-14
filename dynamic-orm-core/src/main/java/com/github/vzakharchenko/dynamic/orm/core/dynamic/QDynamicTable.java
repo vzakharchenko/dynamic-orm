@@ -58,6 +58,7 @@ public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         if (primaryKeyColumn == null) {
             throw new IllegalStateException("primary key is not found: " + this);
         }
+        Assert.notNull(pkGenerator0);
         Assert.isTrue(pkGenerator0.getTypedClass().isAssignableFrom(primaryKeyColumn.getType()));
         this.pkGenerator = pkGenerator0;
         return this;
@@ -82,19 +83,6 @@ public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
             throw new IllegalStateException("column " + columnName + " is not found: " + this);
         }
         return addVersionColumn(versionColumn0);
-    }
-
-    protected <TYPE extends Serializable> QDynamicTable addSoftDeleteColumn(
-            Path<TYPE> softDelete0, TYPE value, TYPE defaultValue) {
-        if (softDelete0 == null) {
-            throw new IllegalStateException("column is not found: " + this);
-        }
-        RelationalPath<?> qTable = ModelHelper.getQTable(softDelete0);
-        if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException(WRONG_COLUMN + softDelete0);
-        }
-        this.softDelete = SoftDeleteFactory.createSoftDelete(softDelete0, value, defaultValue);
-        return this;
     }
 
     protected QDynamicTable addSoftDeleteColumn(

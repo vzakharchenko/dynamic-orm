@@ -71,13 +71,9 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
         String fileName = DYNAMIC + new SimpleDateFormat(PATTERN, Locale.getDefault()).format(
                 new Date()) + "_" + System.nanoTime() + ".xml";
         File file = new File(WORK_DIR, FilenameUtils.getName(fileName));
-        PrintStream out = new PrintStream(file, Charset.defaultCharset().name());
-        try {
+        try (PrintStream out = new PrintStream(file, Charset.defaultCharset().name())) {
             XMLChangeLogSerializer xmlChangeLogSerializer = new XMLChangeLogSerializer();
             xmlChangeLogSerializer.write(changeSets, out);
-        } finally {
-            out.flush();
-            out.close();
         }
         LOGGER.error(FileUtils.readFileToString(file, Charset.defaultCharset()));
         update(dataSource, fileName);

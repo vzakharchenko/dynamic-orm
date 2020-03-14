@@ -90,7 +90,7 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
 
         // generate sql
         String sql = ormQueryFactory.select().showSql(ormQueryFactory.buildQuery().from(unionTable1)
-                .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
+                .where(testColumn11.in(query)), unionTable1);
 
         assertEquals(sql, "select \"UNIONTABLE1\".\"ID1\", \"UNIONTABLE1\".\"MODIFICATIONTIME1\", \"UNIONTABLE1\".\"TESTCOLUMN1_1\", \"UNIONTABLE1\".\"TESTCOLUMN1_2\"\n" +
                 "from \"UNIONTABLE1\" \"UNIONTABLE1\"\n" +
@@ -101,7 +101,7 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
         // fetch data
         DynamicTableModel tableModel = ormQueryFactory.select().findOne(
                 ormQueryFactory.buildQuery().from(unionTable1)
-                        .where(testColumn11.in(query)), unionTable1, DynamicTableModel.class);
+                        .where(testColumn11.in(query)), unionTable1);
         assertEquals(tableModel.getValue("TestColumn1_2", String.class), "data1");
 
     }
