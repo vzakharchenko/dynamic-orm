@@ -95,12 +95,12 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         assertEquals(testStringColumnValue, "testValue");
 
         // get value  from secondTable and put it to cache
-        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(secondTable);
         assertEquals(tableModels.size(), 2);
         transactionManager.commit();
 
         // get value from cache
-        ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        ormQueryFactory.selectCache().findAll(secondTable);
 
         //soft delete the second row of the second Table
         transactionManager.startTransactionIfNeeded();
@@ -108,7 +108,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         transactionManager.commit();
 
         // get new cache records (soft deleted values are not included)
-        tableModels = ormQueryFactory.selectCache().findAll(secondTable, DynamicTableModel.class);
+        tableModels = ormQueryFactory.selectCache().findAll(secondTable);
         assertEquals(tableModels.size(), 1);
 
         // select all data from all table

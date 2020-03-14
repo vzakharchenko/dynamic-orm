@@ -1,5 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.StaticTableMappingProjection;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
@@ -38,6 +40,11 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
     }
 
     @Override
+    public List<DynamicTableModel> findAll(QDynamicTable dynamicTable) {
+        return findAll(dynamicTable, DynamicTableModel.class);
+    }
+
+    @Override
     public <MODEL extends DMLModel> List<MODEL> findAll(SQLCommonQuery<?> sqlQuery,
                                                         RelationalPath<?> qTable,
                                                         Class<MODEL> modelClass) {
@@ -45,6 +52,11 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
         StaticTableMappingProjection<MODEL> expression = TableMappingProjectionFactory
                 .buildMapper(qTable, modelClass);
         return findAll(validateQuery(sqlQuery, qTable, modelClass), expression);
+    }
+
+    @Override
+    public List<DynamicTableModel> findAll(SQLCommonQuery<?> sqlQuery, QDynamicTable dynamicTable) {
+        return findAll(sqlQuery, dynamicTable, DynamicTableModel.class);
     }
 
     @Override
@@ -90,6 +102,11 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
     }
 
     @Override
+    public DynamicTableModel findOne(SQLCommonQuery<?> sqlQuery, QDynamicTable dynamicTable) {
+        return findOne(sqlQuery, dynamicTable, DynamicTableModel.class);
+    }
+
+    @Override
     public <MODEL extends DMLModel> MODEL findOne(SQLCommonQuery<?> sqlQuery,
                                                   Class<MODEL> modelClass) {
         RelationalPath<?> qTableFromModel = queryContext.getQModel(modelClass);
@@ -130,7 +147,6 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
     @Override
     public RawModelBuilder rawSelect(SQLCommonQuery<?> sqlQuery) {
         return new RawModelBuilderImpl(DBHelper.castProjectionQueryToSqlQuery(sqlQuery),
-
                 queryContext, this);
     }
 

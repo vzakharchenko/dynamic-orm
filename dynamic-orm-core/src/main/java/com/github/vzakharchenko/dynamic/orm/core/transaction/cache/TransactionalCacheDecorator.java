@@ -33,11 +33,11 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         this.cacheKeyLockStrategy = cacheKeyLockStrategy;
     }
 
-    private TransactionalCacheImpl getTransactionCache() {
+    private TransactionalCache getTransactionCache() {
 
         final String cacheName = targetCache.getName();
-        TransactionalCacheImpl transactionalCache =
-                (TransactionalCacheImpl) TransactionSynchronizationManager
+        TransactionalCache transactionalCache =
+                (TransactionalCache) TransactionSynchronizationManager
                         .getResource(cacheName);
         if (transactionalCache != null) {
             return transactionalCache;
@@ -56,7 +56,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
 
 
     public <T> T getFromActiveTransaction(Serializable key, Class<T> tClass) {
-        TransactionalCacheImpl transactionalCache = getTransactionCache();
+        TransactionalCache transactionalCache = getTransactionCache();
         T value = transactionalCache.getFromCache(key, tClass);
         if (value == null) {
             if (transactionalCache.getEvictObjects().contains(key)) {

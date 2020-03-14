@@ -32,7 +32,7 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
         return Ordered.HIGHEST_PRECEDENCE;
     }
 
-    private void afterCompletion(TransactionalCacheImpl transactionalCache) {
+    private void afterCompletion(TransactionalCache transactionalCache) {
         if (transactionalCache != null) {
             transactionalCache.getEvictObjects().forEach(evictKey -> {
                 LOGGER.debug("Cleaning  " + evictKey +
@@ -63,8 +63,8 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
             LOGGER.debug("Starting merge Transaction cache for " +
                     cacheName + " Cache. Transaction Name:" +
                     transactionName);
-            TransactionalCacheImpl transactionalCache =
-                    (TransactionalCacheImpl)
+            TransactionalCache transactionalCache =
+                    (TransactionalCache)
                             TransactionSynchronizationManager
                                     .getResource(cacheName);
             afterCompletion(transactionalCache);

@@ -145,9 +145,9 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         DynamicTableModel dynamicTableModel2 = new DynamicTableModel(qDynamicTable);
         dynamicTableModel2.addColumnValue("STRING_Test_FIELD", "model 2 value");
 
-        ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
+        ormQueryFactory.modify(qDynamicTable).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
 
-        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 2);
@@ -187,7 +187,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         ormQueryFactory.insert(dynamicTableModel1, dynamicTableModel2);
 
-        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 2);
@@ -226,17 +226,17 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         DynamicTableModel dynamicTableModel2 = new DynamicTableModel(qDynamicTable);
         dynamicTableModel2.addColumnValue("STRING_Test_FIELD", "model 2 value");
 
-        CrudBuilder<DynamicTableModel> modify = ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class);
+        CrudBuilder<DynamicTableModel> modify = ormQueryFactory.modify(qDynamicTable);
         modify.primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
 
-        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 2);
 
         modify.deleteByIds(1000);
 
-        tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 1);
@@ -270,10 +270,10 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         dynamicTableModel1.addColumnValue("ID", 1000);
         dynamicTableModel1.addColumnValue("STRING_Test_FIELD", "test123");
 
-        CrudBuilder<DynamicTableModel> modify = ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class);
+        CrudBuilder<DynamicTableModel> modify = ormQueryFactory.modify(qDynamicTable);
         modify.primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1);
 
-        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 1);
@@ -287,7 +287,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         modify.updateBuilder().updateModel(dtm).update();
 
-        tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        tableModels = ormQueryFactory.select().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 1);
@@ -406,7 +406,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         // select from View
         DynamicTableModel dynamicTableModel = ormQueryFactory.select()
-                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView);
         assertNotNull(dynamicTableModel);
     }
 
@@ -431,7 +431,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         // fetch from View with cache (need manually register related tables with query)
         DynamicTableModel dynamicTableModel2 = ormQueryFactory.selectCache().registerRelatedTables(
                 Collections.singletonList(QTestTableVersionAnnotation.qTestTableVersionAnnotation))
-                .findOne(ormQueryFactory.buildQuery().from(testView), testView, DynamicTableModel.class);
+                .findOne(ormQueryFactory.buildQuery().from(testView), testView);
         assertNotNull(dynamicTableModel2);
     }
 
@@ -447,6 +447,20 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         QDynamicTable testView = qDynamicTableFactory.getQDynamicTableByName("testView");
         assertNotNull(testView);
+
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testViewFailed() {
+        qDynamicTableFactory
+                .createView("testView").resultSet(ormQueryFactory.buildQuery()
+                        .from(QTestTableVersionAnnotation.qTestTableVersionAnnotation),
+                QTestTableVersionAnnotation.qTestTableVersionAnnotation.id.as("id"),
+                QTestTableVersionAnnotation.qTestTableVersionAnnotation.version.as("version")
+        ).finish()
+                .buildSchema();
+
+        qDynamicTableFactory.getQDynamicTableByName("testView223");
 
     }
 

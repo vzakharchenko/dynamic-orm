@@ -47,10 +47,10 @@ public class DynamicCacheTest extends OracleTestQueryOrm {
         dynamicTableModel2.addColumnValue("STRING_Test_FIELD", "model 2 value");
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
-        ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
+        ormQueryFactory.modify(qDynamicTable).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
         ormQueryFactory.transactionManager().commit();
 
-        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
 
         assertNotNull(tableModels);
         assertEquals(tableModels.size(), 2);
@@ -90,10 +90,10 @@ public class DynamicCacheTest extends OracleTestQueryOrm {
         dynamicTableModel2.addColumnValue("STRING_Test_FIELD", "test123");
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
-        ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
+        ormQueryFactory.modify(qDynamicTable).primaryKeyGenerator(PKGeneratorInteger.getInstance()).insert(dynamicTableModel1, dynamicTableModel2);
         ormQueryFactory.transactionManager().commit();
 
-        LazyList<DynamicTableModel> lazyList = ormQueryFactory.modelCacheBuilder(qDynamicTable, DynamicTableModel.class).findAllByColumn(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"), "test123");
+        LazyList<DynamicTableModel> lazyList = ormQueryFactory.modelCacheBuilder(qDynamicTable).findAllByColumn(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"), "test123");
 
         lazyList.getModelList();
 

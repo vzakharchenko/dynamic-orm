@@ -1,5 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilderFactory;
@@ -56,6 +58,11 @@ public class OrmQueryFactoryImpl extends CrudOrmQueryFactoryImpl {
     public <MODEL extends DMLModel> CacheBuilder<MODEL> modelCacheBuilder(RelationalPath<?> qTable,
                                                                           Class<MODEL> modelClass) {
         return CacheBuilderFactory.build(modelClass, qTable, getQueryContext());
+    }
+
+    @Override
+    public CacheBuilder<DynamicTableModel> modelCacheBuilder(QDynamicTable dynamicTable) {
+        return modelCacheBuilder(dynamicTable, DynamicTableModel.class);
     }
 
     @Override

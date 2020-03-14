@@ -1,5 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.querydsl.core.types.Expression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
@@ -23,6 +25,16 @@ public interface SelectBuilder
      */
     <MODEL extends DMLModel> List<MODEL> findAll(RelationalPath<?> qTable,
                                                  Class<MODEL> modelClass);
+
+    /**
+     * The fetch all  data models from a database using sqlQuery query.
+     * the result is mapped to the data models
+     *
+     * @param dynamicTable Dynamic metadata
+     * @return List of Models
+     */
+    List<DynamicTableModel> findAll(QDynamicTable dynamicTable);
+
     /**
      * The fetch all  data models from a database using sqlQuery query.
      * the result is mapped to the data models
@@ -36,6 +48,17 @@ public interface SelectBuilder
     <MODEL extends DMLModel> List<MODEL> findAll(SQLCommonQuery<?> sqlQuery,
                                                  RelationalPath<?> qTable,
                                                  Class<MODEL> modelClass);
+
+    /**
+     * The fetch all  data models from a database using sqlQuery query.
+     * the result is mapped to the data models
+     *
+     * @param sqlQuery     queryDsl query
+     * @param dynamicTable dynamic metadata
+     * @return List of Models
+     */
+    List<DynamicTableModel> findAll(SQLCommonQuery<?> sqlQuery,
+                                    QDynamicTable dynamicTable);
 
     /**
      * The fetch all  data models from a database using sqlQuery query.
@@ -74,6 +97,16 @@ public interface SelectBuilder
     <MODEL extends DMLModel> MODEL findOne(SQLCommonQuery<?> sqlQuery,
                                            RelationalPath<?> qTable,
                                            Class<MODEL> modelClass);
+    /**
+     * The fetch a data model from a database using sqlQuery query.
+     * the result is mapped to the data models
+     *
+     * @param sqlQuery   queryDsl query
+     * @param dynamicTable Dynamic Table Metadata
+     * @return MODEL
+     */
+    DynamicTableModel findOne(SQLCommonQuery<?> sqlQuery,
+                                           QDynamicTable dynamicTable);
 
     /**
      * The fetch a data model from a database using sqlQuery query.

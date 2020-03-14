@@ -69,7 +69,7 @@ public class SoftDeleteTest extends OracleTestQueryOrm {
         assertEquals(testTableVersion.getValue("STATUS", Integer.class), Integer.valueOf(0));
         assertEquals(testTableVersion.getValue("TEST_COLUMN", Integer.class), Integer.valueOf(123456));
 
-        DynamicTableModel dynamicTableModelCache = ormQueryFactory.modelCacheBuilder(qDynamicTable, DynamicTableModel.class).findOneByColumn(qDynamicTable.getNumberColumnByName("TEST_COLUMN"), 123456);
+        DynamicTableModel dynamicTableModelCache = ormQueryFactory.modelCacheBuilder(qDynamicTable).findOneByColumn(qDynamicTable.getNumberColumnByName("TEST_COLUMN"), 123456);
         assertNotNull(dynamicTableModelCache);
         assertNotNull(dynamicTableModelCache.getValue("ID"));
         assertNotNull(dynamicTableModelCache.getValue("VERSION"));
@@ -79,12 +79,12 @@ public class SoftDeleteTest extends OracleTestQueryOrm {
 
         ormQueryFactory.softDeleteById(testTableVersion);
 
-        DynamicTableModel dynamicTableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable, DynamicTableModel.class);
+        DynamicTableModel dynamicTableModel = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery().from(qDynamicTable), qDynamicTable);
         assertNotNull(dynamicTableModel);
         assertEquals(dynamicTableModel.getValue("STATUS", Integer.class), Integer.valueOf(-1));
 
 
-        DynamicTableModel dynamicTableModelCacheAfterDeletion = ormQueryFactory.modelCacheBuilder(qDynamicTable, DynamicTableModel.class).findOneByColumn(qDynamicTable.getNumberColumnByName("TEST_COLUMN"), 123456);
+        DynamicTableModel dynamicTableModelCacheAfterDeletion = ormQueryFactory.modelCacheBuilder(qDynamicTable).findOneByColumn(qDynamicTable.getNumberColumnByName("TEST_COLUMN"), 123456);
         assertNull(dynamicTableModelCacheAfterDeletion);
 
     }

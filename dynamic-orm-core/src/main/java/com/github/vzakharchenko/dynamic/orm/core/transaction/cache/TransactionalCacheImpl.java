@@ -70,7 +70,7 @@ public class TransactionalCacheImpl implements TransactionalCache {
     public void cacheEvict(Serializable key) {
         transactionCache.remove(key);
         evictValues.put(key, key);
-        lock(key);
+//        lock(key);
         unLock(key);
     }
 

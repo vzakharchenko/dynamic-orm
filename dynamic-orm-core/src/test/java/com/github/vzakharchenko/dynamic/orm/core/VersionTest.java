@@ -56,7 +56,7 @@ public class VersionTest extends OracleTestQueryOrm {
                 .finish().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
-        ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class)
+        ormQueryFactory.modify(qDynamicTable)
                 .versionColumn(qDynamicTable.getNumberColumnByName("VERSION")).insert(testTableVersion);
 
         assertNotNull(testTableVersion.getValue("ID"));
@@ -203,7 +203,7 @@ public class VersionTest extends OracleTestQueryOrm {
                 .finish().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
-        CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class)
+        CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable)
                 .versionColumn(qDynamicTable.getNumberColumnByName("VERSION"));
         builder.insert(testTableVersion);
 
@@ -237,7 +237,7 @@ public class VersionTest extends OracleTestQueryOrm {
                 .finish().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
-        CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable, DynamicTableModel.class)
+        CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable)
                 .versionColumn(qDynamicTable.getNumberColumnByName("VERSION"));
         builder.insert(testTableVersion);
         ormQueryFactory.transactionManager().commit();

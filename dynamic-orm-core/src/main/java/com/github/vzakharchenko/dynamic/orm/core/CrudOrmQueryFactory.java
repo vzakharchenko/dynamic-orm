@@ -4,6 +4,8 @@ import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SequanceName;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.annotations.Version;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
@@ -49,6 +51,16 @@ public interface CrudOrmQueryFactory {
      */
     <MODEL extends DMLModel> CrudBuilder<MODEL> modify(RelationalPath<?> qTable,
                                                        Class<MODEL> modelClass);
+    /**
+     * Modification data for the corresponding qtable(the Metadata Model) class and data model
+     * <p>
+     * Attention!  All modification Queries should be in the transaction Synchronisation
+     *
+     * @param dynamicTable Dynamic Metadata Model
+     * @return modification builder
+     * @see CrudBuilder
+     */
+    CrudBuilder<DynamicTableModel> modify(QDynamicTable dynamicTable);
 
 
     /**

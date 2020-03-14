@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
@@ -17,6 +18,7 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  *
@@ -61,54 +63,80 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
                         diffColumnModelMap));
     }
 
-    // CHECKSTYLE:OFF
-    private void afterModification(Map<Serializable, DiffColumnModel> diffColumnModelMap,
-                                   boolean clearOldModel, boolean clearNewModel) {
 
+    private void clearPrimaryKey(Serializable primaryKeyValue) {
+        TransactionalCache transactionCache = queryContext.getTransactionCache();
+        PrimaryKeyCacheKey primaryKeyCacheKey = CacheHelper
+                .buildPrimaryKeyCacheKey(primaryKeyValue, this.qTable);
+        transactionCache.cacheEvict(primaryKeyCacheKey);
+    }
+
+    private void clearAllData() {
+        TransactionalCache transactionCache = queryContext.getTransactionCache();
+        CachedAllData cachedAllData = CacheHelper
+                .buildAllDataCache(this.qTable);
+        transactionCache.cacheEvict(cachedAllData);
+    }
+
+
+    private void clearChangedColumn(Path<Serializable> cachedColumn,
+                                    DiffColumn<Serializable> columnDiff,
+                                    boolean clearOldModel, boolean clearNewModel) {
+        TransactionalCache transactionCache = queryContext.getTransactionCache();
+//clear oldModel
+        if (clearOldModel) {
+            transactionCache.cacheEvict(CacheHelper
+                    .buildCachedColumnWithValue(cachedColumn,
+                            columnDiff.getOldValue()));
+        }
+        // clear new Model;
+        if (clearNewModel) {
+            transactionCache.cacheEvict(CacheHelper
+                    .buildCachedColumnWithValue(cachedColumn,
+                            columnDiff.getNewValue()));
+        }
+    }
+
+    private void clearColumns(DiffColumnModel diffColumnModel,
+                              boolean clearOldModel, boolean clearNewModel) {
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         CacheContext cacheContext = queryContext.getCacheContext();
-
-        for (Map.Entry<Serializable, DiffColumnModel> entry : diffColumnModelMap.entrySet()) {
-            Serializable primaryKeyValue = entry.getKey();
-            DiffColumnModel diffColumnModel = entry.getValue();
-            Assert.notNull(primaryKeyValue);
-            //clear Primary key
-            PrimaryKeyCacheKey primaryKeyCacheKey = CacheHelper
-                    .buildPrimaryKeyCacheKey(primaryKeyValue, this.qTable);
-            transactionCache.cacheEvict(primaryKeyCacheKey);
-            // clear cached column
-            List<Path<Serializable>> cachedColumns = cacheContext
-                    .getCachedColumns(this.qTable.getTableName());
-            for (Path<Serializable> cachedColumn : cachedColumns) {
+        List<Path<Serializable>> cachedColumns = cacheContext
+                .getCachedColumns(this.qTable.getTableName());
+        cachedColumns.forEach(new Consumer<Path<Serializable>>() {
+            @Override
+            public void accept(Path<Serializable> cachedColumn) {
                 DiffColumn<Serializable> columnDiff = diffColumnModel
                         .getColumnDiff(cachedColumn);
                 transactionCache.cacheEvict(CacheHelper.buildCachedColumn(cachedColumn));
                 if (columnDiff.isChanged()) {
-                    //clear oldModel
-                    if (clearOldModel) {
-                        transactionCache.cacheEvict(CacheHelper
-                                .buildCachedColumnWithValue(cachedColumn,
-                                        columnDiff.getOldValue()));
-                    }
-                    // clear new Model;
-                    if (clearNewModel) {
-                        transactionCache.cacheEvict(CacheHelper
-                                .buildCachedColumnWithValue(cachedColumn,
-                                        columnDiff.getNewValue()));
-                    }
+                    clearChangedColumn(cachedColumn, columnDiff, clearOldModel, clearNewModel);
                 } else {
                     transactionCache.cacheEvict(CacheHelper
                             .buildCachedColumnWithValue(cachedColumn,
                                     columnDiff.getNewValue()));
                 }
             }
-        }
+        });
+    }
+
+    private void afterModification(Map<Serializable, DiffColumnModel> diffColumnModelMap,
+                                   boolean clearOldModel, boolean clearNewModel) {
+        diffColumnModelMap.forEach((primaryKeyValue, diffColumnModel) -> {
+            Assert.notNull(primaryKeyValue);
+            //clear Primary key
+            clearPrimaryKey(primaryKeyValue);
+            //clear Fetch All
+            clearAllData();
+            // clear cached column
+            clearColumns(diffColumnModel, clearOldModel, clearNewModel);
+        });
         cleanQueryCache();
 
         sendSoftDeleteEventIfNeeded(diffColumnModelMap);
 
     }
-    // CHECKSTYLE:ON
+
     private void sendSoftDeleteEventIfNeeded(
             Map<Serializable, DiffColumnModel> diffColumnModelMap) {
         if (softDelete != null) {

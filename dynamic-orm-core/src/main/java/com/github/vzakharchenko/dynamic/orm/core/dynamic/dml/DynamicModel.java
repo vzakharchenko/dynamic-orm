@@ -2,6 +2,7 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.dml;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.querydsl.core.types.Path;
 
 import java.util.Collection;
 
@@ -10,6 +11,8 @@ import java.util.Collection;
  */
 public interface DynamicModel extends DMLModel, Cloneable {
     void addColumnValue(String column, Object value);
+
+    void addColumnValue(Path column, Object value);
 
     <T> T getValue(String column, Class<T> tClass);
 

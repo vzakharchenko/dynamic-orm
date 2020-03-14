@@ -61,7 +61,7 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
                                                 .qTestTableVersionAnnotation.id))
                                 .where(QTestTableVersionAnnotation
                                         .qTestTableVersionAnnotation.id.eq(staticTable.getId())),
-                        relatedTable, DynamicTableModel.class);
+                        relatedTable);
         assertNotNull(tableModel);
         assertEquals(tableModel.getValue("Id"), relatedTableData.getValue("Id"));
         transactionManager.commit();

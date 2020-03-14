@@ -1,6 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
@@ -66,7 +68,6 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
      * <p>
      * Attention!  If the transaction synchronisation is active, the cache is evicted after commit.
      * <p>
-     * IT IS BETTER TO USE OUTSIDE OF A TRANSACTION
      *
      * @return SelectCacheBuilder
      * @see SelectCacheBuilder
@@ -90,7 +91,6 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
      * <p>
      * Attention!  If the transaction synchronisation is active, the cache is evicted after commit.
      * <p>
-     * IT IS BETTER TO USE OUTSIDE OF A TRANSACTION
      *
      * @param qTable     Metadata Model
      * @param modelClass data Model class
@@ -109,6 +109,31 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
 
     /**
      * Builder cache query for one model type. Cleaned  only the obsolete data
+     * Attention! To save the relevance of the cache. All data modifications
+     * should be carried out through OrmQueryFactory using the methods:
+     * modify(...)
+     * insert(...)
+     * updateById(...)
+     * deleteById(...)
+     * softDeleteById(...)
+     * <p>
+     * Attention!  If the transaction synchronisation is active, the cache is evicted after commit.
+     * <p>
+     *
+     * @param dynamicTable Dynamic Metadata Model
+     * @return Builder cache queries for a data model
+     * @see CacheBuilder
+     * <p>
+     * CLEANING THE CACHE  OCCURS AFTER  ANY MODIFICATION THE TABLES INVOLVED IN THE QUERY
+     * <p>
+     * THE CACHE IS CLEARED ONLY WITH OUTDATED DATA
+     * <p>
+     * THIS METHOD ALLOWS YOU TO FULLY SYNCHRONIZE THE DATABASE AND THE CACHE
+     */
+    CacheBuilder<DynamicTableModel> modelCacheBuilder(QDynamicTable dynamicTable);
+
+    /**
+     * Builder cache query for one model type. Cleaned  only the obsolete data
      * Attention! To save the relevance of the cache. All data modifications should be carried out
      * through OrmQueryFactory using the methods:
      * Attention! qTable(the Metadata Model) is taken either from the annotation @QueryDslModel,
@@ -121,7 +146,6 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
      * <p>
      * Attention!  If the transaction synchronisation is active, the cache is evicted after commit.
      * <p>
-     * IT IS BETTER TO USE OUTSIDE OF A TRANSACTION
      *
      * @param modelClass data Model class
      * @param <MODEL>    data Model type
@@ -137,5 +161,4 @@ public interface OrmQueryFactory extends CrudOrmQueryFactory {
      */
     <MODEL extends DMLModel> CacheBuilder<MODEL> modelCacheBuilder(Class<MODEL> modelClass);
 
-    void clearCache();
 }

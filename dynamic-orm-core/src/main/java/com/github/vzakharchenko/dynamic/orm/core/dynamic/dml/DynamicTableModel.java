@@ -2,6 +2,7 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.dml;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.querydsl.core.types.Path;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -26,6 +27,11 @@ public final class DynamicTableModel implements DynamicModel {
         qDynamicTable.checkColumn(column, value);
         Assert.hasText(column);
         columns.put(StringUtils.upperCase(column), value);
+    }
+
+    @Override
+    public void addColumnValue(Path column, Object value) {
+        addColumnValue(ModelHelper.getColumnName(column), value);
     }
 
     @Override

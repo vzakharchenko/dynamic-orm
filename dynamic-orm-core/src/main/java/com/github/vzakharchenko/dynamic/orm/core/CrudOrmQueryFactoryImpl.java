@@ -1,5 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.exception.EmptyBatchException;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
@@ -77,6 +79,11 @@ public abstract class CrudOrmQueryFactoryImpl implements OrmQueryFactory, Access
         queryContextImpl.validateModel(qTable, modelClass);
         return CrudBuilderFactory
                 .buildCrudBuilder(modelClass, qTable, queryContextImpl);
+    }
+
+    @Override
+    public CrudBuilder<DynamicTableModel> modify(QDynamicTable dynamicTable) {
+        return modify(dynamicTable, DynamicTableModel.class);
     }
 
     @Override

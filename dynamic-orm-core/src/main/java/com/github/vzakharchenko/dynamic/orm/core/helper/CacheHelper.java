@@ -47,6 +47,9 @@ public abstract class CacheHelper {
     public static CachedColumn buildCachedColumn(Path column) {
         return new CachedColumn(column);
     }
+    public static CachedAllData buildCachedAllData(RelationalPath<?> qTable) {
+        return new CachedAllData(qTable);
+    }
 
     public static PrimaryKeyCacheKey buildPrimaryKeyCacheModel(
             DMLModel model, RelationalPath<?> qTable) {
