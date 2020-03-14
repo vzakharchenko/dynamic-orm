@@ -15,6 +15,7 @@ import java.util.Set;
 import static org.mockito.Mockito.*;
 import static org.springframework.transaction.support.TransactionSynchronization.STATUS_COMMITTED;
 import static org.springframework.transaction.support.TransactionSynchronization.STATUS_ROLLED_BACK;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
 public class OrmTransactionSynchronizationAdapterTest {
@@ -41,13 +42,14 @@ public class OrmTransactionSynchronizationAdapterTest {
         when(transactionalCache.getUpdatedObjects()).thenReturn(Set.of("1"));
         when(transactionalCache.getUpdatedObjects()).thenReturn(Set.of("1"));
         when(cache.get("test")).thenReturn(() -> "testValue");
+        when(cache.getName()).thenReturn("test");
     }
 
 
     @AfterMethod
     public void afterMethods() {
         TransactionSynchronizationManager.unbindResourceIfPossible("test");
-        if (TransactionSynchronizationManager.isSynchronizationActive()){
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.clearSynchronization();
             TransactionSynchronizationManager.clear();
         }
@@ -75,6 +77,28 @@ public class OrmTransactionSynchronizationAdapterTest {
     }
 
     @Test
+    public void testTransactionalCacheDecorator2() {
+        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey("1", QTestTableVersion.qTestTableVersion);
+        TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache, cacheKeyLockStrategy);
+        try {
+            TransactionSynchronizationManager.initSynchronization();
+            transactionalCacheDecorator.deleteModel(primaryKeyCacheKey);
+            transactionalCacheDecorator.insertModel(primaryKeyCacheKey);
+            transactionalCacheDecorator.updateModel(primaryKeyCacheKey);
+            assertNull(transactionalCacheDecorator.getFromTargetCache(primaryKeyCacheKey, List.class));
+            assertNull(transactionalCacheDecorator.getFromTargetCache("1", List.class));
+            transactionalCacheDecorator.getFromTargetCache("test", String.class);
+            assertNotNull(transactionalCacheDecorator.getDeletedObjects());
+            assertNotNull(transactionalCacheDecorator.getEvictObjects());
+            assertNotNull(transactionalCacheDecorator.getInsertedObjects());
+            assertNotNull(transactionalCacheDecorator.getUpdatedObjects());
+            assertNotNull(transactionalCacheDecorator.getFromActiveTransaction("test", String.class));
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+    }
+
+    @Test
     public void testTransactionalCacheImpl() {
         TransactionalCacheImpl transactionalCacheImpl = new TransactionalCacheImpl(cache, cacheKeyLockStrategy);
         PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey("1", QTestTableVersion.qTestTableVersion);
@@ -87,6 +111,7 @@ public class OrmTransactionSynchronizationAdapterTest {
             assertNull(transactionalCacheImpl.getFromTargetCache("1", List.class));
             Assert.assertEquals(transactionalCacheImpl.getFromTargetCache("test", String.class), "testValue");
             transactionalCacheImpl.getFromTargetCache("test", String.class);
+            assertNotNull(transactionalCacheImpl.getInternalCache());
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
         }

@@ -16,7 +16,7 @@ public class TransactionCacheManagerImpl implements TransactionCacheManager {
 
     private final CacheManager targetCacheManager;
 
-    private CacheKeyLockStrategy cacheKeyLockStrategy = new SimpleCacheKeyLockStrategy();
+    private CacheKeyLockStrategy cacheKeyLockStrategy = new DisabledCacheKeyLockStrategy();
 
     @Autowired
     public TransactionCacheManagerImpl(CacheManager targetCacheManager) {
