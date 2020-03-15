@@ -3,6 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/vzakharchenko/dynamic-orm/badge.svg?branch=master)](https://coveralls.io/github/vzakharchenko/dynamic-orm?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c587a6e77be5e8cbef0/maintainability)](https://codeclimate.com/github/vzakharchenko/dynamic-orm/maintainability)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm)
+[![BCH compliance](https://bettercodehub.com/edge/badge/vzakharchenko/dynamic-orm?branch=master)](https://bettercodehub.com/)
 
 # supported database
  - Oracle
