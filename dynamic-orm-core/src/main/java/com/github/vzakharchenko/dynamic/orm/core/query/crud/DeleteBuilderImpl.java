@@ -109,7 +109,7 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
                     .set(ModelHelper.getPrimaryKeyColumn(qTable), id)
                     .set(softDelete.getColumn(), softDelete.getDeletedValue()).byId().batch();
         }
-        return updateModelBuilder.update();
+        return updateModelBuilder != null ? updateModelBuilder.update() : null;
     }
 
     @Override

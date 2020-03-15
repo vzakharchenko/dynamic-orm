@@ -32,9 +32,9 @@ public class QRolePermission extends com.querydsl.sql.RelationalPathBase<QRolePe
 
     public final com.querydsl.sql.PrimaryKey<QRolePermission> rolePermissionPkey = createPrimaryKey(id);
 
-    public final com.querydsl.sql.ForeignKey<QPermission> rolePermission1Fkey = createForeignKey(permissionId, "ID");
-
     public final com.querydsl.sql.ForeignKey<QRole> rolePermission2Fkey = createForeignKey(roleId, "ID");
+
+    public final com.querydsl.sql.ForeignKey<QPermission> rolePermission1Fkey = createForeignKey(permissionId, "ID");
 
     public QRolePermission(String variable) {
         super(QRolePermission.class, forVariable(variable), "PUBLIC", "ROLE_PERMISSION");

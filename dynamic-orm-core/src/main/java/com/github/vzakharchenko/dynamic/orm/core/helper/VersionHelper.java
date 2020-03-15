@@ -49,7 +49,7 @@ public abstract class VersionHelper {
             return buildDefaultNumber(typeClass);
         }
         if (Integer.class.isAssignableFrom(typeClass)) {
-            Integer intVersion = (Integer) currentVersion + 1;
+            Integer intVersion = ((Integer) currentVersion) + 1;
             return (TYPE) intVersion;
         } else if (Long.class.isAssignableFrom(typeClass)) {
             Long longVersion = (Long) currentVersion + 1;

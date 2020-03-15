@@ -32,9 +32,9 @@ public class QUserrole extends com.querydsl.sql.RelationalPathBase<QUserrole> {
 
     public final com.querydsl.sql.PrimaryKey<QUserrole> userrolePkey = createPrimaryKey(id);
 
-    public final com.querydsl.sql.ForeignKey<QRole> userroleRoleIdFkey = createForeignKey(roleId, "ID");
-
     public final com.querydsl.sql.ForeignKey<QUserdata> userroleUserIdFkey = createForeignKey(userId, "ID");
+
+    public final com.querydsl.sql.ForeignKey<QRole> userroleRoleIdFkey = createForeignKey(roleId, "ID");
 
     public QUserrole(String variable) {
         super(QUserrole.class, forVariable(variable), "PUBLIC", "USERROLE");

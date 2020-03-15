@@ -21,14 +21,14 @@ public class DefaultTransactionNameGenerator implements TransactionNameGenerator
             StackTraceElement stackTraceElement = stackTrace[i];
             if (Objects.equals(stackTraceElement.getClassName(),
                     TransactionTemplate.class.getCanonicalName())) {
-                StackTraceElement stackTraceElementNext = stackTrace[i + 1];
+                StackTraceElement stackTraceElementNext = stackTrace[++i];
                 return stackTraceElementNext.getClassName() + "." +
                         stackTraceElementNext.getMethodName() + "@" +
                         stackTraceElementNext.getLineNumber();
             }
             if (Objects.equals(stackTraceElement.getClassName(),
                     TransactionBuilderImpl.class.getCanonicalName())) {
-                StackTraceElement stackTraceElementNext = stackTrace[i + 1];
+                StackTraceElement stackTraceElementNext = stackTrace[++i];
                 return stackTraceElementNext.getClassName() + "." +
                         stackTraceElementNext.getMethodName() + "@" +
                         stackTraceElementNext.getLineNumber();
