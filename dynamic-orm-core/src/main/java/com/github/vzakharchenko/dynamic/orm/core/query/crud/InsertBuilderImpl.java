@@ -69,7 +69,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
             if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
                 if (PrimaryKeyHelper.isPrimaryKeyValueNull(qTable, model)) {
                     throw new IllegalStateException("model for " + qTable.getTableName() +
-                            " has empty Primary Key : " + model);
+                            " has empty Primary Key : " + model.getClass());
                 }
                 CacheHelper.checkModelIsDeleted(queryContext, model, qTable);
             }

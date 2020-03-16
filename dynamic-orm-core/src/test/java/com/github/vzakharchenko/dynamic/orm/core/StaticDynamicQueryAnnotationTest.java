@@ -37,7 +37,7 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addVersionColumn("modificationTime")
-                .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .addForeignKey("StaticId").buildForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation, QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
                 .finish().buildSchema();
 
         // get dynamic table metadata

@@ -1,18 +1,23 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.fk;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 
 public interface QForeignKeyBuilder {
     QTableBuilder buildForeignKey(
-            Path localColumn, RelationalPath<?> remoteQTable, Path remotePrimaryKey);
+            RelationalPath<?> remoteQTable, Path<?>... remotePrimaryKey);
 
     QTableBuilder buildForeignKey(
-            String localColumnName, RelationalPath<?> remoteQTable, Path remotePrimaryKey);
+            QDynamicTable remoteDynamicTable, String... remotePrimaryKey);
 
-    QTableBuilder buildForeignKey(String localColumnName, RelationalPath<?> remoteQTable);
+    QTableBuilder buildForeignKey(
+            String remoteDynamicTableName, String... remotePrimaryKey);
 
-    QTableBuilder buildForeignKey(String localColumnName,
-                                  String dynamicTableName);
+    QTableBuilder buildForeignKey(RelationalPath<?> remoteQTable);
+
+    QTableBuilder buildForeignKey(String remoteDynamicTableName);
+
+    QTableBuilder buildForeignKey(QDynamicTable remoteDynamicTable);
 }

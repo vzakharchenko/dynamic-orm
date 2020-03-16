@@ -178,6 +178,69 @@ public class UnionAndSubQueryTest extends DebugAnnotationTestQueryOrm {
     }
 
     @Test
+    public void testUnionQueryCache() {
+
+        Testtable testtable1 = new Testtable();
+        testtable1.setId(0);
+        testtable1.setTest2(2456);
+        ormQueryFactory.modify(QTesttable.testtable, Testtable.class).insert(testtable1);
+
+        TestTableCache testtable2 = new TestTableCache();
+        testtable2.setId(0);
+        testtable2.setTest2(4546);
+        ormQueryFactory.modify(QTestTableCache.testTableCache, TestTableCache.class).insert(testtable2);
+
+        SubQueryExpression<Tuple> listSubQuery1 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.test2)
+                .from(QTesttable.testtable)
+                .distinct()
+                .fullJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTesttable.testtable.test2));
+        SubQueryExpression<Tuple> listSubQuery2 = SQLExpressions.select(QTestTableCache.testTableCache.id, QTesttable.testtable.test2)
+                .from(QTesttable.testtable)
+                .leftJoin(QTestTableCache.testTableCache).on(QTestTableCache.testTableCache.id.eq(QTesttable.testtable.id))
+                .orderBy(new OrderSpecifier(Order.DESC, QTestTableCache.testTableCache.test2));
+        List<SubQueryExpression<?>> listSubQueries = Arrays.asList(listSubQuery1, listSubQuery2);
+        UnionBuilder unionAll = ormQueryFactory.selectCache().union(ormQueryFactory.buildQuery(), listSubQueries);
+        String showSql = unionAll.showSql();
+
+        assertEquals(showSql, "select \"ID\", \"TEST2\"\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TESTTABLE\".\"TEST2\" desc)\n" +
+                "union\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)) as \"union\"");
+
+        assertEquals(unionAll.showCountSql(), "select count(*)\n" +
+                "from ((select distinct \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "full join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TESTTABLE\".\"TEST2\" desc)\n" +
+                "union\n" +
+                "(select \"TEST_TABLE_CACHE\".\"ID\", \"TESTTABLE\".\"TEST2\"\n" +
+                "from \"TESTTABLE\" \"TESTTABLE\"\n" +
+                "left join \"TEST_TABLE_CACHE\" \"TEST_TABLE_CACHE\"\n" +
+                "on \"TEST_TABLE_CACHE\".\"ID\" = \"TESTTABLE\".\"ID\"\n" +
+                "order by \"TEST_TABLE_CACHE\".\"TEST2\" desc)) as \"union\"");
+        List<RawModel> rawModels = unionAll.findAll();
+        Long count = unionAll.count();
+        assertEquals(count.intValue(), 1);
+        Long cacheCount = unionAll.count();
+        Long cacheCount2 = unionAll.count();
+
+        assertTrue(cacheCount == cacheCount2);
+        unionAll = ormQueryFactory.select().union(ormQueryFactory.buildQuery(), listSubQueries.toArray(new SubQueryExpression[listSubQueries.size()]));
+        count = unionAll.count();
+        assertEquals(count.intValue(), 1);
+    }
+
+    @Test
     public void testUnionQuery() {
 
         Testtable testtable1 = new Testtable();

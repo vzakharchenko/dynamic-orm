@@ -49,7 +49,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         NumberPath<Integer> id = QTesttable.testtable.id;
         testTable1
                 .addColumns().addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
-                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
+                .addForeignKey("Test_FK").buildForeignKey(QTesttable.testtable, id);
 
         // validate and create structure
         testTable1.finish().buildSchema();
@@ -81,7 +81,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         NumberPath<Integer> id = QTesttable.testtable.id;
         testTable1.addColumns()
                 .addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
-                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
+                .addForeignKey("Test_FK").buildForeignKey(QTesttable.testtable, id);
 
         // build next table
 
@@ -91,7 +91,8 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         testTable2.addColumns().addDateColumn("dateColumn").notNull().create();
 
-        testTable2.addColumns().addNumberColumn("testTable1_FK", Integer.class).size(18).decimalDigits(0).notNull().create().finish().addForeignKey().buildForeignKey("testTable1_FK", "dynamicTestTable1");
+        testTable2.addColumns().addNumberColumn("testTable1_FK", Integer.class).size(18).decimalDigits(0).notNull().create().finish()
+                .addForeignKey("testTable1_FK").buildForeignKey("dynamicTestTable1");
 
         testTable2.finish().buildSchema();
         QDynamicTable qDynamicTable1 = qDynamicTableFactory.getQDynamicTableByName("dynamicTestTable1");
@@ -316,7 +317,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
                 .addNumberColumn("fk2", Integer.class).create()
                 .addNumberColumn("fk3", Integer.class).create()
                 .finish()
-                .addForeignKey().buildForeignKey("fk2", QTestTableVersion.qTestTableVersion)
+                .addForeignKey("fk2").buildForeignKey(QTestTableVersion.qTestTableVersion)
                 .finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
@@ -324,10 +325,10 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("dynamicTestTable")
-                .addForeignKey().buildForeignKey(
-                dynamicTestTable.getNumberColumnByName("fk1"),
-                QTestTableVersion.qTestTableVersion, QTestTableVersion.qTestTableVersion.id
-        ).finish().buildSchema();
+                .addForeignKeyPath(dynamicTestTable.getNumberColumnByName("fk1"))
+                .buildForeignKey(
+                        QTestTableVersion.qTestTableVersion, QTestTableVersion.qTestTableVersion.id
+                ).finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
@@ -339,9 +340,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("dynamicTestTable")
-                .addIndex().buildIndex(
-                dynamicTestTable.getStringColumnByName("test"),
-                true
+                .addIndex(dynamicTestTable.getStringColumnByName("test")).buildIndex(
         ).finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
@@ -564,9 +563,9 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
                 .addNumberColumn("exIdt", Integer.class).create()
                 .addStringColumn("exIdt2").size(255).create()
                 .finish()
-                .addIndex().buildIndex("exIdt", true)
-                .addForeignKey().buildForeignKey("exIdt", QTestTableVersionAnnotation.qTestTableVersionAnnotation)
-                .addForeignKey().buildForeignKey("exIdt2", qDynamicTable.getTableName())
+                .addIndex("exIdt").buildUniqueIndex()
+                .addForeignKey("exIdt").buildForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                .addForeignKey("exIdt2").buildForeignKey(qDynamicTable.getTableName())
                 .finish()
                 .createSequence("sequence").finish()
                 .buildSchema();

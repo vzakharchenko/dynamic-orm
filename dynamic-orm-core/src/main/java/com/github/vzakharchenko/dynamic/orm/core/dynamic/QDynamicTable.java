@@ -113,24 +113,20 @@ public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         return this;
     }
 
-    protected QDynamicTable addIndex(Path<?> column, boolean unique) {
-        if (column == null) {
-            throw new IllegalStateException("column is not found: " + this);
+    protected QDynamicTable addIndex(List<Path<?>> columns,
+                                     boolean unique,
+                                     boolean clustered) {
+        if (columns == null || columns.isEmpty()) {
+            throw new IllegalStateException("columns are not found: " + this);
         }
-        RelationalPath<?> qTable = ModelHelper.getQTable(column);
-        if (ObjectUtils.notEqual(qTable, this)) {
-            throw new IllegalStateException(WRONG_COLUMN + column);
+        for (Path<?> column : columns) {
+            RelationalPath<?> qTable = ModelHelper.getQTable(column);
+            if (ObjectUtils.notEqual(qTable, this)) {
+                throw new IllegalStateException(WRONG_COLUMN + column);
+            }
         }
-        indexDatas.add(new IndexData(column, unique));
+        indexDatas.add(new IndexData(columns, unique, clustered));
         return this;
-    }
-
-    protected QDynamicTable addIndex(String columnName, boolean unique) {
-        if (columnName == null) {
-            throw new IllegalStateException("columnName " + " is Empty: " + this);
-        }
-        return addIndex(ModelHelper.getColumnByName(this,
-                StringUtils.upperCase(columnName)), unique);
     }
 
     public PKGenerator<?> getPkGenerator() {

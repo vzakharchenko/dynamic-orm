@@ -114,6 +114,8 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     @Override
     public UnionBuilder union(SQLCommonQuery<?> sqlQuery,
                               List<SubQueryExpression<?>> subQueries) {
+        SQLBuilderHelper.subQueryWrapper(subQueries);
+
         return new UnionCacheBuilderImpl(DBHelper
                 .castProjectionQueryToSqlQuery(sqlQuery).clone(), subQueries,
                 false, queryContext, queryCacheContext);

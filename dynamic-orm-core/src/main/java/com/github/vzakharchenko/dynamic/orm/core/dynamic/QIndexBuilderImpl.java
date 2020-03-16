@@ -3,26 +3,41 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.index.QIndexBuilder;
 import com.querydsl.core.types.Path;
 
+import java.util.List;
+
 public class QIndexBuilderImpl implements QIndexBuilder {
 
     private final QTableBuilder tableBuilder;
     private final QDynamicTable dynamicTable;
+    private final List<Path<?>> localColumns;
+    private boolean clusteredFlag;
 
     public QIndexBuilderImpl(QTableBuilder tableBuilder,
+                             List<Path<?>> localColumns,
                              QDynamicTable dynamicTable) {
         this.tableBuilder = tableBuilder;
+        this.localColumns = localColumns;
         this.dynamicTable = dynamicTable;
     }
 
-    @Override
-    public QTableBuilder buildIndex(Path<?> columnName, boolean unique) {
-        dynamicTable.addIndex(columnName, unique);
+    private QTableBuilder buildIndex(boolean unique) {
+        dynamicTable.addIndex(localColumns, unique, clusteredFlag);
         return tableBuilder;
     }
 
     @Override
-    public QTableBuilder buildIndex(String columnName, boolean unique) {
-        dynamicTable.addIndex(columnName, unique);
-        return tableBuilder;
+    public QIndexBuilder clustered() {
+        clusteredFlag = true;
+        return this;
+    }
+
+    @Override
+    public QTableBuilder buildIndex() {
+        return buildIndex(false);
+    }
+
+    @Override
+    public QTableBuilder buildUniqueIndex() {
+        return buildIndex(true);
     }
 }

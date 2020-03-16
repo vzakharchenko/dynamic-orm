@@ -17,7 +17,30 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
-                .addIndex().buildIndex("INDEXED_COLUMN", false)
+                .addIndex("INDEXED_COLUMN").buildIndex()
+                .finish().buildSchema();
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void indexTestFailed() {
+        qDynamicTableFactory.buildTables("Test_table_Index")
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .addIndex((String) null).buildIndex()
+                .finish().buildSchema();
+    }
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void indexTestFailed2() {
+        qDynamicTableFactory.buildTables("Test_table_Index")
+                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .addStringColumn("test_column").size(200).create()
+                .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
+                .finish()
+                .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
+                .addIndex(new String[0]).buildIndex()
                 .finish().buildSchema();
     }
 
@@ -29,7 +52,7 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence<>("TEST_SEQUENCE")).finish()
-                .addIndex().buildIndex("INDEXED_COLUMN", true)
+                .addIndex("INDEXED_COLUMN").clustered().buildUniqueIndex()
                 .finish().buildSchema();
     }
 }

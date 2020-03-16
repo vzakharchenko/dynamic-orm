@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -90,10 +91,14 @@ public abstract class TableFactory {
 
     private static Index buildIndex(Table table, IndexData indexData, String name) {
         String tableName = table.getName();
-        Column column = new Column(ModelHelper.getColumnRealName(indexData.getColumn()));
-        column.setRelation(table);
-        Index index = new Index(name, "", "", tableName, column);
+        Index index = new Index(name, "", "", tableName);
         index.setUnique(indexData.isUnique());
+        index.setColumns(indexData.getColumns().stream().map(path -> {
+            Column column = new Column(ModelHelper.getColumnRealName(path));
+            column.setRelation(table);
+            return column;
+        }).collect(Collectors.toList()));
+        index.setClustered(indexData.isClustered());
         return index;
     }
 
@@ -103,20 +108,23 @@ public abstract class TableFactory {
         liquibase.structure.core.PrimaryKey pk = new liquibase.structure.core.PrimaryKey();
         pk.setName(table.getName() + "PK_01");
         pk.setTable(table);
-        Path primaryColumn = (Path) primaryKey.getLocalColumns().get(0);
-        pk.addColumn(0, table.getColumn(ModelHelper.getColumnRealName(primaryColumn)));
+        PrimaryKeyHelper.getPrimaryKeyColumns(primaryKey.getEntity())
+                .forEach((Consumer<Path>) primaryColumn ->
+                        pk.addColumn(pk.getColumns().size(),
+                                table.getColumn(ModelHelper.getColumnRealName(primaryColumn))));
         return pk;
     }
 
     private static liquibase.structure.core.ForeignKey buildForeignKey(
             Table table, ForeignKey foreignKey, int count) {
-        Path fkColumn = (Path) foreignKey.getLocalColumns().get(0);
+        List<Path<?>> fkColumns = foreignKey.getLocalColumns();
         liquibase.structure.core.ForeignKey fk = new liquibase
                 .structure.core.ForeignKey(table.getName() + "FK" + count,
                 "",
                 "",
-                table.getName(),
-                table.getColumn(ModelHelper.getColumnRealName(fkColumn)));
+                table.getName());
+        fk.setForeignKeyColumns(fkColumns.stream().map(path ->
+                new Column(ModelHelper.getColumnRealName(path))).collect(Collectors.toList()));
         fk.setPrimaryKeyTable(new Table("", "", ModelHelper
                 .getTableName(foreignKey.getEntity())));
         List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper

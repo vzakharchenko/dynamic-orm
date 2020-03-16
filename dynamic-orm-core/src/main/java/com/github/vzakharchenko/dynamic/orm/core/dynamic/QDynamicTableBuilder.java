@@ -11,6 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -53,13 +57,41 @@ public final class QDynamicTableBuilder implements QTableBuilder {
     }
 
     @Override
-    public QForeignKeyBuilder addForeignKey() {
-        return new QForeignKeyBuilderImpl(this, qDynamicTable, dynamicContextHolder);
+    public QForeignKeyBuilder addForeignKey(String... localColumns) {
+        List<Path<?>> localStringColumns = Arrays.stream(localColumns)
+                .map(StringUtils::upperCase).map((Function<String, Path<?>>)
+                        s -> qDynamicTable.getColumnByName(s))
+                .collect(Collectors.toList());
+        return addForeignKey(localStringColumns);
     }
 
     @Override
-    public QIndexBuilder addIndex() {
-        return new QIndexBuilderImpl(this, qDynamicTable);
+    public QForeignKeyBuilder addForeignKeyPath(Path<?>... localColumns) {
+        return addForeignKey(Arrays.asList(localColumns));
+    }
+
+    @Override
+    public QIndexBuilder addIndex(String... localColumns) {
+        List<Path<?>> localStringColumns = Arrays.stream(localColumns)
+                .map(StringUtils::upperCase).map((Function<String, Path<?>>)
+                        s -> qDynamicTable.getColumnByName(s))
+                .collect(Collectors.toList());
+        return addIndex(localStringColumns);
+    }
+
+    @Override
+    public QIndexBuilder addIndex(Path<?>... localColumns) {
+        return addIndex(Arrays.asList(localColumns));
+    }
+
+    private QIndexBuilder addIndex(List<Path<?>> localColumns) {
+        return new QIndexBuilderImpl(this,
+                localColumns, qDynamicTable);
+    }
+
+    private QForeignKeyBuilder addForeignKey(List<Path<?>> localColumns) {
+        return new QForeignKeyBuilderImpl(this, qDynamicTable,
+                localColumns, dynamicContextHolder);
     }
 
     @Override
