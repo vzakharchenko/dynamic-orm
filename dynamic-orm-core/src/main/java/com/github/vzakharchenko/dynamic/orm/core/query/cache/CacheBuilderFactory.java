@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.querydsl.sql.RelationalPath;
 
@@ -14,7 +14,7 @@ public abstract class CacheBuilderFactory {
             Class<MODEL> modelClass,
             RelationalPath<?> qTable,
             QueryContextImpl queryContext) {
-        if (!ModelHelper.hasPrimaryKey(qTable)) {
+        if (!PrimaryKeyHelper.hasPrimaryKey(qTable)) {
             throw new IllegalStateException("primaryKey is not Found:" + qTable);
         }
         return new CacheBuilderImpl<>(qTable, modelClass, queryContext);

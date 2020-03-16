@@ -12,7 +12,7 @@ public interface ShowSqlBuilder {
     /**
      * creates the sql query from querydsl object query.
      *
-     * @param sqlQuery   querydsl query
+     * @param sqlQuery    querydsl query
      * @param expressions column or any other expression
      * @return sql query string
      */

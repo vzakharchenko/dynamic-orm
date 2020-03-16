@@ -2,15 +2,17 @@ package com.github.vzakharchenko.dynamic.orm.core.mapper;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.google.common.collect.Maps;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * Created by vzakharchenko on 04.08.14.
@@ -20,7 +22,7 @@ public class StaticTableMappingProjection<MODEL extends DMLModel>
 
     protected Class<MODEL> modelClass;
     protected Path[] paths;
-    protected ComparableExpressionBase primaryKey;
+    protected PrimaryKey<?> primaryKey;
     protected RelationalPath<?> qTable;
 
     private StaticTableMappingProjection(Class<? super MODEL> type,
@@ -32,7 +34,7 @@ public class StaticTableMappingProjection<MODEL extends DMLModel>
         this(modelClass, buildTypeArrayFromTable(qTable));
         this.paths = buildTypeArrayFromTable(qTable);
         this.modelClass = modelClass;
-        this.primaryKey = ModelHelper.getPrimaryKey(qTable);
+        this.primaryKey = PrimaryKeyHelper.getPrimaryKey(qTable);
         this.qTable = qTable;
     }
 
@@ -58,11 +60,16 @@ public class StaticTableMappingProjection<MODEL extends DMLModel>
 
     }
 
+    protected boolean containsPrimaryKey(Tuple row) {
+        return primaryKey.getLocalColumns().stream().allMatch(
+                (Predicate<Path<?>>) path -> row.get(path) != null);
+    }
+
     @Override
     public MODEL map(Tuple row) {
         try {
 
-            if (primaryKey != null && row.get((Expression<Object>) primaryKey) == null) {
+            if (primaryKey != null && !containsPrimaryKey(row)) {
                 return null;
             }
 

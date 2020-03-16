@@ -18,10 +18,9 @@ import java.lang.reflect.Field;
  */
 public class AnnotationHolder {
     private final QueryDslModel queryDslModel;
+    private final SequanceName sequanceName;
     private Version version;
     private SoftDelete softDelete;
-    private final SequanceName sequanceName;
-
     private Field versionField;
     private Path<?> versionColumn;
     private Field softDeleteField;

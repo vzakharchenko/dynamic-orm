@@ -80,4 +80,24 @@
         </createTable>
         <addPrimaryKey columnNames="id" constraintName="ID_Version3_PK" tableName="TEST_TABLE_STATUS"/>
     </changeSet>
+
+    <changeSet author="queryorm composite key" context="production" id="test-9">
+        <createTable tableName="TEST_COMPOSITE_PK_TABLE">
+            <column name="id1" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id2" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test_column" type="INT"/>
+
+        </createTable>
+        <addPrimaryKey columnNames="id1,id2" constraintName="ID_Version4_PK" tableName="TEST_COMPOSITE_PK_TABLE"/>
+    </changeSet>
 </databaseChangeLog>

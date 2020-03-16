@@ -4,21 +4,21 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QNumberColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QSizeColumn;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
 import com.querydsl.core.types.dsl.*;
-import com.querydsl.sql.ColumnMetadata;
-import com.querydsl.sql.ForeignKey;
-import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.RelationalPathBase;
+import com.querydsl.sql.*;
 import liquibase.database.Database;
 import liquibase.datatype.DatabaseDataType;
 import liquibase.datatype.core.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -115,9 +115,21 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         ColumnMetadata metadata = this.getMetadata(path);
         Assert.notNull(metadata);
         Assert.isTrue(!metadata.isNullable());
-        createPrimaryKey(path);
+        PrimaryKey<Object> primaryKey = getPrimaryKey();
+        if (primaryKey == null) {
+            createPrimaryKey(path);
+        } else {
+            List<? extends Path<?>> localColumns = primaryKey.getLocalColumns();
+            updatePrimaryKey(localColumns.toArray(new Path[0]), path);
+        }
         return (DYNAMIC_TABLE) this;
     }
+
+    protected PrimaryKey<Object> updatePrimaryKey(Path[] columnArray,
+                                                  Path column) {
+        return createPrimaryKey(ArrayUtils.add(columnArray, column));
+    }
+
 
     protected DYNAMIC_TABLE addPrimaryKey(String columnName) {
         Assert.hasText(columnName);
@@ -126,30 +138,26 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
     protected DYNAMIC_TABLE addForeignKey(
-            Path localColumn, RelationalPath<?> remoteQTable, Path remotePrimaryKey) {
-        Assert.notNull(localColumn);
-        RelationalPath<?> qTable = ModelHelper.getQTable(localColumn);
-        Assert.isTrue(Objects.equals(this, qTable));
-        ForeignKey foreignKey = new ForeignKey(remoteQTable, localColumn,
-                remotePrimaryKey.getMetadata().getName());
+            List<Path<?>> localColumns,
+            RelationalPath<?> remoteQTable,
+            List<Path<?>> remoteKeys) {
+        Assert.notNull(localColumns, "localColumns is null");
+        Assert.isTrue(!localColumns.isEmpty(), "localColumns are empty");
+        Assert.isTrue(Objects.equals(remoteKeys.size(), localColumns.size()),
+                "localColumns and remoteKeys have different size");
+        for (Path localColumn : localColumns) {
+            RelationalPath<?> qTable = ModelHelper.getQTable(localColumn);
+            Assert.isTrue(Objects.equals(this, qTable));
+        }
+        ForeignKey foreignKey = new ForeignKey(remoteQTable,
+                ImmutableList.copyOf(localColumns),
+                ImmutableList.copyOf(remoteKeys.stream().map(
+                        ModelHelper::getColumnRealName)
+                        .collect(Collectors.toList())));
         getForeignKeys().add(foreignKey);
         return (DYNAMIC_TABLE) this;
     }
 
-    protected DYNAMIC_TABLE addForeignKey(
-            String localColumnName, RelationalPath<?> remoteQTable, Path remotePrimaryKey) {
-        Assert.hasText(localColumnName);
-        Path<?> fkColumn = columns.get(StringUtils.upperCase(localColumnName));
-        return addForeignKey(fkColumn, remoteQTable, remotePrimaryKey);
-    }
-
-    protected DYNAMIC_TABLE addForeignKey(
-            String localColumnName, RelationalPath<?> remoteQTable) {
-        Assert.hasText(localColumnName);
-        Path<?> fkColumn = columns.get(StringUtils.upperCase(localColumnName));
-        return addForeignKey(fkColumn, remoteQTable, ModelHelper
-                .getPrimaryKeyColumn(remoteQTable));
-    }
 
     private DYNAMIC_TABLE addColumn(
             ColumnMetaDataInfo columnMetaDataInfo) {
@@ -202,8 +210,12 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         }
     }
 
+    public Path<?> getColumnByName(String columnName) {
+        return columns.get(StringUtils.upperCase(columnName));
+    }
+
     public <T> SimpleExpression<T> getColumnByName(String columnName, Class<T> tClass) {
-        Path<?> column = columns.get(StringUtils.upperCase(columnName));
+        Path<?> column = getColumnByName(columnName);
         if (column == null) {
             throw new IllegalStateException("column " + columnName +
                     " is not found in table " + getTableName());

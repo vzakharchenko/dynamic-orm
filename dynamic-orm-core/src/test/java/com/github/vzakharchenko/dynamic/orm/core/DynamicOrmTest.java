@@ -6,6 +6,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
@@ -48,7 +49,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         NumberPath<Integer> id = QTesttable.testtable.id;
         testTable1
                 .addColumns().addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
-                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
+                .addForeignKey("Test_FK").buildForeignKey(QTesttable.testtable, id);
 
         // validate and create structure
         testTable1.finish().buildSchema();
@@ -57,10 +58,10 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         List<Path<?>> columns = qDynamicTable.getColumns();
         assertEquals(columns.size(), 3);
 
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable));
 
         NumberPath<Integer> pk = qDynamicTable.getNumberColumnByName("ID", Integer.class);
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable), pk);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumns(qDynamicTable).get(0), pk);
         assertNotNull(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"));
         assertEquals(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"), ModelHelper.getColumnByName(qDynamicTable, "STRING_Test_FIELD"));
         assertNotNull(qDynamicTable.getNumberColumnByName("Test_FK", id.getType()));
@@ -80,7 +81,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         NumberPath<Integer> id = QTesttable.testtable.id;
         testTable1.addColumns()
                 .addNumberColumn("Test_FK", id.getType()).size(ModelHelper.getColumnSize(id)).decimalDigits(ModelHelper.getColumnDigitSize(id)).nullable().create().finish()
-                .addForeignKey().buildForeignKey("Test_FK", QTesttable.testtable, id);
+                .addForeignKey("Test_FK").buildForeignKey(QTesttable.testtable, id);
 
         // build next table
 
@@ -90,7 +91,8 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         testTable2.addColumns().addDateColumn("dateColumn").notNull().create();
 
-        testTable2.addColumns().addNumberColumn("testTable1_FK", Integer.class).size(18).decimalDigits(0).notNull().create().finish().addForeignKey().buildForeignKey("testTable1_FK", "dynamicTestTable1");
+        testTable2.addColumns().addNumberColumn("testTable1_FK", Integer.class).size(18).decimalDigits(0).notNull().create().finish()
+                .addForeignKey("testTable1_FK").buildForeignKey("dynamicTestTable1");
 
         testTable2.finish().buildSchema();
         QDynamicTable qDynamicTable1 = qDynamicTableFactory.getQDynamicTableByName("dynamicTestTable1");
@@ -103,15 +105,15 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         List<Path<?>> columns2 = qDynamicTable1.getColumns();
         assertEquals(columns2.size(), 3);
 
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable1));
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable2));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable1));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable2));
 
         NumberPath<Integer> pk1 = qDynamicTable1.getNumberColumnByName("ID", Integer.class);
         StringPath pk2 = qDynamicTable2.getStringColumnByName("ID");
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable1), pk1);
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable2), pk2);
-        assertNotEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable2), pk1);
-        assertNotEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable1), pk2);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1), pk1);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable2), pk2);
+        assertNotEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable2), pk1);
+        assertNotEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1), pk2);
 
         assertNotNull(qDynamicTable1.getStringColumnByName("STRING_Test_FIELD"));
         assertEquals(qDynamicTable1.getStringColumnByName("STRING_Test_FIELD"), ModelHelper.getColumnByName(qDynamicTable1, "STRING_Test_FIELD"));
@@ -119,7 +121,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         assertNotNull(qDynamicTable2.getDateColumnByName("dateColumn"));
         assertEquals(qDynamicTable2.getDateColumnByName("dateColumn"), ModelHelper.getColumnByName(qDynamicTable2, "dateColumn"));
-        assertNotNull(qDynamicTable2.getNumberColumnByName("testTable1_FK", ModelHelper.getPrimaryKey(qDynamicTable1).getType()));
+        assertNotNull(qDynamicTable2.getNumberColumnByName("testTable1_FK", PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1).getType()));
     }
 
     @Test
@@ -315,7 +317,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
                 .addNumberColumn("fk2", Integer.class).create()
                 .addNumberColumn("fk3", Integer.class).create()
                 .finish()
-                .addForeignKey().buildForeignKey("fk2", QTestTableVersion.qTestTableVersion)
+                .addForeignKey("fk2").buildForeignKey(QTestTableVersion.qTestTableVersion)
                 .finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
@@ -323,10 +325,10 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("dynamicTestTable")
-                .addForeignKey().buildForeignKey(
-                dynamicTestTable.getNumberColumnByName("fk1"),
-                QTestTableVersion.qTestTableVersion, QTestTableVersion.qTestTableVersion.id
-        ).finish().buildSchema();
+                .addForeignKeyPath(dynamicTestTable.getNumberColumnByName("fk1"))
+                .buildForeignKey(
+                        QTestTableVersion.qTestTableVersion, QTestTableVersion.qTestTableVersion.id
+                ).finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
@@ -338,9 +340,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("dynamicTestTable")
-                .addIndex().buildIndex(
-                dynamicTestTable.getStringColumnByName("test"),
-                true
+                .addIndex(dynamicTestTable.getStringColumnByName("test")).buildIndex(
         ).finish().buildSchema();
         ormQueryFactory.transactionManager().commit();
 
@@ -563,9 +563,9 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
                 .addNumberColumn("exIdt", Integer.class).create()
                 .addStringColumn("exIdt2").size(255).create()
                 .finish()
-                .addIndex().buildIndex("exIdt", true)
-                .addForeignKey().buildForeignKey("exIdt", QTestTableVersionAnnotation.qTestTableVersionAnnotation)
-                .addForeignKey().buildForeignKey("exIdt2", qDynamicTable.getTableName())
+                .addIndex("exIdt").buildUniqueIndex()
+                .addForeignKey("exIdt").buildForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation)
+                .addForeignKey("exIdt2").buildForeignKey(qDynamicTable.getTableName())
                 .finish()
                 .createSequence("sequence").finish()
                 .buildSchema();

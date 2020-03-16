@@ -19,10 +19,8 @@ public class AbstractDynamicContext {
     protected final Map<String, QDynamicTable> dynamicTableMap = new ConcurrentHashMap<>();
     protected final Map<String, ViewDataHolder> viewMap = new ConcurrentHashMap<>();
     protected final Map<String, SequanceModel> sequenceModelMap = new ConcurrentHashMap<>();
-
-
-    private final OrmQueryFactory ormQueryFactory;
     protected final Database database;
+    private final OrmQueryFactory ormQueryFactory;
 
     public AbstractDynamicContext(Database database, OrmQueryFactory ormQueryFactory) {
         this.ormQueryFactory = ormQueryFactory;

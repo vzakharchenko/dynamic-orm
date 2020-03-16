@@ -3,23 +3,24 @@ package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 import com.github.vzakharchenko.dynamic.orm.core.*;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.cache.ModelLazyListFactory;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.SQLBuilderHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.*;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.SubQueryExpression;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -43,16 +44,16 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(DBHelper.castProjectionQueryToSqlQuery(sqlQuery0),
                         queryCacheContext.getqRelatedTables());
-        ComparableExpressionBase primaryKey = ModelHelper.getPrimaryKey(qTable);
-        String sqlString = showSql(sqlQuery0, primaryKey);
+        List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper.getPrimaryKeyColumns(qTable);
+        String sqlString = showListSql(sqlQuery0, primaryKeyColumns);
         queryContext.getCacheContext().register(sqlString, queryStatistic);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(sqlString);
         try {
-            List<Serializable> primaryKeys = transactionCache.getFromCache(sqlString, List.class);
+            List<CompositeKey> primaryKeys = transactionCache.getFromCache(sqlString, List.class);
 
             if (primaryKeys == null) {
-                primaryKeys = selectBuilder.findAll(sqlQuery0, primaryKey);
+                primaryKeys = selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns);
                 transactionCache.putToCache(sqlString, (Serializable) primaryKeys);
             }
             LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
@@ -61,6 +62,22 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
         } finally {
             transactionCache.unLock(sqlString);
         }
+    }
+
+    private List<CompositeKey> selectPrimaryKeys(SQLCommonQuery<?> sqlQuery,
+                                                 RelationalPath<?> qTable,
+                                                 List<? extends Path<?>> primaryKeyColumns) {
+        List<RawModel> rawModels = selectBuilder.rawSelect(sqlQuery)
+                .findAll(primaryKeyColumns.stream().map((Function<Path<?>, Expression<?>>)
+                        path -> path).collect(Collectors.toList()));
+        return rawModels.stream().map(rawModel -> {
+            CompositeKeyBuilder builder = CompositeKeyBuilder.create(qTable);
+            primaryKeyColumns.forEach((Consumer<Path<?>>) path -> {
+                Object columnValue = rawModel.getColumnValue(path);
+                builder.addPrimaryKey(path, columnValue);
+            });
+            return builder.build();
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -97,6 +114,8 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     @Override
     public UnionBuilder union(SQLCommonQuery<?> sqlQuery,
                               List<SubQueryExpression<?>> subQueries) {
+        SQLBuilderHelper.subQueryWrapper(subQueries);
+
         return new UnionCacheBuilderImpl(DBHelper
                 .castProjectionQueryToSqlQuery(sqlQuery).clone(), subQueries,
                 false, queryContext, queryCacheContext);

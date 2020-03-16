@@ -7,7 +7,8 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
 import com.github.vzakharchenko.dynamic.orm.core.cache.event.EventFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheContext;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
@@ -40,7 +41,7 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     }
 
     @Override
-    public void afterInsert(Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+    public void afterInsert(Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
         afterModification(diffColumnModelMap, false, true);
 
         queryContext.getTransactionalEventPublisher()
@@ -52,7 +53,7 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     }
 
     @Override
-    public void afterDelete(Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+    public void afterDelete(Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
         afterModification(diffColumnModelMap, true, false);
 
         queryContext.getTransactionalEventPublisher()
@@ -64,10 +65,10 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     }
 
 
-    private void clearPrimaryKey(Serializable primaryKeyValue) {
+    private void clearPrimaryKey(CompositeKey compositeKey) {
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         PrimaryKeyCacheKey primaryKeyCacheKey = CacheHelper
-                .buildPrimaryKeyCacheKey(primaryKeyValue, this.qTable);
+                .buildPrimaryKeyCacheKey(compositeKey);
         transactionCache.cacheEvict(primaryKeyCacheKey);
     }
 
@@ -120,12 +121,14 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
         });
     }
 
-    private void afterModification(Map<Serializable, DiffColumnModel> diffColumnModelMap,
+    private void afterModification(Map<CompositeKey, DiffColumnModel> diffColumnModelMap,
                                    boolean clearOldModel, boolean clearNewModel) {
         diffColumnModelMap.forEach((primaryKeyValue, diffColumnModel) -> {
             Assert.notNull(primaryKeyValue);
             //clear Primary key
-            clearPrimaryKey(primaryKeyValue);
+            if (clearOldModel) {
+                clearPrimaryKey(PrimaryKeyHelper.getCompositeKey(primaryKeyValue, qTable));
+            }
             //clear Fetch All
             clearAllData();
             // clear cached column
@@ -138,10 +141,10 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     }
 
     private void sendSoftDeleteEventIfNeeded(
-            Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+            Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
         if (softDelete != null) {
-            Map<Serializable, DiffColumnModel> softDeletedModelMap =
-                    softDeletedMap(qTable, diffColumnModelMap);
+            Map<CompositeKey, DiffColumnModel> softDeletedModelMap =
+                    softDeletedMap(diffColumnModelMap);
             if (MapUtils.isNotEmpty(softDeletedModelMap)) {
                 queryContext.getTransactionalEventPublisher()
                         .publishEvent(EventFactory.softDeleteCacheEvent(qTable,
@@ -154,7 +157,7 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     }
 
     @Override
-    public void afterUpdate(Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+    public void afterUpdate(Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
 
         afterModification(diffColumnModelMap, true, true);
         queryContext.getTransactionalEventPublisher()
@@ -173,21 +176,24 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
         cachedQueries.forEach(transactionCache::cacheEvict);
     }
 
-    private Map<Serializable, DiffColumnModel> softDeletedMap(
-            RelationalPath<?> qTable0, Map<Serializable, DiffColumnModel> diffColumnModelMap) {
-        Map<Serializable, DiffColumnModel> softDeletedModelMap = new HashMap<>();
-        Path primaryKeyColumn = ModelHelper.getPrimaryKeyColumn(qTable0);
-        for (Map.Entry<Serializable, DiffColumnModel> entry : diffColumnModelMap.entrySet()) {
+    private Map<CompositeKey, DiffColumnModel> softDeletedMap(
+            Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
+        Map<CompositeKey, DiffColumnModel> softDeletedModelMap = new HashMap<>();
+        for (Map.Entry<CompositeKey, DiffColumnModel> entry : diffColumnModelMap.entrySet()) {
             if (softDelete != null) {
                 DiffColumnModel diffColumnModel = entry.getValue();
-                DiffColumn primaryKeyDiff = diffColumnModel.getColumnDiff(primaryKeyColumn);
-                if (primaryKeyDiff.getNewValue() != null) {
-                    DiffColumn<? extends Serializable> columnDiff = diffColumnModel
-                            .getColumnDiff(softDelete.getColumn());
-                    if (Objects.equals(columnDiff.getNewValue(), softDelete.getDeletedValue())) {
-                        softDeletedModelMap.put(entry.getKey(), diffColumnModel);
+                Map<Path<?>, DiffColumn<?>> columnDiffPrimaryKey = diffColumnModel
+                        .getColumnDiffPrimaryKey();
+                columnDiffPrimaryKey.forEach((path, diffColumn) -> {
+                    if (diffColumn.getNewValue() != null) {
+                        DiffColumn<? extends Serializable> columnDiff = diffColumnModel
+                                .getColumnDiff(softDelete.getColumn());
+                        if (Objects.equals(columnDiff.getNewValue(), softDelete
+                                .getDeletedValue())) {
+                            softDeletedModelMap.put(entry.getKey(), diffColumnModel);
+                        }
                     }
-                }
+                });
             }
         }
         return Collections.unmodifiableMap(softDeletedModelMap);

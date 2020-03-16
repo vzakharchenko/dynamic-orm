@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.querydsl.sql.RelationalPath;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  */
 public class PrimaryKeyCacheKey implements Serializable {
-    private Serializable key;
+    private CompositeKey key;
 
     private String tableName;
 
@@ -18,12 +18,12 @@ public class PrimaryKeyCacheKey implements Serializable {
         super();
     }
 
-    public PrimaryKeyCacheKey(Serializable key, RelationalPath<?> qTable) {
+    public PrimaryKeyCacheKey(CompositeKey key) {
         this.key = key;
-        this.tableName = StringUtils.upperCase(ModelHelper.getTableName(qTable));
+        this.tableName = StringUtils.upperCase(ModelHelper.getTableName(key.getTable()));
     }
 
-    public Serializable getKey() {
+    public CompositeKey getKey() {
         return key;
     }
 

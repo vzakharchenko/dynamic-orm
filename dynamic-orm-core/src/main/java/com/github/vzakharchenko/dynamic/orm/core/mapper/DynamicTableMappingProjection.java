@@ -31,7 +31,7 @@ public class DynamicTableMappingProjection
     public DynamicTableModel map(Tuple row) {
         try {
 
-            if (primaryKey != null && row.get(primaryKey) == null) {
+            if (primaryKey != null && !containsPrimaryKey(row)) {
                 return null;
             }
 

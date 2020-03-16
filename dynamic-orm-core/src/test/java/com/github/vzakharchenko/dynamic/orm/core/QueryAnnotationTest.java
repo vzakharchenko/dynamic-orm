@@ -43,8 +43,8 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addSoftDeleteColumn("isDeleted", true, false)
                 .addVersionColumn("modificationTime")
-                .addIndex().buildIndex("uniqValue", true)
-                .addForeignKey().buildForeignKey("linkToFirstTable", "firstTable")
+                .addIndex("uniqValue").buildUniqueIndex()
+                .addForeignKey("linkToFirstTable").buildForeignKey( "firstTable")
                 .finish().buildSchema();
         transactionManager.commit();
 

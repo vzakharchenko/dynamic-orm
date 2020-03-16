@@ -8,7 +8,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.sql.ForeignKey;
 import com.querydsl.sql.PrimaryKey;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -101,8 +100,9 @@ public final class SchemaHelper {
     private static void updateIndices(SchemaTable schemaTable, QDynamicTable dynamicTable) {
         schemaTable.setIndices(dynamicTable.getIndexDatas().stream().map(indexData -> {
             SchemaIndex schemaIndex = new SchemaIndex();
-            schemaIndex.setColumns(Collections.singletonList(
-                    indexData.getColumn().getMetadata().getName()));
+            schemaIndex.setColumns(indexData.getColumns().stream()
+                    .map(ModelHelper::getColumnRealName)
+                    .collect(Collectors.toList()));
             schemaIndex.setUniq(indexData.isUnique());
             return schemaIndex;
         }).collect(Collectors.toList()));

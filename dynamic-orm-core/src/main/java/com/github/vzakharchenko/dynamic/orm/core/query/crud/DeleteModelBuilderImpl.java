@@ -1,8 +1,9 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -30,6 +31,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     private final LinkedList<ModifyItem<MODEL>> batch0 = new LinkedList<>();
     private final AfterModify<MODEL> afterModify;
     private final Path<?> versionColumn;
+
     // CHECKSTYLE:OFF
     protected DeleteModelBuilderImpl(RelationalPath<?> qTable, Class<MODEL> modelClass,
                                      MODEL model, QueryContextImpl queryContext,
@@ -45,8 +47,10 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
 
     private void addDeleteItem(MODEL model) {
         ModifyItem<MODEL> newDeleteItem = createNewDeleteItem();
-        newDeleteItem.set(ModelHelper.getPrimaryKeyColumn(qTable),
-                ModelHelper.getPrimaryKeyValue(model, qTable, Object.class));
+        if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
+            CompositeKey compositeKey = PrimaryKeyHelper.getPrimaryKeyValues(model, qTable);
+            newDeleteItem.set(compositeKey.getCompositeMap());
+        }
         batch0.add(newDeleteItem);
     }
 
@@ -123,7 +127,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
 
     @Override
     public Long delete() {
-        if (ModelHelper.hasPrimaryKey(qTable)) {
+        if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
             return deleteWithPrimaryKey();
         }
         return deleteWithOutPrimaryKey();

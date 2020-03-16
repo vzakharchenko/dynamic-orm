@@ -74,7 +74,8 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public DeleteModelBuilder<MODEL> delete(MODEL model) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .delete(model);
     }
 
@@ -85,7 +86,8 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long deleteModelByIds(List<MODEL> models) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .deleteModelByIds(models);
     }
 
@@ -96,7 +98,8 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long softDeleteModelByIds(List<MODEL> models) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .softDeleteModelByIds(models);
     }
 
@@ -107,19 +110,22 @@ public class CrudBuilderImpl<MODEL extends DMLModel> implements CrudBuilder<MODE
 
     @Override
     public Long softDeleteByIds(List<Serializable> ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .softDeleteByIds(ids);
     }
 
     @Override
     public Long deleteByIds(Serializable... ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .deleteByIds(ids);
     }
 
     @Override
     public Long deleteByIds(List<Serializable> ids) {
-        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext, versionColumnPath)
+        return new DeleteBuilderImpl<>(modelClass, qTable, queryContext)
+                .versionColumn(versionColumnPath)
                 .deleteByIds(ids);
     }
 }

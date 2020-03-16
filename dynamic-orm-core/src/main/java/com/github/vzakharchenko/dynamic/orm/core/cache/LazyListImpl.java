@@ -2,12 +2,12 @@ package com.github.vzakharchenko.dynamic.orm.core.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,14 +18,15 @@ public class LazyListImpl<MODEL extends DMLModel> implements LazyList<MODEL> {
 
     protected final RelationalPath<?> qTable;
 
-    private final List<Serializable> listPrimaryKey;
+    private final List<CompositeKey> listPrimaryKey;
 
     private final Class<MODEL> modelClass;
 
     private final OrmQueryFactory ormQueryFactory;
 
     protected LazyListImpl(
-            RelationalPath<?> qTable, List<Serializable> listPrimaryKey,
+            RelationalPath<?> qTable,
+            List<CompositeKey> listPrimaryKey,
             Class<MODEL> modelClass, QueryContextImpl queryContext) {
         this.qTable = qTable;
         this.modelClass = modelClass;
@@ -43,7 +44,7 @@ public class LazyListImpl<MODEL extends DMLModel> implements LazyList<MODEL> {
     }
 
     @Override
-    public List<Serializable> getPrimaryKeyList() {
+    public List<CompositeKey> getPrimaryKeyList() {
         return listPrimaryKey;
     }
 

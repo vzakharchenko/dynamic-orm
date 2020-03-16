@@ -5,8 +5,9 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.VersionHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
@@ -200,7 +201,7 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
     @Override
     public Long update() {
         try {
-            if (ModelHelper.hasPrimaryKey(qTable)) {
+            if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
                 return updateWithCache();
             }
             return updateAll();
@@ -222,6 +223,7 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
         modifyItem.set((Path) versionColumn, newVersion);
         return ((SimpleExpression<Serializable>) versionColumn).eq(currentVersion);
     }
+
     // CHECKSTYLE:OFF
     private Long updateWithCache() {
         List<Serializable> pkeys = new ArrayList<>();
@@ -237,12 +239,12 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
             }
         }
 
-        Map<Serializable, MapModel> oldModels = ((RawCacheBuilder)
+        Map<CompositeKey, MapModel> oldModels = ((RawCacheBuilder)
                 queryContext
                         .getOrmQueryFactory().modelCacheBuilder(qTable, modelClass))
-                .findAllOfMapByIds(pkeys);
+                .findAllOfMapByIds(PrimaryKeyHelper.getCompositeKeys(pkeys, qTable));
         Assert.isTrue(Objects.equals(oldModels.size(), pkeys.size()));
-        Map<Serializable, DiffColumnModel> diffMap = foundDiff(oldModels);
+        Map<CompositeKey, DiffColumnModel> diffMap = foundDiff(oldModels);
 
         for (ModifyItem<MODEL> updateBatch : setsBatch) {
             if (!updateBatch.isEmpty()) {
@@ -281,15 +283,16 @@ public class UpdateModelBuilderImpl<MODEL extends DMLModel>
             setsBatch.clear();
         }
     }
+
     // CHECKSTYLE:ON
-    protected Map<Serializable, DiffColumnModel> foundDiff(Map<Serializable,
+    protected Map<CompositeKey, DiffColumnModel> foundDiff(Map<CompositeKey,
             MapModel> oldModels) {
-        Map<Serializable, DiffColumnModel> diffMap = new HashMap<>();
+        Map<CompositeKey, DiffColumnModel> diffMap = new HashMap<>();
         setsBatch.stream().filter(modifyItem -> !modifyItem.isEmpty()).forEach(modifyItem -> {
             MapModel mapModelOld = oldModels.get(modifyItem.getPrimaryKeyValue());
             DiffColumnModel diffColumnModel = DiffColumnModelFactory
                     .buildDiffColumnModel(mapModelOld, modifyItem.getMapModel());
-            diffMap.put((Serializable) modifyItem.getPrimaryKeyValue(), diffColumnModel);
+            diffMap.put(modifyItem.getPrimaryKeyValue(), diffColumnModel);
         });
         return diffMap;
 

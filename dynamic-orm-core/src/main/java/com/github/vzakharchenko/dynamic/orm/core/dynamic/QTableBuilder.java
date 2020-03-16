@@ -18,9 +18,13 @@ public interface QTableBuilder {
 
     QPrimaryKeyBuilder addPrimaryKey();
 
-    QForeignKeyBuilder addForeignKey();
+    QForeignKeyBuilder addForeignKey(String... localColumns);
 
-    QIndexBuilder addIndex();
+    QForeignKeyBuilder addForeignKeyPath(Path<?>... localColumns);
+
+    QIndexBuilder addIndex(String... localColumns);
+
+    QIndexBuilder addIndex(Path<?>... localColumns);
 
     QTableBuilder addVersionColumn(
             String columnName);

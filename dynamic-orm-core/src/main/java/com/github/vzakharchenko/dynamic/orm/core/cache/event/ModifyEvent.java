@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.event.transaction.TransactionalCombinedEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -31,7 +32,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     private Class<? extends DMLModel> modelClass0;
     private DMLModel oldModel;
     private DMLModel newModel;
-    private Map<Serializable, DiffColumnModel> diffColumnModelMap0;
+    private Map<CompositeKey, DiffColumnModel> diffColumnModelMap0;
     private CacheEventType cacheEventType0;
 
     protected ModifyEvent(RelationalPath<?> qTable) {
@@ -48,7 +49,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
 
     @Override
     public ModifyEventBuilder<EVENT> diffColumnModelMap(
-            Map<Serializable, DiffColumnModel> diffColumnModelMap) {
+            Map<CompositeKey, DiffColumnModel> diffColumnModelMap) {
         this.diffColumnModelMap0 = diffColumnModelMap;
         return this;
     }
@@ -171,10 +172,10 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
     }
 
     private void combine(
-            Map<Serializable, DiffColumnModel> newDiffColumnModelMap,
-            Map.Entry<Serializable, DiffColumnModel> entry
+            Map<CompositeKey, DiffColumnModel> newDiffColumnModelMap,
+            Map.Entry<CompositeKey, DiffColumnModel> entry
     ) {
-        Serializable key = entry.getKey();
+        CompositeKey key = entry.getKey();
         DiffColumnModel diffColumnModelMerge = entry.getValue();
         DiffColumnModel diffColumnModelOrigin = this.diffColumnModelMap0.get(key);
         if (diffColumnModelOrigin == null) {
@@ -200,11 +201,11 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
 
     @Override
     public void combine(EVENT modelModifyEvent) {
-        Map<Serializable, DiffColumnModel> newDiffColumnModelMap
+        Map<CompositeKey, DiffColumnModel> newDiffColumnModelMap
                 = new HashMap<>(diffColumnModelMap0);
-        Map<Serializable, DiffColumnModel> diffColumnMap = modelModifyEvent
+        Map<CompositeKey, DiffColumnModel> diffColumnMap = modelModifyEvent
                 .getDiffColumnModelMap();
-        for (Map.Entry<Serializable, DiffColumnModel> entry : diffColumnMap.entrySet()) {
+        for (Map.Entry<CompositeKey, DiffColumnModel> entry : diffColumnMap.entrySet()) {
             combine(newDiffColumnModelMap, entry);
         }
         this.diffColumnModelMap0 = newDiffColumnModelMap;
@@ -229,7 +230,7 @@ public abstract class ModifyEvent<EVENT extends ModifyEvent<EVENT>>
         return Collections.unmodifiableList(transactionHistory);
     }
 
-    protected Map<Serializable, DiffColumnModel> getDiffColumnModelMap() {
+    protected Map<CompositeKey, DiffColumnModel> getDiffColumnModelMap() {
         return diffColumnModelMap0;
     }
 

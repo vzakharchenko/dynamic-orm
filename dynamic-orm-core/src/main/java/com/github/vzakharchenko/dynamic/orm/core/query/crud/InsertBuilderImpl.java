@@ -5,15 +5,11 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.VersionHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.*;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.AbstractMappingProjection;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.dml.SQLInsertClause;
@@ -36,9 +32,10 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
     private final RelationalPath<?> qTable;
     private final AfterModify<MODEL> afterModify;
     private final PKGenerator<?> pkGenerator;
-    private AbstractMappingProjection<MODEL> mappingProjection;
     private final Path<?> versionColumn;
     private final SoftDelete<?> softDelete;
+    private AbstractMappingProjection<MODEL> mappingProjection;
+
     // CHECKSTYLE:OFF
     protected InsertBuilderImpl(Class<MODEL> modelClass, RelationalPath<?> qTable,
                                 QueryContextImpl queryContext, AfterModify<MODEL> afterModify,
@@ -64,14 +61,15 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
     public Long insert(List<MODEL> models) {
         DBHelper.transactionCheck();
         Assert.notEmpty(models);
-        if (ModelHelper.hasPrimaryKey(qTable)) {
+        if (PrimaryKeyHelper.hasPrimaryKey(qTable) &&
+                !PrimaryKeyHelper.hasCompositePrimaryKey(qTable)) {
             setNextPrimaryKey(models);
         }
         for (MODEL model : models) {
-            if (ModelHelper.hasPrimaryKey(qTable)) {
-                if (ModelHelper.isPrimaryKeyValueNull(qTable, model)) {
+            if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
+                if (PrimaryKeyHelper.isPrimaryKeyValueNull(qTable, model)) {
                     throw new IllegalStateException("model for " + qTable.getTableName() +
-                            " has empty Primary Key : " + model);
+                            " has empty Primary Key : " + model.getClass());
                 }
                 CacheHelper.checkModelIsDeleted(queryContext, model, qTable);
             }
@@ -97,7 +95,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
         SQLInsertClause sqlInsertClause = new SQLInsertClause(connection,
                 queryContext.getDialect(), qTable);
         try {
-            Map<Serializable, DiffColumnModel> diffColumnModelMap = createDiff(models);
+            Map<CompositeKey, DiffColumnModel> diffColumnModelMap = createDiff(models);
             for (MODEL model : models) {
                 AbstractMappingProjection<MODEL> mappingProjection0 = getMappingProjection();
                 sqlInsertClause.populate(model, mappingProjection0).addBatch();
@@ -113,6 +111,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
         }
 
     }
+
     // CHECKSTYLE:ON
     private AbstractMappingProjection<MODEL> getMappingProjection() {
         if (mappingProjection == null) {
@@ -122,30 +121,28 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
     }
 
     protected void setNextPrimaryKey(Collection<MODEL> batchModels) {
-        Expression primaryKey = ModelHelper.getPrimaryKey(qTable);
         PKGenerator<?> pkGenerator0 = this.pkGenerator;
-        if (primaryKey != null) {
-            for (MODEL batchModel : batchModels) {
-                Object primaryKeyValue = ModelHelper.getPrimaryKeyValue(batchModel, qTable);
-                if (pkGenerator0 == null) {
-                    pkGenerator0 = ModelHelper.getPrimaryKeyGeneratorFromModel(batchModel);
-                }
-                if (pkGenerator0 != null && primaryKeyValue == null) {
-                    pkGenerator0.generate(queryContext.getOrmQueryFactory(), qTable, batchModel);
-                }
+        for (MODEL batchModel : batchModels) {
+            CompositeKey compositeKey = PrimaryKeyHelper
+                    .getOnePrimaryKeyValues(batchModel, qTable);
+            if (pkGenerator0 == null) {
+                pkGenerator0 = ModelHelper.getPrimaryKeyGeneratorFromModel(batchModel);
+            }
+            if (pkGenerator0 != null && compositeKey == null) {
+                pkGenerator0.generate(queryContext.getOrmQueryFactory(), qTable, batchModel);
             }
         }
-
     }
 
-    protected Map<Serializable, DiffColumnModel> createDiff(List<MODEL> models) {
-        Map<Serializable, DiffColumnModel> diffMap = new HashMap<>();
-        if (ModelHelper.hasPrimaryKey(qTable)) {
+    protected Map<CompositeKey, DiffColumnModel> createDiff(List<MODEL> models) {
+        Map<CompositeKey, DiffColumnModel> diffMap = new HashMap<>();
+        if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
             for (MODEL model : models) {
                 MapModel mapModelNew = MapModelFactory.buildMapModel(qTable, model);
                 DiffColumnModel diffColumnModel = DiffColumnModelFactory
                         .buildDiffColumnModel(null, mapModelNew);
-                diffMap.put(ModelHelper.getPrimaryKeyValue(model, qTable, Serializable.class),
+                CompositeKey primaryKeyValue = PrimaryKeyHelper.getPrimaryKeyValues(model, qTable);
+                diffMap.put(primaryKeyValue,
                         diffColumnModel);
 
             }

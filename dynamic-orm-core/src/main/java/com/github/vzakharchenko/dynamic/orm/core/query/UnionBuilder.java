@@ -63,6 +63,7 @@ public interface UnionBuilder {
 
     /**
      * get result as subquery
+     *
      * @return subquery
      */
     SQLQuery getUnionSubQuery();

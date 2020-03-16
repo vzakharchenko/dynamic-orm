@@ -31,8 +31,8 @@ public abstract class CacheHelper {
 
 
     public static PrimaryKeyCacheKey buildPrimaryKeyCacheKey(
-            Serializable key, RelationalPath<?> qTable) {
-        return new PrimaryKeyCacheKey(key, qTable);
+            CompositeKey key) {
+        return new PrimaryKeyCacheKey(key);
     }
 
     public static CachedAllData buildAllDataCache(RelationalPath<?> qTable) {
@@ -47,14 +47,15 @@ public abstract class CacheHelper {
     public static CachedColumn buildCachedColumn(Path column) {
         return new CachedColumn(column);
     }
+
     public static CachedAllData buildCachedAllData(RelationalPath<?> qTable) {
         return new CachedAllData(qTable);
     }
 
     public static PrimaryKeyCacheKey buildPrimaryKeyCacheModel(
             DMLModel model, RelationalPath<?> qTable) {
-        return new PrimaryKeyCacheKey(ModelHelper
-                .getPrimaryKeyValue(model, qTable, Serializable.class), qTable);
+        return new PrimaryKeyCacheKey(PrimaryKeyHelper
+                .getPrimaryKeyValues(model, qTable));
     }
 
     public static <MODEL extends DMLModel> MODEL newInstance(

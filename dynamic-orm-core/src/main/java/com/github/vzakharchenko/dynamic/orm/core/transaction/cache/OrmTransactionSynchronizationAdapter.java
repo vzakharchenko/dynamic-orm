@@ -9,10 +9,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 public class OrmTransactionSynchronizationAdapter extends TransactionSynchronizationAdapter {
 
+    public static final String TRANSACTION_NAME = ". Transaction Name:";
     private static final Logger LOGGER = LoggerFactory
             .getLogger(OrmTransactionSynchronizationAdapter.class);
-    public static final String TRANSACTION_NAME = ". Transaction Name:";
-
     private final String cacheName;
     private final String transactionName;
     private final Cache targetCache;
