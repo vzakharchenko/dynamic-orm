@@ -9,8 +9,8 @@ import java.util.Collection;
 /**
  *
  */
-public class QueryCacheContext implements Cloneable, CacheSupport<QueryCacheContext> {
-    private Collection<RelationalPath> qRelatedTables = new ArrayList<>();
+public class QueryCacheContext implements CacheSupport<QueryCacheContext> {
+    private final Collection<RelationalPath> qRelatedTables = new ArrayList<>();
 
     @Override
     public QueryCacheContext registerRelatedTables(Collection<RelationalPath> qTables) {
@@ -20,17 +20,6 @@ public class QueryCacheContext implements Cloneable, CacheSupport<QueryCacheCont
 
     public Collection<RelationalPath> getqRelatedTables() {
         return ImmutableList.copyOf(qRelatedTables);
-    }
-
-    @Override
-    public QueryCacheContext clone() {
-        try {
-            QueryCacheContext queryCacheContext = (QueryCacheContext) super.clone();
-            queryCacheContext.qRelatedTables = new ArrayList<>();
-            return queryCacheContext;
-        } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException(e);
-        }
     }
 }
 

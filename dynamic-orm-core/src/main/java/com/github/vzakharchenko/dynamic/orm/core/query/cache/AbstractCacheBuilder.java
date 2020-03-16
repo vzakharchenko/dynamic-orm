@@ -138,6 +138,25 @@ public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
     }
 
 
+    protected List<CompositeKey> findPrimaryKeysByColumn(
+            CacheFindAllByColumn<?> cacheByColumn,
+            Object columnValue,
+            boolean isNotNull) {
+        ComparableExpressionBase columnExpression = (ComparableExpressionBase)
+                cacheByColumn.getColumn();
+        BooleanExpression booleanExpression =
+                isNotNull ? columnExpression.isNotNull() : columnValue == null
+                        ? columnExpression.isNull()
+                        : columnExpression.eq(columnValue);
+        List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
+                .rawSelect(expressionQuery(booleanExpression)).findAll(
+                        PrimaryKeyExpressionHelper.getPrimaryKeyExpressionColumns(qTable));
+        List<CompositeKey> primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable);
+        cacheByColumn.getTransactionCache().putToCache(cacheByColumn.getCachedColumn(),
+                (Serializable) primaryKeys);
+        return primaryKeys;
+    }
+
     protected <TYPE extends Serializable> LazyList<MODEL> findAllByColumn(
             CacheFindAllByColumn<TYPE> cacheByColumn,
             TYPE columnValue,
@@ -147,19 +166,8 @@ public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
                 transactionCache
                         .getFromCache(cacheByColumn.getCachedColumn(), List.class);
         if (primaryKeys == null) {
-            ComparableExpressionBase columnExpression = (ComparableExpressionBase)
-                    cacheByColumn.getColumn();
-            BooleanExpression booleanExpression =
-                    isNotNull ? columnExpression.isNotNull() : columnValue == null
-                            ? columnExpression.isNull()
-                            : columnExpression.eq(columnValue);
-            List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
-                    .rawSelect(expressionQuery(booleanExpression)).findAll(
-                            PrimaryKeyExpressionHelper.getPrimaryKeyExpressionColumns(qTable));
-            primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable);
-            transactionCache.putToCache(cacheByColumn.getCachedColumn(), (Serializable) primaryKeys);
+            primaryKeys = findPrimaryKeysByColumn(cacheByColumn, columnValue, isNotNull);
         }
-
         return ModelLazyListFactory.buildLazyList(qTable, primaryKeys,
                 modelClass, queryContext);
     }
