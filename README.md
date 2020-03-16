@@ -43,6 +43,7 @@
   - support create Sql sequence on runtime
   - support create/update View on runtime
   - save/load dynamic structure
+  - support Composite Primary key
 
 # dependencies
  - [querydsl](http://www.querydsl.com/) - crud operation(insert, update, delete),  querying (select, union, CTE)
@@ -1172,4 +1173,34 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         Long newCountValue = rawModelAndPutNewCache.getAliasValue(Wildcard.count);
 
         
+```
+#  Composite Primary key
+
+```java
+        // create Database schema
+        qDynamicTableFactory
+                .buildTables("testDynamicTableWithCompositeKey")
+                .addColumns().addNumberColumn("id1", Integer.class)
+                .useAsPrimaryKey().create()
+                .addStringColumn("id2").size(255).useAsPrimaryKey().create()
+                .addStringColumn("testColumn").size(255).create()
+                .finish().finish().buildSchema();
+
+        // get dynamic table
+        QDynamicTable table = qDynamicTableFactory
+                .getQDynamicTableByName("testDynamicTableWithCompositeKey");
+
+        // insert Data
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
+        dynamicTableModel.addColumnValue("Id1", 1);
+        dynamicTableModel.addColumnValue("Id2", "2");
+        dynamicTableModel.addColumnValue("testColumn", "test");
+        ormQueryFactory.insert(dynamicTableModel);
+
+        List<DynamicTableModel> models = ormQueryFactory.selectCache().findAll(table);
+        assertNotNull(models);
+        assertEquals(models.size(), 1);
+        assertEquals(models.get(0).getValue("Id1", Integer.class), Integer.valueOf(1));
+        assertEquals(models.get(0).getValue("Id2", String.class), "2");
+        assertEquals(models.get(0).getValue("testColumn", String.class), "test");
 ```

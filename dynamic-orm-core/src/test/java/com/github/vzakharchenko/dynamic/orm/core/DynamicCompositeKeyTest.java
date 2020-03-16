@@ -69,7 +69,7 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         dynamicTableModel.addColumnValue("testColumn", "test");
         ormQueryFactory.insert(dynamicTableModel);
 
-        List<DynamicTableModel> models = ormQueryFactory.select().findAll(table);
+        List<DynamicTableModel> models = ormQueryFactory.selectCache().findAll(table);
         assertNotNull(models);
         assertEquals(models.size(), 1);
         assertEquals(models.get(0).getValue("Id1", Integer.class), Integer.valueOf(1));
