@@ -376,8 +376,8 @@ how it works:
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addSoftDeleteColumn("isDeleted", true, false)
                 .addVersionColumn("modificationTime")
-                .addIndex().buildIndex("uniqValue", true)
-                .addForeignKey().buildForeignKey("linkToFirstTable", "firstTable")
+                .addIndex("uniqValue").buildIndex()
+                .addForeignKey("linkToFirstTable").buildForeignKey("firstTable")
                 .finish().buildSchema();
         transactionManager.commit();
 
@@ -575,7 +575,7 @@ Annotations:
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
                 .addVersionColumn("modificationTime")
-                .addForeignKey().buildForeignKey("StaticId", QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .addForeignKey("StaticId").buildForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation,  QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
                 .finish().buildSchema();
 
         // fetch dynamic table metadata
