@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QNumberColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QSizeColumn;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
 import com.querydsl.core.types.dsl.*;
@@ -147,8 +148,8 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
             String localColumnName, RelationalPath<?> remoteQTable) {
         Assert.hasText(localColumnName);
         Path<?> fkColumn = columns.get(StringUtils.upperCase(localColumnName));
-        return addForeignKey(fkColumn, remoteQTable, ModelHelper
-                .getPrimaryKeyColumn(remoteQTable));
+        return addForeignKey(fkColumn, remoteQTable, PrimaryKeyHelper
+                .getPrimaryKeyColumns(remoteQTable).get(0));
     }
 
     private DYNAMIC_TABLE addColumn(

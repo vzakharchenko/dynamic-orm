@@ -3,8 +3,8 @@ package com.github.vzakharchenko.dynamic.orm.core.pk;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
+import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
 
 import java.io.Serializable;
@@ -25,11 +25,12 @@ public interface PKGenerator<TYPE> extends Serializable {
 
     default void generate(OrmQueryFactory ormQueryFactory,
                           RelationalPath<?> qTable, DMLModel model) {
-        ComparableExpressionBase primaryKey = ModelHelper.getPrimaryKey(qTable);
-        if (primaryKey == null) {
-            throw new IllegalStateException(qTable + ".Primary Key is not Found");
+        PrimaryKey<?> primaryKey = PrimaryKeyHelper.getPrimaryKey(qTable);
+        if (primaryKey == null || PrimaryKeyHelper.hasCompositePrimaryKey(qTable)) {
+            throw new IllegalStateException(qTable + " does not contain Primary Key" +
+                    " or has composite PK ");
         }
-        ModelHelper.setColumnValue(model, (Path) primaryKey,
+        ModelHelper.setColumnValue(model, PrimaryKeyHelper.getPrimaryKeyColumns(qTable).get(0),
                 generateNewValue(ormQueryFactory, qTable, model));
     }
 }

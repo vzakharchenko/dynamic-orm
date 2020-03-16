@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
@@ -14,6 +15,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.vzakharchenko.dynamic.orm.core.RawModelBuilderImpl.SIZE;
 
 /**
  *
@@ -54,12 +57,12 @@ public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
     // CHECKSTYLE:ON
 
     protected QDynamicTable addPKGenerator(PKGenerator<?> pkGenerator0) {
-        Path<?> primaryKeyColumn = ModelHelper.getPrimaryKeyColumn(this);
-        if (primaryKeyColumn == null) {
-            throw new IllegalStateException("primary key is not found: " + this);
+        List<? extends Path<?>> columns = PrimaryKeyHelper.getPrimaryKeyColumns(this);
+        if (columns.size() > SIZE) {
+            throw new IllegalStateException("Composite key does not support: " + this);
         }
         Assert.notNull(pkGenerator0);
-        Assert.isTrue(pkGenerator0.getTypedClass().isAssignableFrom(primaryKeyColumn.getType()));
+        Assert.isTrue(pkGenerator0.getTypedClass().isAssignableFrom(columns.get(0).getType()));
         this.pkGenerator = pkGenerator0;
         return this;
     }

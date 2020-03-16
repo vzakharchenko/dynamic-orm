@@ -24,12 +24,11 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     private final DataSource dataSource;
     private final Database database;
     private final OrmQueryFactory ormQueryFactory;
-    private DynamicContext dynamicContext;
-    private DynamicStructureUpdater dynamicStructureUpdater;
-
     private final Map<String, QDynamicTable> dynamicTableMap = new HashMap<>();
     private final Map<String, SequanceModel> sequenceModelMap = new HashMap<>();
     private final Map<String, ViewModel> viewModelMap = new HashMap<>();
+    private DynamicContext dynamicContext;
+    private DynamicStructureUpdater dynamicStructureUpdater;
 
     public QDynamicTableFactoryImpl(OrmQueryFactory ormQueryFactory,
                                     DataSource dataSource) {

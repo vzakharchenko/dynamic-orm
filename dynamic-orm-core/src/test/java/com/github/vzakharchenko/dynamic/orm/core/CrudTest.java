@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
@@ -35,7 +36,7 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @Test
     public void testInsertDynamicTest() {
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
-        assertTrue(ModelHelper.isPrimaryKey(dynamicTable.getStringColumnByName("Id")));
+        assertTrue(PrimaryKeyHelper.isOneOfPrimaryKey(dynamicTable.getStringColumnByName("Id")));
         DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
         dynamicTableModel.addColumnValue("TestColumn", "testData");
         ormQueryFactory.insert(dynamicTableModel);

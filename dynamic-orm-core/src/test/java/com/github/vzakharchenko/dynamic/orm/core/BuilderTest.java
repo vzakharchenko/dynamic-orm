@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
+import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.CrudBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateBuilder;
@@ -9,6 +10,7 @@ import com.github.vzakharchenko.dynamic.orm.qModel.QTesttable;
 import com.querydsl.sql.SQLCommonQuery;
 import org.testng.annotations.Test;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +19,7 @@ import static org.testng.Assert.*;
 /**
  *
  */
-public class BuilderTest extends OracleTestQueryOrm {
+public class BuilderTest extends DebugAnnotationTestQueryOrm {
 
 
     @Test
@@ -186,10 +188,10 @@ public class BuilderTest extends OracleTestQueryOrm {
         assertEquals(sqls, "\n" +
                 "update \"TESTTABLE\"\n" +
                 "set \"TEST2\" = 1234, \"ID\" = 0\n" +
-                "where \"TESTTABLE\".\"ID\" = 0\n" +
+                "where (\"TESTTABLE\".\"ID\" = 0)\n" +
                 "update \"TESTTABLE\"\n" +
                 "set \"TEST2\" = 4321, \"ID\" = 1\n" +
-                "where \"TESTTABLE\".\"ID\" = 1 and (\"TESTTABLE\".\"TEST2\" = 4)\n");
+                "where (\"TESTTABLE\".\"ID\" = 1) and ((\"TESTTABLE\".\"TEST2\" = 4))\n");
 
         assertEquals(updateBuilder.update(), Long.valueOf(2), Objects.toString(setBuilder.showSql()));
 

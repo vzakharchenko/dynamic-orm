@@ -3,6 +3,8 @@ package com.github.vzakharchenko.dynamic.orm.core.pk;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLExpressions;
@@ -39,8 +41,10 @@ public final class PKGeneratorSequence<NUMBER extends Number>
             sequanceName0 = ModelHelper.getSequanceNameFromModel(model.getClass());
         }
 
-        SimpleExpression<NUMBER> nextval = SQLExpressions.nextval(ModelHelper
-                .getPrimaryKeyColumn(qTable).getType(), sequanceName0);
+        Path<NUMBER> path = (Path<NUMBER>) PrimaryKeyHelper
+                .getPrimaryKeyColumns(qTable).get(0);
+        Class<? extends NUMBER> type = path.getType();
+        SimpleExpression<? extends NUMBER> nextval = SQLExpressions.nextval(type, sequanceName0);
 
         return ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), nextval);
     }

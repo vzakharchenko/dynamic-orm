@@ -1,8 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +14,7 @@ import java.util.List;
 public interface LazyList<MODEL extends DMLModel> {
     List<MODEL> getModelList();
 
-    List<Serializable> getPrimaryKeyList();
+    List<CompositeKey> getPrimaryKeyList();
 
     int size();
 

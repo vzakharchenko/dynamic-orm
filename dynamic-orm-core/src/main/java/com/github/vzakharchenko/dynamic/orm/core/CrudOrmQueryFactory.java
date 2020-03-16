@@ -51,6 +51,7 @@ public interface CrudOrmQueryFactory {
      */
     <MODEL extends DMLModel> CrudBuilder<MODEL> modify(RelationalPath<?> qTable,
                                                        Class<MODEL> modelClass);
+
     /**
      * Modification data for the corresponding qtable(the Metadata Model) class and data model
      * <p>

@@ -1,47 +1,33 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.crud;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.RelationalPath;
-import com.querydsl.sql.dml.SQLDeleteClause;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by vzakharchenko on 18.09.15.
  */
-public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<MODEL> {
+public class DeleteBuilderImpl<MODEL extends DMLModel> extends AbstractDeleteBuilder<MODEL> {
 
-    private final QueryContextImpl queryContext;
 
-    private final Class<MODEL> modelClass;
-
-    private final RelationalPath<?> qTable;
-    private final Path<?> versionColumn;
-    private final AfterModify<MODEL> afterModify;
-
-    // CHECKSTYLE:OFF
-    protected DeleteBuilderImpl(Class<MODEL> modelClass, RelationalPath<?> qTable,
-                                QueryContextImpl queryContext, Path<?> versionColumn) {
-        this.modelClass = modelClass;
-        this.qTable = qTable;
-        this.queryContext = queryContext;
-        this.afterModify = new AfterModifyImpl<>(qTable, modelClass, queryContext);
-        this.versionColumn = versionColumn;
+    protected DeleteBuilderImpl(Class<MODEL> modelClass,
+                                RelationalPath<?> qTable,
+                                QueryContextImpl queryContext) {
+        super(modelClass, qTable, queryContext);
     }
-    // CHECKSTYLE:ON
+
+
+    protected DeleteBuilderImpl<MODEL> versionColumn(Path column) {
+        versionColumn = column;
+        return this;
+    }
 
     @Override
     public DeleteModelBuilder<MODEL> delete(MODEL model) {
@@ -80,7 +66,7 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
     public Long softDeleteModelByIds(List<MODEL> models) {
         List<Serializable> ids = new ArrayList<>(models.size());
         for (MODEL model : models) {
-            ids.add(ModelHelper.getPrimaryKeyValue(model, qTable, Serializable.class));
+            ids.add(PrimaryKeyHelper.getPrimaryKeyValues(model, qTable));
         }
         return softDeleteByIds(ids);
     }
@@ -92,7 +78,7 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
 
     @Override
     public Long softDeleteByIds(List<Serializable> ids) {
-        SoftDelete<?> softDelete = queryContext.getSoftDeleteColumn(qTable, modelClass);
+        SoftDelete softDelete = queryContext.getSoftDeleteColumn(qTable, modelClass);
         if (softDelete == null) {
             throw new IllegalStateException(com.github.vzakharchenko.dynamic.orm.core
                     .annotations.SoftDelete.class +
@@ -105,8 +91,9 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
                         .getOrmQueryFactory().modify(qTable, modelClass)
                         .versionColumn(versionColumn).updateBuilder();
             }
+            PrimaryKeyHelper.updateModelBuilder(
+                    updateModelBuilder, qTable, id);
             updateModelBuilder = updateModelBuilder
-                    .set(ModelHelper.getPrimaryKeyColumn(qTable), id)
                     .set(softDelete.getColumn(), softDelete.getDeletedValue()).byId().batch();
         }
         return updateModelBuilder != null ? updateModelBuilder.update() : null;
@@ -119,43 +106,11 @@ public class DeleteBuilderImpl<MODEL extends DMLModel> implements DeleteBuilder<
 
     @Override
     public Long deleteByIds(List<Serializable> ids) {
-        DBHelper.transactionCheck();
-        ComparableExpressionBase primaryKey = ModelHelper.getPrimaryKey(qTable);
-        Assert.notNull(primaryKey);
-        RawCacheBuilder cacheQuery = (RawCacheBuilder) queryContext.getOrmQueryFactory()
-                .modelCacheBuilder(qTable, modelClass);
-
-        Map<Serializable, MapModel> oldModelMaps = cacheQuery.findAllOfMapByIds(ids);
-        Map<Serializable, DiffColumnModel> diffColumnModelMap = foundDiff(oldModelMaps);
-        Assert.isTrue(Objects.equals(oldModelMaps.size(), ids.size()));
-        Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
-        try {
-            SQLDeleteClause sqlDeleteClause = new SQLDeleteClause(connection,
-                    queryContext.getDialect(), qTable);
-            sqlDeleteClause = sqlDeleteClause.where(primaryKey.in(ids));
-            long execute = sqlDeleteClause.execute();
-            afterModify.afterDelete(diffColumnModelMap);
-            DBHelper.invokeExceptionIfNoAction(execute, ids.size());
-            return execute;
-        } finally {
-            DataSourceUtils.releaseConnection(connection, queryContext.getDataSource());
+        if (!PrimaryKeyHelper.hasPrimaryKey(qTable)) {
+            throw new IllegalArgumentException(qTable.getTableName() +
+                    " does not contains Primary Key");
         }
-    }
-
-    protected Map<Serializable, DiffColumnModel> foundDiff(Map<Serializable,
-            MapModel> oldModels) {
-        Map<Serializable, DiffColumnModel> diffMap = new HashMap<>();
-        if (ModelHelper.hasPrimaryKey(qTable)) {
-            for (Map.Entry<Serializable, MapModel> entry : oldModels.entrySet()) {
-                MapModel mapModelOld = entry.getValue();
-                DiffColumnModel diffColumnModel = DiffColumnModelFactory
-                        .buildDiffColumnModel(mapModelOld, null);
-                diffMap.put(entry.getKey(), diffColumnModel);
-
-            }
-        }
-        return diffMap;
-
+        return deleteByIds0(ids);
     }
 
 }

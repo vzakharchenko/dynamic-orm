@@ -2,8 +2,8 @@ package com.github.vzakharchenko.dynamic.orm.core.cache.event;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -27,7 +27,7 @@ public interface ModifyEventBuilder<EVENT extends ModifyEvent<EVENT>> {
      * @return Event Builder.
      */
     ModifyEventBuilder<EVENT> diffColumnModelMap(
-            Map<Serializable, DiffColumnModel> diffColumnModelMap);
+            Map<CompositeKey, DiffColumnModel> diffColumnModelMap);
 
     /**
      * EVENT type

@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class UnionCacheBuilderImpl extends UnionBuilderImpl {
     private final QueryCacheContext queryCacheContext;
+
     // CHECKSTYLE:OFF
     public UnionCacheBuilderImpl(SQLQuery sqlQuery, List<SubQueryExpression<?>> listSubQueries,
                                  boolean unionAll,

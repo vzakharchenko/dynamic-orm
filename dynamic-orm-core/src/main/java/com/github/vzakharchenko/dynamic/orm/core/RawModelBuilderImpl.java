@@ -27,9 +27,8 @@ import java.util.stream.Collectors;
  */
 public class RawModelBuilderImpl implements RawModelBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RawModelBuilderImpl.class);
     public static final int SIZE = 1;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(RawModelBuilderImpl.class);
     protected final SQLQuery sqlQuery;
 
     protected final QueryContextImpl queryContext;

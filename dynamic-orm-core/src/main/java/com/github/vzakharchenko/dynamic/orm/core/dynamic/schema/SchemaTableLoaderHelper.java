@@ -126,7 +126,7 @@ public final class SchemaTableLoaderHelper {
         if (primaryKeys != null) {
             primaryKeys.forEach(schemaPrimaryKey -> qTableBuilder
                     .addPrimaryKey().addPrimaryKey(schemaPrimaryKey.getColumn())
-                    );
+            );
             loadGenerator(qTableBuilder, schemaTable);
         }
     }

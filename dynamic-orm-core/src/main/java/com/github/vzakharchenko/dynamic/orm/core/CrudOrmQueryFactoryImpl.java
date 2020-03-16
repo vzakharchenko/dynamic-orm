@@ -24,13 +24,10 @@ import java.util.List;
  *
  */
 public abstract class CrudOrmQueryFactoryImpl implements OrmQueryFactory, AccessQueryContext {
-    private TransactionCacheManager transactionCacheManager;
-
-    private TransactionalEventPublisher transactionalEventPublisher;
-
-    private PlatformTransactionManager transactionManager;
-
     private final DataSource dataSource;
+    private TransactionCacheManager transactionCacheManager;
+    private TransactionalEventPublisher transactionalEventPublisher;
+    private PlatformTransactionManager transactionManager;
     private Configuration configuration;
     private QueryContextImpl queryContext;
     private String cacheName = "cache-orm";

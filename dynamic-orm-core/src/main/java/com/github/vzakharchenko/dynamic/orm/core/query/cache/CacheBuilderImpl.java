@@ -1,9 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.query.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.*;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
@@ -17,6 +20,8 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -37,7 +42,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     protected CacheBuilderImpl(RelationalPath<?> qTable, Class<MODEL> modelClass,
                                QueryContextImpl queryContext) {
         this.qTable = qTable;
-        Assert.isTrue(ModelHelper.hasPrimaryKey(qTable),
+        Assert.isTrue(PrimaryKeyHelper.hasPrimaryKey(qTable),
                 "Table " + qTable.getTableName() + " does not have primary key");
         this.modelClass = modelClass;
         this.queryContext = queryContext;
@@ -46,7 +51,8 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
     @Override
     public MODEL findOneById(Serializable key) {
-        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(key, qTable);
+        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(
+                PrimaryKeyHelper.getCompositeKey(key, qTable));
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         Map<Path<?>, Object> modelMap = transactionCache.getFromCache(pkCacheKey, HashMap.class);
         if (modelMap == null) {
@@ -61,9 +67,15 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         return CacheHelper.buildModel(qTable, modelClass, modelMap);
     }
 
-    private SQLCommonQuery<?> findByIdQuery(Serializable key) {
+    private SQLCommonQuery<?> findByIdQuery0(CompositeKey key) {
         return queryContext.getOrmQueryFactory().buildQuery().from(qTable)
-                .where(ModelHelper.getPrimaryKey(qTable).eq(key));
+                .where(key.getWherePart());
+    }
+
+    private SQLCommonQuery<?> findByIdQuery(Serializable key) {
+        CompositeKey compositeKey = (key instanceof CompositeKey) ? (CompositeKey) key :
+                PrimaryKeyHelper.getOnePrimaryKey(qTable, key);
+        return findByIdQuery0(compositeKey);
     }
 
     private BooleanExpression buildWhereWithSoftDelete(BooleanExpression where) {
@@ -75,7 +87,8 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
         List<MODEL> returnedModels = new ArrayList<>(keys.size());
 
-        Map<Serializable, MapModel> listOfMapByIds = findAllOfMapByIds(keys);
+        Map<CompositeKey, MapModel> listOfMapByIds = findAllOfMapByIds(
+                PrimaryKeyHelper.getCompositeKeys(keys, qTable));
 
         for (Serializable key : keys) {
             returnedModels.add(CacheHelper.buildModel(modelClass, listOfMapByIds.get(key)));
@@ -85,12 +98,13 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     }
 
 
-    private List<Serializable> skippedList(List<? extends Serializable> keys,
-                                           Map<Serializable, Map<Path<?>, Object>> models) {
+    private List<CompositeKey> skippedList(List<CompositeKey> keys,
+                                           Map<CompositeKey, Map<Path<?>, Object>> models) {
 
-        List<Serializable> skippedList = new ArrayList<>();
-        for (Serializable key : keys) {
-            PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(key, qTable);
+        List<CompositeKey> skippedList = new ArrayList<>();
+        for (CompositeKey key : keys) {
+            PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(
+                    PrimaryKeyHelper.getCompositeKey(key, qTable));
             Map<Path<?>, Object> modelMap = queryContext.getTransactionCache()
                     .getFromCache(pkCacheKey, Map.class);
             if (modelMap != null) {
@@ -102,14 +116,14 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         return skippedList;
     }
 
-    private void transactionModel(MODEL model, Map<Serializable, Map<Path<?>, Object>> models) {
+    private void transactionModel(MODEL model, Map<CompositeKey, Map<Path<?>, Object>> models) {
         TransactionalCache transactionCache = queryContext.getTransactionCache();
-        Serializable primaryKeyValue = ModelHelper
-                .getPrimaryKeyValue(model, qTable, Serializable.class);
+        CompositeKey primaryKeyValue = PrimaryKeyHelper
+                .getPrimaryKeyValues(model, qTable);
         Map<Path<?>, Object> modelMap = CacheHelper.buildMapFromModel(qTable, model);
         models.put(primaryKeyValue, modelMap);
         PrimaryKeyCacheKey pkCacheKey = CacheHelper
-                .buildPrimaryKeyCacheKey(primaryKeyValue, qTable);
+                .buildPrimaryKeyCacheKey(primaryKeyValue);
         transactionCache.lock(pkCacheKey);
         try {
             if (softDelete == null || Objects.equals(
@@ -122,20 +136,20 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     }
 
     @Override
-    public Map<Serializable, MapModel> findAllOfMapByIds(List<? extends Serializable> keys) {
+    public Map<CompositeKey, MapModel> findAllOfMapByIds(List<CompositeKey> keys) {
 
-        Map<Serializable, Map<Path<?>, Object>> models = new LinkedHashMap<>();
+        Map<CompositeKey, Map<Path<?>, Object>> models = new LinkedHashMap<>();
 
-        List<Serializable> skippedList = skippedList(keys, models);
+        List<CompositeKey> skippedList = skippedList(
+                PrimaryKeyHelper.getCompositeKeys(keys, qTable), models);
 
-        List<MODEL> modelList = queryContext.getOrmQueryFactory().select()
-                .findAll(findByIdsQuery(skippedList), qTable, modelClass);
+        List<MODEL> modelList = findByIdsQuery(skippedList);
 
         for (MODEL model : modelList) {
             transactionModel(model, models);
         }
-        Map<Serializable, MapModel> returnedModels = new LinkedHashMap<>(keys.size());
-        for (Serializable key : keys) {
+        Map<CompositeKey, MapModel> returnedModels = new LinkedHashMap<>(keys.size());
+        for (CompositeKey key : keys) {
             Map<Path<?>, Object> diffModels = models.get(key);
             if (diffModels == null) {
                 throw new IllegalStateException(key + " is not found");
@@ -145,10 +159,39 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         return returnedModels;
     }
 
-    private SQLCommonQuery<?> findByIdsQuery(List<Serializable> keys) {
-        return queryContext.getOrmQueryFactory().buildQuery().from(qTable)
-                .where(buildWhereWithSoftDelete(ModelHelper.getPrimaryKey(qTable).in(keys)));
+    private List<MODEL> findByIdsQuery(List<CompositeKey> keys) {
+        if (PrimaryKeyHelper.hasCompositePrimaryKey(qTable)) {
+            return findByIdsQueryCompositePk(keys);
+        } else {
+            return findByIdsQueryPk(keys);
+        }
     }
+
+    private List<MODEL> findByIdsQueryCompositePk(List<CompositeKey> keys) {
+        List<MODEL> models = new ArrayList<>();
+        keys.forEach(key -> models.add(findByIdsQueryComposite(key)));
+        return models;
+    }
+
+    private List<MODEL> findByIdsQueryPk(List<CompositeKey> keys) {
+        Path<?> column = PrimaryKeyHelper.getPrimaryKeyColumns(qTable)
+                .get(0);
+        ComparableExpressionBase columnExpression = (ComparableExpressionBase) column;
+        return queryContext.getOrmQueryFactory().select()
+                .findAll(queryContext.getOrmQueryFactory().buildQuery().from(qTable)
+                        .where(columnExpression.in(keys.stream()
+                                .map((Function<CompositeKey, Object>)
+                                        compositeKey -> compositeKey.getColumn(column))
+                                .collect(Collectors.toList()))), qTable, modelClass);
+    }
+
+    //
+    private MODEL findByIdsQueryComposite(CompositeKey column) {
+        return queryContext.getOrmQueryFactory().select()
+                .findOne(queryContext.getOrmQueryFactory().buildQuery().from(qTable)
+                        .where(column.getWherePart()), qTable, modelClass);
+    }
+
 
     // CHECKSTYLE:OFF
     private <TYPE extends Serializable> LazyList<MODEL> findAllByColumn(Path<TYPE> column,
@@ -164,20 +207,19 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(cachedColumn);
         try {
-            List<Serializable> primaryKeys =
+            List<CompositeKey> primaryKeys =
                     transactionCache.getFromCache(cachedColumn, List.class);
 
             if (primaryKeys == null) {
                 ComparableExpressionBase columnExpression = (ComparableExpressionBase) column;
                 BooleanExpression booleanExpression =
-                        isNotNull
-                                ? columnExpression.isNotNull()
-                                : columnValue == null
+                        isNotNull ? columnExpression.isNotNull() : columnValue == null
                                 ? columnExpression.isNull()
                                 : columnExpression.eq(columnValue);
-                primaryKeys = queryContext.getOrmQueryFactory().select()
-                        .findAll(expressionQuery(booleanExpression),
-                                ModelHelper.getPrimaryKeyColumn(qTable0));
+                List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
+                        .rawSelect(expressionQuery(booleanExpression)).findAll(
+                                PrimaryKeyHelper.getPrimaryKeyExpressionColumns(qTable0));
+                primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable0);
                 transactionCache.putToCache(cachedColumn, (Serializable) primaryKeys);
             }
 
@@ -187,6 +229,7 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
             transactionCache.unLock(cachedColumn);
         }
     }
+
     // CHECKSTYLE:ON
     private SQLCommonQuery<?> expressionQuery(BooleanExpression expression) {
         return queryContext.getOrmQueryFactory().buildQuery().from(qTable)
@@ -212,14 +255,15 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(cachedAllData);
         try {
-            List<Serializable> primaryKeys =
+            List<CompositeKey> primaryKeys =
                     transactionCache.getFromCache(cachedAllData, List.class);
 
             if (primaryKeys == null) {
-                primaryKeys = queryContext.getOrmQueryFactory().select()
-                        .findAll(queryContext.getOrmQueryFactory()
-                                .buildQuery().from(qTable), ModelHelper
-                                .getPrimaryKeyColumn(qTable));
+                List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
+                        .rawSelect(queryContext.getOrmQueryFactory()
+                                .buildQuery().from(qTable)).findAll(PrimaryKeyHelper
+                                .getPrimaryKeyExpressionColumns(qTable));
+                primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable);
                 transactionCache.putToCache(cachedAllData, (Serializable) primaryKeys);
             }
 
@@ -258,7 +302,8 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
     @Override
     public boolean isPresentInCache(Serializable key) {
-        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(key, qTable);
+        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(
+                PrimaryKeyHelper.getCompositeKey(key, qTable));
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         return transactionCache.isInCache(pkCacheKey);
     }

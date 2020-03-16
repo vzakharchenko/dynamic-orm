@@ -4,18 +4,17 @@ import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModelFactory;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.MapUtils;
-import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  *
@@ -29,7 +28,7 @@ public class ModifyItem<MODEL extends DMLModel> {
     private final Class<MODEL> modelClass;
 
 
-    private final Path<?> primaryKey;
+    private final PrimaryKey<?> primaryKey;
 
     private BooleanExpression where;
 
@@ -42,7 +41,7 @@ public class ModifyItem<MODEL extends DMLModel> {
     public ModifyItem(RelationalPath<?> qTable, Class<MODEL> modelClass) {
         this.qTable = qTable;
         this.modelClass = modelClass;
-        this.primaryKey = ModelHelper.getPrimaryKeyColumn(qTable);
+        this.primaryKey = PrimaryKeyHelper.getPrimaryKey(qTable);
 
     }
 
@@ -52,16 +51,14 @@ public class ModifyItem<MODEL extends DMLModel> {
 
     public <T> void set(Path<T> column, T value) {
         setMap.put(column, value);
-        if (byId0 != null && Objects.equals(primaryKey, column)) {
-            byId();
-        }
         mapModel = null;
         diffColumnModel = null;
     }
 
     public void set(Map<Path<?>, Object> setMap0) {
         this.setMap.putAll(setMap0);
-        if (byId0 != null && setMap0.containsKey(primaryKey)) {
+        if (byId0 != null && setMap0.keySet().containsAll(PrimaryKeyHelper
+                .getPrimaryKeyColumns(qTable))) {
             byId();
         }
         mapModel = null;
@@ -77,18 +74,18 @@ public class ModifyItem<MODEL extends DMLModel> {
         return modelClass;
     }
 
-    public ComparableExpressionBase<Comparable<?>> getPrimaryKey() {
+    public BooleanExpression getPrimaryKey() {
         if (primaryKey == null) {
             return null;
         }
-        return (ComparableExpressionBase<Comparable<?>>) primaryKey;
+        return PrimaryKeyHelper.getPrimaryKeyExpression(qTable, setMap);
     }
 
-    public Comparable<?> getPrimaryKeyValue() {
+    public CompositeKey getPrimaryKeyValue() {
         if (primaryKey == null) {
             throw new IllegalStateException("primary key is not Found " + qTable);
         }
-        return getValue(primaryKey, Comparable.class);
+        return PrimaryKeyHelper.getCompositeKey(qTable, setMap);
     }
 
     public Object getValue(Path<?> column) {
@@ -122,18 +119,20 @@ public class ModifyItem<MODEL extends DMLModel> {
                 predicate : where.and(predicate);
     }
 
+    public boolean byIdInternal() {
+        if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
+            byId0 = PrimaryKeyHelper.getPrimaryKeyExpression(qTable, setMap);
+            return true;
+        }
+        return false;
+    }
+
     public boolean byId() {
         if (byId0 != null) {
             return true;
+        } else {
+            return byIdInternal();
         }
-        ComparableExpressionBase<Comparable<?>> primaryKey0 = getPrimaryKey();
-        if (primaryKey0 == null) {
-            return false;
-        }
-        Comparable<?> primaryKeyValue = getPrimaryKeyValue();
-        Assert.notNull(primaryKeyValue, "primary key is not found " + qTable);
-        byId0 = primaryKey0.eq(primaryKeyValue);
-        return true;
     }
 
     public MapModel getMapModel() {

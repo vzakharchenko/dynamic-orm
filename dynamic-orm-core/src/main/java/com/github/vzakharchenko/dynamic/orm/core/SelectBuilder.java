@@ -97,16 +97,17 @@ public interface SelectBuilder
     <MODEL extends DMLModel> MODEL findOne(SQLCommonQuery<?> sqlQuery,
                                            RelationalPath<?> qTable,
                                            Class<MODEL> modelClass);
+
     /**
      * The fetch a data model from a database using sqlQuery query.
      * the result is mapped to the data models
      *
-     * @param sqlQuery   queryDsl query
+     * @param sqlQuery     queryDsl query
      * @param dynamicTable Dynamic Table Metadata
      * @return MODEL
      */
     DynamicTableModel findOne(SQLCommonQuery<?> sqlQuery,
-                                           QDynamicTable dynamicTable);
+                              QDynamicTable dynamicTable);
 
     /**
      * The fetch a data model from a database using sqlQuery query.

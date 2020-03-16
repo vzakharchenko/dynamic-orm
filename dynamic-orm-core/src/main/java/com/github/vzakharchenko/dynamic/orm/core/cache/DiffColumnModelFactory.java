@@ -23,14 +23,25 @@ public abstract class DiffColumnModelFactory {
         return new DiffColumn<>(column, oldValue, newValue);
     }
 
+    private static boolean hasOldValue(Map<Path<?>, DiffColumn<?>> primaryDiff) {
+        return primaryDiff.entrySet().stream().anyMatch(entry -> entry.getValue()
+                .getOldValue() != null);
+    }
+
+    private static boolean hasNewValue(Map<Path<?>, DiffColumn<?>> primaryDiff) {
+        return primaryDiff.entrySet().stream().anyMatch(entry -> entry.getValue()
+                .getNewValue() != null);
+    }
+
     public static <MODEL extends DMLModel> MODEL buildOldModel(
             Class<MODEL> modelClass, DiffColumnModel diffColumnModel) {
-        RelationalPath<?> qTable = diffColumnModel.getQTable();
-        Path primaryKey = ModelHelper.getPrimaryKeyColumn(qTable);
-        DiffColumn primaryDiff = diffColumnModel.getColumnDiff(primaryKey);
-        if (primaryDiff.getOldValue() == null) {
+
+        Map<Path<?>, DiffColumn<?>> primaryDiff = diffColumnModel.getColumnDiffPrimaryKey();
+
+        if (!hasOldValue(primaryDiff)) {
             return null;
         }
+        RelationalPath<?> qTable = diffColumnModel.getQTable();
         MODEL model = CacheHelper.newInstance(qTable, modelClass);
         for (Path<?> column : qTable.getColumns()) {
             DiffColumn diffColumn = diffColumnModel.getColumnDiff(column);
@@ -42,12 +53,12 @@ public abstract class DiffColumnModelFactory {
 
     public static <MODEL extends DMLModel> MODEL buildNewModel(
             Class<MODEL> modelClass, DiffColumnModel diffColumnModel) {
-        RelationalPath<?> qTable = diffColumnModel.getQTable();
-        Path primaryKey = ModelHelper.getPrimaryKeyColumn(qTable);
-        DiffColumn primaryDiff = diffColumnModel.getColumnDiff(primaryKey);
-        if (primaryDiff.getNewValue() == null) {
+        Map<Path<?>, DiffColumn<?>> primaryDiff = diffColumnModel.getColumnDiffPrimaryKey();
+
+        if (!hasNewValue(primaryDiff)) {
             return null;
         }
+        RelationalPath<?> qTable = diffColumnModel.getQTable();
         MODEL model = CacheHelper.newInstance(qTable, modelClass);
         for (Path<?> column : qTable.getColumns()) {
             DiffColumn diffColumn = diffColumnModel.getColumnDiff(column);

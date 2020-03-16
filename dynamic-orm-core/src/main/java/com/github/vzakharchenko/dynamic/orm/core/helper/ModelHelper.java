@@ -11,9 +11,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Operation;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.ColumnMetadata;
-import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.beanutils.BeanUtilsBean2;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -78,27 +76,6 @@ public abstract class ModelHelper {
         }
     }
 
-    public static Object getPrimaryKeyValue(DMLModel modeltype, RelationalPath<?> qTable) {
-        Path primaryKeyColumn = (Path) getPrimaryKey(qTable);
-        return getValueFromModelByColumn(modeltype, primaryKeyColumn);
-    }
-
-    public static <T> T getPrimaryKeyValue(DMLModel modeltype, RelationalPath<?> qTable,
-                                           Class<T> typeClass) {
-        Path primaryKeyColumn = (Path) getPrimaryKey(qTable);
-        return (T) getValueFromModelByColumn(modeltype, primaryKeyColumn);
-    }
-
-    public static ComparableExpressionBase getPrimaryKey(RelationalPath qTable) {
-        if (qTable == null) {
-            return null;
-        }
-        PrimaryKey primaryKey = qTable.getPrimaryKey();
-        if (primaryKey == null) {
-            return null;
-        }
-        return (ComparableExpressionBase) primaryKey.getLocalColumns().get(0);
-    }
 
 //    public static BooleanExpression getWherePart(RelationalPath<?> qTable, DMLModel model) {
 //        ComparableExpressionBase primaryKey = getPrimaryKey(qTable);
@@ -120,10 +97,6 @@ public abstract class ModelHelper {
 //        return where;
 //    }
 
-
-    public static Path getPrimaryKeyColumn(RelationalPath qTable) {
-        return (Path) getPrimaryKey(qTable);
-    }
 
     public static void setColumnValue(DMLModel modeltype, Path column, Object value) {
         try {
@@ -278,23 +251,6 @@ public abstract class ModelHelper {
             }
         }
         return null;
-    }
-
-    public static boolean isPrimaryKeyValueNull(RelationalPath<?> qTable, DMLModel model) {
-        Path primaryKeyColumn = getPrimaryKeyColumn(qTable);
-        return primaryKeyColumn != null &&
-                getValueFromModelByColumn(model, primaryKeyColumn) == null;
-    }
-
-    public static boolean hasPrimaryKey(RelationalPath<?> qTable) {
-        return getPrimaryKeyColumn(qTable) != null;
-    }
-
-
-    public static boolean isPrimaryKey(Path column) {
-        RelationalPath<?> qTable = getQTable(column);
-        ComparableExpressionBase primaryKey = getPrimaryKey(qTable);
-        return Objects.equals(primaryKey, column);
     }
 
     public static <MODEL extends DMLModel> MODEL cloneModel(MODEL model) {

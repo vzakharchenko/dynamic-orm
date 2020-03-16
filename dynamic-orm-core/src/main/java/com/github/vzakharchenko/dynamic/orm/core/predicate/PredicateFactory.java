@@ -5,6 +5,10 @@ import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.SimpleExpression;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,14 +28,18 @@ public abstract class PredicateFactory {
 //        return and(booleanExpressions);
 //    }
 
-    public static Predicate and(BooleanExpression... predicates) {
+    public static BooleanExpression and(List<SimpleExpression> predicates) {
         BooleanExpression booleanExpression = null;
-        for (BooleanExpression predicate : predicates) {
+        for (SimpleExpression predicate : predicates) {
             booleanExpression = booleanExpression == null ?
-                    predicate :
-                    booleanExpression.and(wrapPredicate(predicate));
+                    wrapExpressionPredicate(predicate) :
+                    booleanExpression.and(wrapExpressionPredicate(predicate));
         }
         return booleanExpression;
+    }
+
+    public static Predicate and(BooleanExpression... predicates) {
+        return and(Arrays.asList(predicates));
     }
 
     public static BooleanExpression wrapPredicate(Predicate predicate) {

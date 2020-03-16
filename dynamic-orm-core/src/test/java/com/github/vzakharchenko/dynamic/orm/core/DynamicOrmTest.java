@@ -6,6 +6,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaUtils;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.core.pk.UUIDPKGenerator;
@@ -57,10 +58,10 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         List<Path<?>> columns = qDynamicTable.getColumns();
         assertEquals(columns.size(), 3);
 
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable));
 
         NumberPath<Integer> pk = qDynamicTable.getNumberColumnByName("ID", Integer.class);
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable), pk);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumns(qDynamicTable).get(0), pk);
         assertNotNull(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"));
         assertEquals(qDynamicTable.getStringColumnByName("STRING_Test_FIELD"), ModelHelper.getColumnByName(qDynamicTable, "STRING_Test_FIELD"));
         assertNotNull(qDynamicTable.getNumberColumnByName("Test_FK", id.getType()));
@@ -103,15 +104,15 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
         List<Path<?>> columns2 = qDynamicTable1.getColumns();
         assertEquals(columns2.size(), 3);
 
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable1));
-        assertTrue(ModelHelper.hasPrimaryKey(qDynamicTable2));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable1));
+        assertTrue(PrimaryKeyHelper.hasPrimaryKey(qDynamicTable2));
 
         NumberPath<Integer> pk1 = qDynamicTable1.getNumberColumnByName("ID", Integer.class);
         StringPath pk2 = qDynamicTable2.getStringColumnByName("ID");
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable1), pk1);
-        assertEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable2), pk2);
-        assertNotEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable2), pk1);
-        assertNotEquals(ModelHelper.getPrimaryKeyColumn(qDynamicTable1), pk2);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1), pk1);
+        assertEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable2), pk2);
+        assertNotEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable2), pk1);
+        assertNotEquals(PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1), pk2);
 
         assertNotNull(qDynamicTable1.getStringColumnByName("STRING_Test_FIELD"));
         assertEquals(qDynamicTable1.getStringColumnByName("STRING_Test_FIELD"), ModelHelper.getColumnByName(qDynamicTable1, "STRING_Test_FIELD"));
@@ -119,7 +120,7 @@ public class DynamicOrmTest extends OracleTestQueryOrm {
 
         assertNotNull(qDynamicTable2.getDateColumnByName("dateColumn"));
         assertEquals(qDynamicTable2.getDateColumnByName("dateColumn"), ModelHelper.getColumnByName(qDynamicTable2, "dateColumn"));
-        assertNotNull(qDynamicTable2.getNumberColumnByName("testTable1_FK", ModelHelper.getPrimaryKey(qDynamicTable1).getType()));
+        assertNotNull(qDynamicTable2.getNumberColumnByName("testTable1_FK", PrimaryKeyHelper.getPrimaryKeyColumn(qDynamicTable1).getType()));
     }
 
     @Test

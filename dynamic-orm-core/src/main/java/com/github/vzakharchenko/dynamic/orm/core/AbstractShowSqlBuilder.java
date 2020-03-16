@@ -6,6 +6,7 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.querydsl.core.JoinExpression;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
 import com.querydsl.sql.SQLQuery;
@@ -78,5 +79,10 @@ public abstract class AbstractShowSqlBuilder
         SQLQuery<?> clone = DBHelper.castProjectionQueryToSqlQuery(sqlQuery).clone();
         clone.setUseLiterals(true);
         return clone.select(expressions).getSQL().getSQL();
+    }
+
+
+    protected String showListSql(SQLCommonQuery<?> sqlQuery, List<? extends Path<?>> columns) {
+        return showSql(sqlQuery, columns.toArray(new Expression[0]));
     }
 }

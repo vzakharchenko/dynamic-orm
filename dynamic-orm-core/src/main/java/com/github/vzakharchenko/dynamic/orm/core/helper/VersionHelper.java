@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
-import com.querydsl.core.types.Path;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.querydsl.core.types.Path;
 
 import java.io.Serializable;
 import java.math.BigInteger;

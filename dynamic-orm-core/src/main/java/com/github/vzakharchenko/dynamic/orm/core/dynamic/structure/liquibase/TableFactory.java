@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.IndexData;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.ForeignKey;
@@ -17,8 +18,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -117,9 +119,11 @@ public abstract class TableFactory {
                 table.getColumn(ModelHelper.getColumnRealName(fkColumn)));
         fk.setPrimaryKeyTable(new Table("", "", ModelHelper
                 .getTableName(foreignKey.getEntity())));
-        Path primaryKeyColumn = ModelHelper.getPrimaryKeyColumn(foreignKey.getEntity());
-        fk.setPrimaryKeyColumns(Collections.singletonList(new Column(ModelHelper
-                .getColumnRealName(primaryKeyColumn))));
+        List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper
+                .getPrimaryKeyColumns(foreignKey.getEntity());
+        fk.setPrimaryKeyColumns(primaryKeyColumns.stream().map((Function<Path<?>, Column>)
+                primaryKeyColumn -> new Column(ModelHelper
+                        .getColumnRealName(primaryKeyColumn))).collect(Collectors.toList()));
         return fk;
     }
 

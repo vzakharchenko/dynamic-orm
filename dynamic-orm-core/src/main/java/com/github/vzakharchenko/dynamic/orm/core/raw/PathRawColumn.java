@@ -15,6 +15,6 @@ public class PathRawColumn implements RawColumn {
     @Override
     public boolean checkColumn(Expression expression, String columnName) {
         Path column = (Path) expression;
-       return StringUtils.equalsIgnoreCase(ModelHelper.getColumnName(column), columnName);
+        return StringUtils.equalsIgnoreCase(ModelHelper.getColumnName(column), columnName);
     }
 }

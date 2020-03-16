@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  *
@@ -47,6 +49,13 @@ public final class DiffColumnModel implements Serializable {
 
     public <TYPE> DiffColumn<TYPE> getColumnDiff(Path<TYPE> column) {
         return (DiffColumn<TYPE>) diffColumnMap.get(column);
+    }
+
+    public Map<Path<?>, DiffColumn<?>> getColumnDiffPrimaryKey() {
+        Map<Path<?>, DiffColumn<?>> primaryColumnMap = new HashMap<>();
+        PrimaryKeyHelper.getPrimaryKeyColumns(qTable).forEach(
+                (Consumer<Path<?>>) path -> primaryColumnMap.put(path, getColumnDiff(path)));
+        return primaryColumnMap;
     }
 
     public <TYPE> DiffColumn<TYPE> getActualColumnDiff(Path<TYPE> column) {

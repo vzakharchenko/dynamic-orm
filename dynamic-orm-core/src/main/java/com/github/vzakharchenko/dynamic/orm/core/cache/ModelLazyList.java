@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 
@@ -13,10 +14,10 @@ import java.util.List;
  */
 public class ModelLazyList<MODEL extends DMLModel> extends AbstractList<MODEL> {
     private static final int MAX_LAZYLIST_CACHE_SIZE = 100;
-    private final List<Serializable> listIds;
+    private final List<CompositeKey> listIds;
     private final CacheBuilder<MODEL> cacheBuilder;
 
-    protected ModelLazyList(List<Serializable> listIds, CacheBuilder<MODEL> cacheBuilder) {
+    protected ModelLazyList(List<CompositeKey> listIds, CacheBuilder<MODEL> cacheBuilder) {
         super();
         this.listIds = listIds;
         this.cacheBuilder = cacheBuilder;

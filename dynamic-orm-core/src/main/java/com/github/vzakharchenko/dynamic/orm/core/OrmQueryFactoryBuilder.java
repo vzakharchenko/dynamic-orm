@@ -10,7 +10,9 @@ public interface OrmQueryFactoryBuilder {
     OrmQueryFactory build();
 
     OrmQueryFactoryBuilder configuration(Configuration configuration);
+
     OrmQueryFactoryBuilder debug();
+
     OrmQueryFactoryBuilder cacheRegion(String cacheName);
 
     OrmQueryFactoryBuilder transactionManager(

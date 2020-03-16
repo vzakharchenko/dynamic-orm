@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *   TransactionAware event publisher.  All events will be sent only after transaction.
- * */
+ * TransactionAware event publisher.  All events will be sent only after transaction.
+ */
 public class TransactionAwareApplicationEventPublisher implements TransactionalEventPublisher {
 
     private ApplicationEventPublisher publisher;
