@@ -2,6 +2,7 @@ package com.github.vzakharchenko.dynamic.orm.core.helper;
 
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -22,8 +23,15 @@ public final class CompositeKeyBuilder {
     }
 
     public CompositeKeyBuilder addPrimaryKey(
-            Path column, Serializable value) {
-        compositeMap.put(column, value);
+            Path column, Object value) {
+        Assert.notNull(column, "Column is Null");
+        Assert.notNull(value, "Value is Null");
+        Assert.isTrue(PrimaryKeyHelper.getPrimaryKeyColumns(qTable).contains(column),
+                qTable + " does not contain " + column + " primary key");
+        Assert.isTrue(value.getClass().isAssignableFrom(column.getType()),
+                "Type mismatch: " + value.getClass() + " is not accessible from " +
+                        column.getType());
+        compositeMap.put(column, (Serializable) value);
         return this;
     }
 

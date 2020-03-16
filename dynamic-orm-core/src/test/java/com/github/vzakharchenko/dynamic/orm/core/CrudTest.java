@@ -3,9 +3,9 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
-import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
+import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import org.testng.annotations.BeforeMethod;
@@ -90,6 +90,22 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
                 .set(dynamicTable.getStringColumnByName("Id"), dynamicTableModel.getValue("Id", String.class))
                 .byId().update();
 
+        DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
+        assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
+    }
+
+    @Test
+    public void testUpdateBuilderPartById() {
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(dynamicTable);
+        dynamicTableModel.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel);
+        UpdateModelBuilder<DynamicTableModel> builder = ormQueryFactory.modify(dynamicTable)
+                .updateBuilder();
+        PrimaryKeyHelper.updateModelBuilder(builder, dynamicTable, dynamicTableModel.getValue("Id", String.class));
+        builder
+                .set(dynamicTable.getStringColumnByName("TestColumn"), "newValue")
+                .byId().update();
         DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
     }
@@ -235,27 +251,29 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory.buildTables("DynamicTable1")
                 .addColumns().addTimeColumn(null).create();
     }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed11() {
         qDynamicTableFactory.buildTables("DynamicTable")
-               .addPrimaryKey().addPrimaryKeyGenerator(null);
+                .addPrimaryKey().addPrimaryKeyGenerator(null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed12() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-               .addPrimaryKey().addPrimaryKey((String) null);
+                .addPrimaryKey().addPrimaryKey((String) null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed13() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-               .addPrimaryKey().addPrimaryKey((String) null);
+                .addPrimaryKey().addPrimaryKey((String) null);
     }
+
     @Test(expectedExceptions = IllegalStateException.class)
     public void testAddFailed14() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-               .addVersionColumn((String) null);
+                .addVersionColumn((String) null);
     }
 
 

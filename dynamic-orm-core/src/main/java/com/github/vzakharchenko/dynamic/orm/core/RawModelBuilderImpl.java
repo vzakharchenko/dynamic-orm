@@ -49,21 +49,13 @@ public class RawModelBuilderImpl implements RawModelBuilder {
 
     @Override
     public RawModel findOne(List<Expression<?>> columns) {
-        try {
-
-            List<RawModel> list = findAll(columns);
-            if (list.isEmpty()) {
-                return null;
-            } else if (list.size() > SIZE) {
-                throw new IncorrectResultSizeDataAccessException(1, list.size());
-            } else {
-                return list.get(0);
-            }
-        } catch (QueryException qe) {
-            MappingProjection<RawModel> rawModelExpression = createRawModelExpression(sqlQuery,
-                    columns);
-            throw new QueryException("Sql error: " + selectBuilder.showSql(sqlQuery,
-                    rawModelExpression), qe);
+        List<RawModel> list = findAll(columns);
+        if (list.isEmpty()) {
+            return null;
+        } else if (list.size() > SIZE) {
+            throw new IncorrectResultSizeDataAccessException(1, list.size());
+        } else {
+            return list.get(0);
         }
     }
 

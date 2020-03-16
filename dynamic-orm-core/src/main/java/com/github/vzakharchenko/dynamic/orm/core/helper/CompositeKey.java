@@ -29,7 +29,7 @@ public final class CompositeKey implements Serializable {
     }
 
     public BooleanExpression getWherePart() {
-        return PrimaryKeyHelper.getPrimaryKeyExpression(qTable, getCompositeMap());
+        return PrimaryKeyExpressionHelper.getPrimaryKeyExpression(qTable, getCompositeMap());
     }
 
     @Override

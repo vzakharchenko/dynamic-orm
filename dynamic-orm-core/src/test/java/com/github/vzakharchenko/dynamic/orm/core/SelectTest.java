@@ -7,9 +7,11 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.core.predicate.PredicateFactory;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
+import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableCompositePrimaryKey;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.core.types.dsl.Wildcard;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -101,11 +103,6 @@ public class SelectTest extends AnnotationTestQueryOrm {
     @Test
     public void alwaysFalseQuery() {
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
-        DynamicTableModel value1 = createDynamicModel("1");
-        DynamicTableModel value2 = createDynamicModel("2");
-        DynamicTableModel value3 = createDynamicModel("3");
-        DynamicTableModel value4 = createDynamicModel("4");
-        DynamicTableModel value5 = createDynamicModel("5");
         PredicateFactory.alwaysFalsePredicate();
 
         assertTrue(ormQueryFactory.select().notExist(ormQueryFactory
@@ -263,8 +260,56 @@ public class SelectTest extends AnnotationTestQueryOrm {
         ormQueryFactory.updateById(valueNotNull);
         DynamicTableModel valueNull = ormQueryFactory.modelCacheBuilder(dynamicTable).findOneByColumnIsNotNull(testColumn);
         assertNull(valueNull);
+    }
 
+    @Test
+    public void testFetchOneEmpty() {
+        assertNull(ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery(),
+                        TestTableVersionAnnotation.class));
+    }
 
+    @Test
+    public void testFetchOne_ColumnEmpty() {
+        assertNull(ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation),
+                        QTestTableVersionAnnotation.qTestTableVersionAnnotation.id));
+    }
+    @Test
+    public void testFetchOne_RawEmpty() {
+        assertNull(ormQueryFactory.select()
+                .rawSelect(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation))
+                .findOne(QTestTableVersionAnnotation.qTestTableVersionAnnotation.id));
+    }
+
+    @Test(expectedExceptions = IncorrectResultSizeDataAccessException.class)
+    public void testFetchOne_ColumnTwoRecords() {
+        TestTableVersionAnnotation value1 = new TestTableVersionAnnotation();
+        TestTableVersionAnnotation value2 = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(value1, value2);
+        ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation),
+                        QTestTableVersionAnnotation.qTestTableVersionAnnotation.id);
+    }
+
+    @Test(expectedExceptions = IncorrectResultSizeDataAccessException.class)
+    public void testFetchOne_TwoRecords() {
+        TestTableVersionAnnotation value1 = new TestTableVersionAnnotation();
+        TestTableVersionAnnotation value2 = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(value1, value2);
+        ormQueryFactory.select()
+                .findOne(ormQueryFactory.buildQuery(),
+                        TestTableVersionAnnotation.class);
+    }
+
+    @Test(expectedExceptions = IncorrectResultSizeDataAccessException.class)
+    public void testFetchRawOne_TwoRecords() {
+        TestTableVersionAnnotation value1 = new TestTableVersionAnnotation();
+        TestTableVersionAnnotation value2 = new TestTableVersionAnnotation();
+        ormQueryFactory.insert(value1, value2);
+        ormQueryFactory.select()
+                .rawSelect(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)).findOne(
+                        QTestTableVersionAnnotation.qTestTableVersionAnnotation.id);
     }
 
 }

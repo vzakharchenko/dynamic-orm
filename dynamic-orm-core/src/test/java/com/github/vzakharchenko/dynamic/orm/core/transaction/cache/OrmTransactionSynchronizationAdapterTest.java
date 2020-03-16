@@ -70,7 +70,7 @@ public class OrmTransactionSynchronizationAdapterTest {
 
     @Test
     public void testTransactionalCacheDecorator() {
-        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey("1", QTestTableVersion.qTestTableVersion));
+        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion));
         TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache, cacheKeyLockStrategy);
         transactionalCacheDecorator.deleteModel(primaryKeyCacheKey);
         transactionalCacheDecorator.insertModel(primaryKeyCacheKey);
@@ -79,7 +79,7 @@ public class OrmTransactionSynchronizationAdapterTest {
 
     @Test
     public void testTransactionalCacheDecorator2() {
-        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey("1", QTestTableVersion.qTestTableVersion));
+        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion));
         TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache, cacheKeyLockStrategy);
         try {
             TransactionSynchronizationManager.initSynchronization();
@@ -102,7 +102,7 @@ public class OrmTransactionSynchronizationAdapterTest {
     @Test
     public void testTransactionalCacheImpl() {
         TransactionalCacheImpl transactionalCacheImpl = new TransactionalCacheImpl(cache, cacheKeyLockStrategy);
-        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey("1", QTestTableVersion.qTestTableVersion));
+        PrimaryKeyCacheKey primaryKeyCacheKey = new PrimaryKeyCacheKey(PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion));
         try {
             TransactionSynchronizationManager.initSynchronization();
             transactionalCacheImpl.deleteModel(primaryKeyCacheKey);

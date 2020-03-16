@@ -126,7 +126,9 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
         diffColumnModelMap.forEach((primaryKeyValue, diffColumnModel) -> {
             Assert.notNull(primaryKeyValue);
             //clear Primary key
-            clearPrimaryKey(PrimaryKeyHelper.getCompositeKey(primaryKeyValue, qTable));
+            if (clearOldModel) {
+                clearPrimaryKey(PrimaryKeyHelper.getCompositeKey(primaryKeyValue, qTable));
+            }
             //clear Fetch All
             clearAllData();
             // clear cached column

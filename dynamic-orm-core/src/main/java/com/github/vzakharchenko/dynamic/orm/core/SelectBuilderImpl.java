@@ -3,12 +3,12 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.StaticTableMappingProjection;
 import com.github.vzakharchenko.dynamic.orm.core.mapper.TableMappingProjectionFactory;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.querydsl.core.QueryException;
 import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
 import com.querydsl.sql.SQLQuery;
@@ -20,12 +20,13 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import java.sql.Connection;
 import java.util.List;
 
+import static com.github.vzakharchenko.dynamic.orm.core.RawModelBuilderImpl.SIZE;
+
 /**
  *
  */
-public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectBuilder {
+public class SelectBuilderImpl extends AbstractSelectBuilder {
 
-    private static final int SIZE = 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(SelectBuilderImpl.class);
 
     public SelectBuilderImpl(QueryContextImpl queryContext) {
@@ -37,6 +38,11 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
     public <MODEL extends DMLModel> List<MODEL> findAll(
             RelationalPath<?> qTable, Class<MODEL> modelClass) {
         return findAll(queryContext.getOrmQueryFactory().buildQuery(), qTable, modelClass);
+    }
+
+    @Override
+    public <MODEL extends DMLModel> List<MODEL> findAll(Class<MODEL> modelClass) {
+        return findAll(ModelHelper.getQTableFromModel(modelClass), modelClass);
     }
 
     @Override
@@ -115,39 +121,13 @@ public class SelectBuilderImpl extends AbstractShowSqlBuilder implements SelectB
 
     @Override
     public <TYPE> TYPE findOne(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression) {
-        try {
-            List<TYPE> list = findAll(sqlQuery, expression);
-            if (list.isEmpty()) {
-                return null;
-            } else if (list.size() > SIZE) {
-                throw new IncorrectResultSizeDataAccessException(1, list.size());
-            } else {
-                return list.get(0);
-            }
-        } catch (QueryException qe) {
-            throw new QueryException("Sql error: " + showSql(sqlQuery, expression), qe);
+        List<TYPE> list = findAll(sqlQuery, expression);
+        if (list.isEmpty()) {
+            return null;
+        } else if (list.size() > SIZE) {
+            throw new IncorrectResultSizeDataAccessException(1, list.size());
+        } else {
+            return list.get(0);
         }
     }
-
-    @Override
-    public Long count(SQLCommonQuery<?> sqlQuery) {
-        return findOne(sqlQuery, Wildcard.count);
-    }
-
-    @Override
-    public boolean exist(SQLCommonQuery<?> sqlQuery) {
-        return count(sqlQuery) > 0;
-    }
-
-    @Override
-    public boolean notExist(SQLCommonQuery<?> sqlQuery) {
-        return count(sqlQuery) == 0;
-    }
-
-    @Override
-    public RawModelBuilder rawSelect(SQLCommonQuery<?> sqlQuery) {
-        return new RawModelBuilderImpl(DBHelper.castProjectionQueryToSqlQuery(sqlQuery),
-                queryContext, this);
-    }
-
 }

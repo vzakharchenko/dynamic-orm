@@ -74,7 +74,7 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
             CompositeKeyBuilder builder = CompositeKeyBuilder.create(qTable);
             primaryKeyColumns.forEach((Consumer<Path<?>>) path -> {
                 Object columnValue = rawModel.getColumnValue(path);
-                builder.addPrimaryKey(path, (Serializable) columnValue);
+                builder.addPrimaryKey(path, columnValue);
             });
             return builder.build();
         }).collect(Collectors.toList());

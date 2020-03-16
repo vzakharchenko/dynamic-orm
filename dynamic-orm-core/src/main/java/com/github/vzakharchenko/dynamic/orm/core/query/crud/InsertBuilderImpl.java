@@ -141,7 +141,8 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
                 MapModel mapModelNew = MapModelFactory.buildMapModel(qTable, model);
                 DiffColumnModel diffColumnModel = DiffColumnModelFactory
                         .buildDiffColumnModel(null, mapModelNew);
-                diffMap.put(PrimaryKeyHelper.getOnePrimaryKeyValues(model, qTable),
+                CompositeKey primaryKeyValue = PrimaryKeyHelper.getPrimaryKeyValues(model, qTable);
+                diffMap.put(primaryKeyValue,
                         diffColumnModel);
 
             }

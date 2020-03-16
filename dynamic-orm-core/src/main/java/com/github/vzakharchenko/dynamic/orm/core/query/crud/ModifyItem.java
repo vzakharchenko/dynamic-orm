@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.DiffColumnModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModelFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyExpressionHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -78,7 +79,7 @@ public class ModifyItem<MODEL extends DMLModel> {
         if (primaryKey == null) {
             return null;
         }
-        return PrimaryKeyHelper.getPrimaryKeyExpression(qTable, setMap);
+        return PrimaryKeyExpressionHelper.getPrimaryKeyExpression(qTable, setMap);
     }
 
     public CompositeKey getPrimaryKeyValue() {
@@ -121,7 +122,7 @@ public class ModifyItem<MODEL extends DMLModel> {
 
     public boolean byIdInternal() {
         if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
-            byId0 = PrimaryKeyHelper.getPrimaryKeyExpression(qTable, setMap);
+            byId0 = PrimaryKeyExpressionHelper.getPrimaryKeyExpression(qTable, setMap);
             return true;
         }
         return false;

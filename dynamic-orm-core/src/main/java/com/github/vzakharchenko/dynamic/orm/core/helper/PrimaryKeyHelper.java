@@ -2,12 +2,8 @@ package com.github.vzakharchenko.dynamic.orm.core.helper;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
-import com.github.vzakharchenko.dynamic.orm.core.predicate.PredicateFactory;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
 import org.springframework.util.Assert;
@@ -25,55 +21,6 @@ import static com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper.getVa
 
 public final class PrimaryKeyHelper {
     private PrimaryKeyHelper() {
-    }
-
-    public static BooleanExpression getPrimaryKeyExpression(RelationalPath qTable,
-                                                            Map<Path<?>, Object> setMap) {
-        return getPrimaryKeyExpression(getPrimaryKey(qTable), setMap);
-    }
-
-    public static BooleanExpression getPrimaryKeyExpression(PrimaryKey<?> primaryKey,
-                                                            Map<Path<?>, Object> setMap) {
-        List<SimpleExpression> expressions = primaryKey
-                .getLocalColumns().stream().map((Function<Path<?>, SimpleExpression>) path -> {
-                    Object value = setMap.get(path);
-                    if (value == null) {
-                        throw new IllegalStateException("Primary key value is null");
-                    }
-                    SimpleExpression comparableExpressionBase = (SimpleExpression) path;
-                    return comparableExpressionBase.eq(value);
-                }).collect(Collectors.toList());
-        return PredicateFactory.and(expressions);
-    }
-
-    public static BooleanExpression getPrimaryKeyExpression(PrimaryKey<?> primaryKey,
-                                                            DMLModel dmlModel) {
-        List<SimpleExpression> expressions = primaryKey
-                .getLocalColumns().stream().map((Function<Path<?>, SimpleExpression>) path -> {
-                    Object value = getValueFromModelByColumn(dmlModel, path);
-                    if (value == null) {
-                        throw new IllegalStateException("Primary key value is null");
-                    }
-                    SimpleExpression comparableExpressionBase = (SimpleExpression) path;
-                    return comparableExpressionBase.eq(value);
-                }).collect(Collectors.toList());
-        return PredicateFactory.and(expressions);
-    }
-
-    public static BooleanExpression getPrimaryKeyExpression(RelationalPath qTable,
-                                                            DMLModel dmlModel) {
-        PrimaryKey primaryKey = qTable.getPrimaryKey();
-        if (primaryKey == null) {
-            throw new IllegalStateException("Table  " + qTable.getTableName() +
-                    " does not contain" +
-                    " primary key");
-        }
-        return getPrimaryKeyExpression(primaryKey, dmlModel);
-    }
-
-    public static List<Expression<?>> getPrimaryKeyExpressionColumns(RelationalPath qTable) {
-        return getPrimaryKeyColumns(qTable).stream().map((Function<Path<?>, Expression<?>>)
-                path -> path).collect(Collectors.toList());
     }
 
     public static Path getPrimaryKeyColumn(RelationalPath qTable) {
@@ -146,7 +93,8 @@ public final class PrimaryKeyHelper {
     public static CompositeKey getOnePrimaryKeyValues(DMLModel model, RelationalPath<?> qTable) {
         List<? extends Path<?>> primaryKeyColumns = getPrimaryKeyColumns(qTable);
         Assert.isTrue(primaryKeyColumns.size() == 1,
-                "Composite Key does not supported");
+                "Composite Key does not supported." +
+                        " Please use getPrimaryKeyValues instead of getOnePrimaryKeyValues");
         Object value = getValueFromModelByColumn(model, primaryKeyColumns.get(0));
         return value != null ? getCompositeKey((Serializable) value, qTable) : null;
     }
@@ -196,7 +144,7 @@ public final class PrimaryKeyHelper {
             Path<?> path = columns.get(0);
             CompositeKey compositeKey = CompositeKeyBuilder
                     .create(qTable).addPrimaryKey(path, serializable).build();
-            updateModelBuilder.set(path, compositeKey);
+            updateModelBuilder(updateModelBuilder, qTable, compositeKey);
         }
     }
 
