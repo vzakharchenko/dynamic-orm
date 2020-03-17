@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public interface QTableBuilder {
 
-    QTableColumn addColumns();
+    QTableColumn columns();
 
     QPrimaryKeyBuilder addPrimaryKey();
 

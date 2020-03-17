@@ -49,7 +49,7 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicInsert() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .addColumns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
                 .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
@@ -67,7 +67,7 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicPresetInsert() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .addColumns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
                 .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
@@ -196,7 +196,7 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicUpdate() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .addColumns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
                 .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
@@ -230,7 +230,7 @@ public class VersionTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .addColumns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
                 .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()

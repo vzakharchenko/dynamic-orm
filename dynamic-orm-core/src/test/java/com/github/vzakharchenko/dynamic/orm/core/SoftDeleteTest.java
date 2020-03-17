@@ -48,7 +48,7 @@ public class SoftDeleteTest extends OracleTestQueryOrm {
     public void testDynamicSoftDelete() {
 
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_SOFT_DELETE_TABLE")
-                .addColumns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
                 .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .addNumberColumn("STATUS", Integer.class).size(38).decimalDigits(0).notNull().create()
                 .addNumberColumn("TEST_COLUMN", Integer.class).size(38).decimalDigits(0).notNull().create()

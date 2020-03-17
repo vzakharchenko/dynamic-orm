@@ -17,7 +17,7 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         // create Database schema
         qDynamicTableFactory
                 .buildTables("testDynamicTableWithCompositeKey")
-                .addColumns().addNumberColumn("id1", Integer.class)
+                .columns().addNumberColumn("id1", Integer.class)
                 .useAsPrimaryKey().create()
                 .addStringColumn("id2").size(255).useAsPrimaryKey().create()
                 .addStringColumn("testColumn").size(255).create()
@@ -28,7 +28,7 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         // update Database schema
         qDynamicTableFactory
                 .buildTables("testDynamicTableRelated")
-                .addColumns().addNumberColumn("id", Integer.class)
+                .columns().addNumberColumn("id", Integer.class)
                 .useAsPrimaryKey().create()
                 .addNumberColumn("id1", Integer.class).notNull().create()
                 .addStringColumn("id2").size(255).notNull().create()
@@ -43,7 +43,7 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         // update Database schema
         qDynamicTableFactory
                 .buildTables("testDynamicTableRelated")
-                .addColumns().addNumberColumn("id", Integer.class)
+                .columns().addNumberColumn("id", Integer.class)
                 .useAsPrimaryKey().create()
                 .addNumberColumn("id1", Integer.class).notNull().create()
                 .addStringColumn("id2").size(255).notNull().create()

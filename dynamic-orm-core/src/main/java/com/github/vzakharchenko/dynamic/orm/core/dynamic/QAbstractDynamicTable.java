@@ -27,9 +27,10 @@ import java.util.stream.Collectors;
 public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynamicTable>
         extends RelationalPathBase<Object> {
 
-    private final Map<String, Path<?>> columns = new LinkedHashMap<>();
+    protected final Map<String, Path<?>> columns = new LinkedHashMap<>();
+    private final Map<String, Path<?>> removedColumns = new LinkedHashMap<>();
 
-    private final Map<Path<?>, ColumnMetaDataInfo> columnMetaDataInfoMap = new HashMap<>();
+    protected final Map<Path<?>, ColumnMetaDataInfo> columnMetaDataInfoMap = new HashMap<>();
 
 
     protected QAbstractDynamicTable(String tableName) {
@@ -159,7 +160,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
 
-    private DYNAMIC_TABLE addColumn(
+    protected DYNAMIC_TABLE addColumn(
             ColumnMetaDataInfo columnMetaDataInfo) {
         Assert.notNull(columnMetaDataInfo);
         addMetadata(columnMetaDataInfo);
@@ -170,6 +171,15 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         columns.put(ModelHelper.getColumnRealName(column), column);
         columnMetaDataInfoMap.put(column, columnMetaDataInfo);
         Assert.notNull(add(column));
+        return (DYNAMIC_TABLE) this;
+    }
+
+    protected DYNAMIC_TABLE removeColumn(String name) {
+        Path<?> column = getColumnByName(name);
+        Assert.notNull(column, "Column " + name + " does not exists");
+        String columnName = StringUtils.upperCase(name);
+        columns.remove(columnName);
+        removedColumns.put(columnName, column);
         return (DYNAMIC_TABLE) this;
     }
 
@@ -204,7 +214,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
             return;
         }
 
-        if (value != null && !value.getClass().isAssignableFrom(column.getType())) {
+        if (value != null && !column.getType().isAssignableFrom(value.getClass())) {
             throw new IllegalStateException(value + " has wrong type: expected " +
                     column.getType() + " but found " + value.getClass());
         }
@@ -267,4 +277,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     }
 
 
+    public List<String> deletedColumns() {
+        return new ArrayList<>(removedColumns.keySet());
+    }
 }

@@ -34,6 +34,7 @@ public abstract class TableFactory {
         table.setAttribute("columns", Lists.newArrayList());
         dynamicTable.getColumns().forEach(column -> table.getColumns()
                 .add(buildColumn(table, dynamicTable.getMetaInfo(column))));
+        table.setAttribute("deletedObjects", dynamicTable.deletedColumns());
     }
 
     private static void createPrivateKey(QDynamicTable dynamicTable,

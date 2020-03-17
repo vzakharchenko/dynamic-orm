@@ -206,7 +206,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
 @Transactional()
 public void testQuery() {
             qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addStringColumn("Id")
+                .columns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addStringColumn("TestStringColumn").size(255).create()
                 .addDateColumn("modificationTime").create()
@@ -241,10 +241,21 @@ public void testQuery() {
 ```java
   // add integer column to table
         qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .columns().addNumberColumn("newColumn", Integer.class).create().finish()
                 .finish().buildSchema();
 ```
-   - update operation
+ - add custom column type
+```java
+        qDynamicTableFactory.buildTables("dynamicTestTable")
+                .columns()
+                    .addCustomColumn("customColumn")
+                    .column(Expressions::stringPath)
+                    .jdbcType(new NVarcharType())
+                    .create()
+                .finish()
+                .finish().buildSchema();
+```
+ - update operation
 ```java
         firstTableModel1.addColumnValue("newColumn", 122);
         ormQueryFactory.updateById(firstTableModel1);
@@ -358,7 +369,7 @@ how it works:
         transactionManager.startTransactionIfNeeded();
         // build schema
         qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addStringColumn("Id")
+                .columns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addStringColumn("TestStringColumn").size(255).create()
                 .addDateColumn("modificationTime").create()
@@ -367,7 +378,7 @@ how it works:
                 .finish()
                 .addVersionColumn("modificationTime")
                 .buildNextTable("secondTable")
-                .addColumns().addStringColumn("Id")
+                .columns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addBooleanColumn("isDeleted").notNull().create()
                 .addDateTimeColumn("modificationTime").notNull().create()
@@ -407,7 +418,7 @@ how it works:
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .columns().addNumberColumn("newColumn", Integer.class).create().finish()
                 .finish().buildSchema();
         transactionManager.commit();
 
@@ -570,7 +581,7 @@ Annotations:
         ormQueryFactory.insert(staticTable);
         // build dynamic Table with foreign Key to Static Table
         qDynamicTableFactory.buildTables("relatedTable")
-                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addNumberColumn("StaticId", Integer.class).create()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .finish()
@@ -604,6 +615,28 @@ Annotations:
                         relatedTable);
         assertNotNull(tableModel);
         assertEquals(tableModel.getValue("Id"), relatedTableData.getValue("Id"));
+```
+
+ - remove column
+```java
+        qDynamicTableFactory.buildTables("DynamicTable")
+                .columns()
+                    .modifyColumn()
+                    .removeColumn("TestColumn")
+                    .finish()
+                .finish()
+                .finish().buildSchema();
+```
+ - modify column
+```java
+        qDynamicTableFactory.buildTables("DynamicTable")
+                .columns()
+                    .modifyColumn()
+                    .size("TestColumn", 1)
+                    .finish()
+                .finish()
+                .finish()
+                .buildSchema();
 ```
 ## Generate QueryDslModel
 [Example](dynamic-orm-examples/example-test-qmodels/pom.xml)
@@ -734,7 +767,7 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
 # Create SQL Sequence on runtime
 ```java
         qDynamicTableFactory.buildTables("dynamicTestTable")
-                .addColumns().addNumberColumn("ID", Integer.class).useAsPrimaryKey().create()
+                .columns().addNumberColumn("ID", Integer.class).useAsPrimaryKey().create()
                 .addStringColumn("testColumn").size(100).create()
                 .finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(new PKGeneratorSequence("dynamicTestTableSequance1")).finish()
@@ -790,7 +823,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         // create database schema
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -798,7 +831,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
                 .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
                 .addVersionColumn("modificationTime1")
                 .buildNextTable("UnionTable2")
-                .addColumns()
+                .columns()
                 .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime2").notNull().create()
                 .addStringColumn("TestColumn2_1").size(255).create()
@@ -847,7 +880,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         // create database schema
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -855,7 +888,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
                 .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
                 .addVersionColumn("modificationTime1")
                 .buildNextTable("UnionTable2")
-                .addColumns()
+                .columns()
                 .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime2").notNull().create()
                 .addStringColumn("TestColumn2_1").size(255).create()
@@ -936,7 +969,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         // create database schema
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -944,7 +977,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
                 .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
                 .addVersionColumn("modificationTime1")
                 .buildNextTable("UnionTable2")
-                .addColumns()
+                .columns()
                 .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime2").notNull().create()
                 .addStringColumn("TestColumn2_1").size(255).create()
@@ -1002,7 +1035,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         // create database schema
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -1086,7 +1119,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
 ```java
         // create database schema
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -1180,7 +1213,7 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         // create Database schema
         qDynamicTableFactory
                 .buildTables("testDynamicTableWithCompositeKey")
-                .addColumns().addNumberColumn("id1", Integer.class)
+                .columns().addNumberColumn("id1", Integer.class)
                 .useAsPrimaryKey().create()
                 .addStringColumn("id2").size(255).useAsPrimaryKey().create()
                 .addStringColumn("testColumn").size(255).create()

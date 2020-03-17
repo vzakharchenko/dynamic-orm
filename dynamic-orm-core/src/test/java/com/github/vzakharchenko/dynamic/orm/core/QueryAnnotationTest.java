@@ -24,7 +24,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         transactionManager.startTransactionIfNeeded();
         // build schema
         qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addStringColumn("Id")
+                .columns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addStringColumn("TestStringColumn").size(255).create()
                 .addDateColumn("modificationTime").create()
@@ -33,7 +33,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
                 .finish()
                 .addVersionColumn("modificationTime")
                 .buildNextTable("secondTable")
-                .addColumns().addStringColumn("Id")
+                .columns().addStringColumn("Id")
                 .size(255).useAsPrimaryKey().create()
                 .addBooleanColumn("isDeleted").notNull().create()
                 .addDateTimeColumn("modificationTime").notNull().create()
@@ -73,7 +73,7 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("firstTable")
-                .addColumns().addNumberColumn("newColumn", Integer.class).create().finish()
+                .columns().addNumberColumn("newColumn", Integer.class).create().finish()
                 .finish().buildSchema();
         transactionManager.commit();
 

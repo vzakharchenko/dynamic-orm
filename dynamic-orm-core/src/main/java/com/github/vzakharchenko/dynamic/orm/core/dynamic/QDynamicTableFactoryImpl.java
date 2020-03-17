@@ -28,13 +28,11 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     private final Map<String, SequanceModel> sequenceModelMap = new HashMap<>();
     private final Map<String, ViewModel> viewModelMap = new HashMap<>();
     private DynamicContext dynamicContext;
-    private DynamicStructureUpdater dynamicStructureUpdater;
 
     public QDynamicTableFactoryImpl(OrmQueryFactory ormQueryFactory,
                                     DataSource dataSource) {
         this.dataSource = dataSource;
         this.ormQueryFactory = ormQueryFactory;
-        this.dynamicStructureUpdater = new DynamicStructureSaver(dataSource);
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {
             this.database = DatabaseFactory.getInstance()
@@ -78,7 +76,9 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
 
     @Override
     public void buildSchema() {
-        dynamicStructureUpdater.update(LiquibaseHolder.create(dynamicTableMap,
+
+        DynamicStructureUpdater dynamicStructureSaver = new DynamicStructureSaver(dataSource);
+        dynamicStructureSaver.update(LiquibaseHolder.create(dynamicTableMap,
                 sequenceModelMap, viewModelMap));
         dynamicContext.registerQTables(dynamicTableMap.values());
         dynamicContext.registerViews(viewModelMap.values());
@@ -101,7 +101,6 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
         sequenceModelMap.clear();
         dynamicTableMap.clear();
         viewModelMap.clear();
-        dynamicStructureUpdater = new DynamicStructureSaver(dataSource);
     }
 
 
