@@ -7,19 +7,20 @@ import liquibase.snapshot.InvalidExampleException;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.DatabaseObjectCollection;
 import liquibase.structure.core.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  *
  */
 public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
+
+    public static final String ORM_DELETE = "orm_delete";
+
 
     protected DynamicDatabaseSnapshot(Class<? extends Database> databaseType)
             throws NoSuchMethodException, IllegalAccessException,
@@ -71,6 +72,7 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         mergedDatabase(referenceObjectCollection, Column.class, false);
         mergedDatabase(referenceObjectCollection, Catalog.class, false);
         mergedDatabase(referenceObjectCollection, Schema.class, false);
+
     }
 
     private void mergedDatabase(DatabaseObjectCollection referenceObjectCollection,
@@ -85,10 +87,52 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
                 setInitNewObjectByOldObject(databaseObject);
             }
 
-            if (!databaseObjectCollection.contains(databaseObject, null)) {
-                addDatabaseObject(databaseObject);
+            if (!isDeleted(databaseObject)) {
+                if (!databaseObjectCollection.contains(databaseObject, null)) {
+                    addDatabaseObject(databaseObject);
+                } else {
+                    mergeDatabase(databaseObject);
+                }
             }
         }
+    }
+
+    private void mergeDatabase(DatabaseObject databaseObject) {
+        DatabaseObject newDatabaseObject = getDatabaseObjectCollection()
+                .get(databaseObject, null);
+        databaseObject.getAttributes().forEach(s -> {
+            if (newDatabaseObject.getAttribute(s, Object.class) == null) {
+                newDatabaseObject.setAttribute(s, databaseObject.
+                        getAttribute(s, Object.class));
+            }
+        });
+    }
+
+    private boolean isDeleted(DatabaseObject databaseObject, List<String> removedColumns) {
+        if (CollectionUtils.isNotEmpty(removedColumns)) {
+            return removedColumns.stream().anyMatch(s ->
+                    removedColumns.contains(StringUtils.upperCase(
+                            databaseObject.getAttribute(
+                                    "name", String.class))));
+        }
+        return false;
+    }
+
+    private boolean isDeleted(DatabaseObject databaseObject, Table table) {
+        Table tableOrigin = getDatabaseObjectCollection().get(table, null);
+        if (tableOrigin != null) {
+            return isDeleted(databaseObject, tableOrigin
+                    .getAttribute("deletedObjects", List.class));
+        }
+        return false;
+    }
+
+    private boolean isDeleted(DatabaseObject databaseObject) {
+        Table table = databaseObject.getAttribute("relation", Table.class);
+        if (table != null) {
+            return isDeleted(databaseObject, table);
+        }
+        return false;
     }
 
     private void mergedDynamicTables(DatabaseObjectCollection referenceObjectCollection) {

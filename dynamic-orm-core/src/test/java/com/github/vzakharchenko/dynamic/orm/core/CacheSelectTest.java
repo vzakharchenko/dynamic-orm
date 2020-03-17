@@ -17,7 +17,7 @@ public class CacheSelectTest extends DebugAnnotationTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .addStringColumn("TestColumn").size(255).create()
                 .finish()

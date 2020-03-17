@@ -13,13 +13,11 @@ import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.sql.ProjectableSQLQuery;
 import com.querydsl.sql.SQLExpressions;
 import com.querydsl.sql.SQLQuery;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 import static org.testng.Assert.*;
 
 public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
@@ -28,7 +26,7 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
     public void beforeMethod() {
         // build structure
         qDynamicTableFactory.buildTables("UnionTable1")
-                .addColumns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id1").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime1").notNull().create()
                 .addStringColumn("TestColumn1_1").size(255).create()
                 .addStringColumn("TestColumn1_2").size(255).create()
@@ -36,7 +34,7 @@ public class UnionAndSubQueryDynamicTest extends DebugAnnotationTestQueryOrm {
                 .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
                 .addVersionColumn("modificationTime1")
                 .buildNextTable("UnionTable2")
-                .addColumns()
+                .columns()
                 .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime2").notNull().create()
                 .addStringColumn("TestColumn2_1").size(255).create()

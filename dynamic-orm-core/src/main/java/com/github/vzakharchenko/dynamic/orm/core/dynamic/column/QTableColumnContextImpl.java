@@ -2,8 +2,10 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.column;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.*;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QColumnBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QCustomColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QNumberColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QSizeColumnBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 public class QTableColumnContextImpl implements QTableColumnContext {
@@ -71,6 +73,13 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     }
 
     @Override
+    public QCustomColumnBuilder<QTableColumn, QCustomColumnBuilder<QTableColumn, ?>>
+    addCustomColumn(String columnName) {
+        return new QCustomBuilder(this,
+                dynamicTable, StringUtils.upperCase(columnName));
+    }
+
+    @Override
     public QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
     addDateColumn(String columnName) {
         Assert.notNull(columnName);
@@ -92,6 +101,11 @@ public class QTableColumnContextImpl implements QTableColumnContext {
         Assert.notNull(columnName);
         return new QTimeBuilder(this,
                 dynamicTable, columnName);
+    }
+
+    @Override
+    public QModifyColumn modifyColumn() {
+        return new QModifyColumnImpl(this, dynamicTable);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .addStringColumn("TestColumn").size(255).create()
                 .finish()
@@ -131,7 +131,7 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     public void testUpdatePartWhereWithoutPrimaryKey() {
 
         qDynamicTableFactory.buildTables("DynamicTable2")
-                .addColumns()
+                .columns()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .addStringColumn("TestColumn").size(255).create()
                 .finish()
@@ -157,7 +157,7 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     public void testDeleteWithoutPrimaryKey() {
 
         qDynamicTableFactory.buildTables("DynamicTable2")
-                .addColumns()
+                .columns()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .addStringColumn("TestColumn").size(255).create()
                 .finish()
@@ -195,61 +195,61 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed1() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addStringColumn(null).create();
+                .columns().addStringColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed2() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addDateTimeColumn(null).create();
+                .columns().addDateTimeColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed3() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addNumberColumn(null, null).create();
+                .columns().addNumberColumn(null, null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed4() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addNumberColumn("dsfs", null).create();
+                .columns().addNumberColumn("dsfs", null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed5() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addDateColumn(null).create();
+                .columns().addDateColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed6() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addDateTimeColumn(null).create();
+                .columns().addDateTimeColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed7() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addBooleanColumn(null).create();
+                .columns().addBooleanColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed8() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addClobColumn(null).create();
+                .columns().addClobColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed9() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addBlobColumn(null).create();
+                .columns().addBlobColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed10() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addColumns().addTimeColumn(null).create();
+                .columns().addTimeColumn(null).create();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

@@ -5,11 +5,15 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.Maps;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -71,6 +75,12 @@ public class DynamicTableMappingProjection
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
+    }
+
+    @Override
+    public List<Expression<?>> getArgs() {
+        return qDynamicTable.getColumns().stream().map((Function<Path<?>, Expression<?>>)
+                path -> path).collect(Collectors.toList());
     }
 
     @Override

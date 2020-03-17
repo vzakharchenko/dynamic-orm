@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QDefaultColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumn;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumnContext;
 import liquibase.database.Database;
+import liquibase.datatype.LiquibaseDataType;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
@@ -15,7 +16,7 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
         implements QColumnBuilder<QTableColumn, BUILDER_TYPE> {
     protected final COLUMN_TYPE columnType;
     private final QTableColumnContext qTableColumn;
-    private final QDynamicTable qDynamicTable;
+    protected final QDynamicTable qDynamicTable;
 
     protected QDefaultColumnBuilder(QTableColumnContext qTableColumnContext,
                                     QDynamicTable dynamicTable, String columnName) {
@@ -65,6 +66,17 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
     protected abstract void createColumn(QDynamicTable dynamicTable,
                                          Database database);
 
+
+    protected String getDataTypeString(LiquibaseDataType dataType) {
+        DataSource dataSource = qTableColumn.getContext().getDataSource();
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try {
+            return dataType.toDatabaseDataType(qTableColumn.getContext()
+                    .getDynamicContext().getDatabase(connection)).getType();
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
 
     private void createColumn() {
         DataSource dataSource = qTableColumn.getContext().getDataSource();

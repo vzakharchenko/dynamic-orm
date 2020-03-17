@@ -134,7 +134,7 @@ public final class SchemaTableLoaderHelper {
     private static void loadColumns(QTableBuilder qTableBuilder, List<SchemaColumn> columns) {
         if (columns != null) {
             columns.forEach(schemaColumn -> {
-                QTableColumn tableColumn = qTableBuilder.addColumns();
+                QTableColumn tableColumn = qTableBuilder.columns();
                 loadColumn(tableColumn, schemaColumn);
             });
         }

@@ -31,7 +31,7 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
         transactionManager.startTransactionIfNeeded();
         // build dynamic Table with foreign Key to Static Table
         qDynamicTableFactory.buildTables("relatedTable")
-                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addNumberColumn("StaticId", Integer.class).create()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .finish()

@@ -46,7 +46,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
 
 
     @Override
-    public QTableColumn addColumns() {
+    public QTableColumn columns() {
         return new QTableColumnContextImpl(dynamicContextHolder,
                 this, qDynamicTable);
     }

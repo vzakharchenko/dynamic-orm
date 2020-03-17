@@ -11,7 +11,7 @@ public class PKGeneratorLongTest extends AnnotationTestQueryOrm {
     @Test
     public void uniq() {
         qDynamicTableFactory.buildTables("testTable")
-                .addColumns().addNumberColumn("Id", Long.class).useAsPrimaryKey().create().finish()
+                .columns().addNumberColumn("Id", Long.class).useAsPrimaryKey().create().finish()
                 .addPrimaryKey().addPrimaryKeyGenerator(PKGeneratorLong.getInstance()).finish()
                 .finish().buildSchema();
         QDynamicTable testTable = qDynamicTableFactory.getQDynamicTableByName("testTable");

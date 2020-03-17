@@ -7,7 +7,6 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.core.predicate.PredicateFactory;
 import com.github.vzakharchenko.dynamic.orm.model.TestTableVersionAnnotation;
-import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableCompositePrimaryKey;
 import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.core.types.dsl.Wildcard;
@@ -25,7 +24,7 @@ public class SelectTest extends AnnotationTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .addColumns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
                 .addDateTimeColumn("modificationTime").notNull().create()
                 .addStringColumn("TestColumn").size(255).create()
                 .finish()

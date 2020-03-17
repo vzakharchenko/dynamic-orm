@@ -145,4 +145,14 @@ public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
         return Collections
                 .unmodifiableList(indexDatas);
     }
+
+    @Override
+    public Path<?>[] all() {
+        return getColumns().toArray(new Path[0]);
+    }
+
+    @Override
+    public List<Path<?>> getColumns() {
+        return new ArrayList<>(columns.values());
+    }
 }

@@ -26,11 +26,11 @@ public class DynamicCacheTest extends OracleTestQueryOrm {
     public void testCacheSelect() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTables("testtable1");
         // build primary key
-        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
+        testTable1.columns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size( 200).create();
+        testTable1.columns().addStringColumn("STRING_Test_FIELD").size( 200).create();
 
         // validate and create structure
 
@@ -69,11 +69,11 @@ public class DynamicCacheTest extends OracleTestQueryOrm {
     public void testCacheSmartSelect() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTables("testtable1");
         // build primary key
-        testTable1.addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
+        testTable1.columns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
 
         // build String Field
 
-        testTable1.addColumns().addStringColumn("STRING_Test_FIELD").size(200).create();
+        testTable1.columns().addStringColumn("STRING_Test_FIELD").size(200).create();
 
         // validate and create structure
 

@@ -12,7 +12,7 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
     @Test
     public void indexTest() {
         qDynamicTableFactory.buildTables("Test_table_Index")
-                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .columns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
                 .addStringColumn("test_column").size(200).create()
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()
@@ -24,7 +24,7 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
     @Test(expectedExceptions = IllegalStateException.class)
     public void indexTestFailed() {
         qDynamicTableFactory.buildTables("Test_table_Index")
-                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .columns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
                 .addStringColumn("test_column").size(200).create()
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()
@@ -35,7 +35,7 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
     @Test(expectedExceptions = IllegalStateException.class)
     public void indexTestFailed2() {
         qDynamicTableFactory.buildTables("Test_table_Index")
-                .addColumns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
+                .columns().addNumberColumn("ID", Integer.class).size(18).useAsPrimaryKey().create()
                 .addStringColumn("test_column").size(200).create()
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()
@@ -47,7 +47,7 @@ public class DynamicIndexTest extends OracleTestQueryOrm {
     @Test
     public void indexUniqueTest() {
         qDynamicTableFactory.buildTables("Test_table_Index")
-                .addColumns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create()
+                .columns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create()
                 .addStringColumn("test_column").size(200).create()
                 .addNumberColumn("INDEXED_COLUMN", Integer.class).size(38).decimalDigits(3).create()
                 .finish()

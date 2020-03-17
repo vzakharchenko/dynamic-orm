@@ -2,8 +2,10 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.column;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QColumnBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QCustomColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QNumberColumnBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QSizeColumnBuilder;
+
 
 public interface QTableColumn {
     QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>>
@@ -23,11 +25,16 @@ public interface QTableColumn {
             String columnName,
             Class<T> typeClass);
 
+    QCustomColumnBuilder<QTableColumn, QCustomColumnBuilder<QTableColumn, ?>>
+    addCustomColumn(String columnName);
+
     QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>> addDateColumn(String columnName);
 
     QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>> addDateTimeColumn(String columnName);
 
     QSizeColumnBuilder<QTableColumn, QSizeColumnBuilder<QTableColumn, ?>> addTimeColumn(String columnName);
+
+    QModifyColumn modifyColumn();
 
     QTableBuilder finish();
 
