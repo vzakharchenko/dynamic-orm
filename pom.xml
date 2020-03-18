@@ -66,7 +66,7 @@
 
         <testng>7.1.0</testng>
         <spring>5.2.4.RELEASE</spring>
-        <querydsl>4.2.2</querydsl>
+        <querydsl>4.3.0</querydsl>
     </properties>
 
     <profiles>
