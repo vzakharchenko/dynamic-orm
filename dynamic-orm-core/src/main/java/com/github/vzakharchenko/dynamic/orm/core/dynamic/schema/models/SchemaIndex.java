@@ -8,6 +8,8 @@ public class SchemaIndex implements Serializable {
 
     private Boolean uniq;
 
+    private Boolean clustered;
+
     public List<String> getColumns() {
         return columns;
     }
@@ -22,5 +24,13 @@ public class SchemaIndex implements Serializable {
 
     public void setUniq(Boolean uniq) {
         this.uniq = uniq;
+    }
+
+    public Boolean isClustered() {
+        return clustered;
+    }
+
+    public void setClustered(Boolean clustered) {
+        this.clustered = clustered;
     }
 }

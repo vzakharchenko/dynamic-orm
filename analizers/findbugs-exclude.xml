@@ -103,4 +103,12 @@
         <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QDefaultColumnBuilder"/>
         <Bug pattern="PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS"/>
     </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.JavaTypeUtils"/>
+        <Bug pattern="PMB_POSSIBLE_MEMORY_BLOAT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.DatabaseSchemaLoader"/>
+        <Bug pattern="CE_CLASS_ENVY"/>
+    </Match>
 </FindBugsFilter>

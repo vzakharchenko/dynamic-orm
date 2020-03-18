@@ -70,6 +70,12 @@ public interface QDynamicTableFactory {
      */
     QViewBuilder createView(String viewName);
 
+
+    /**
+     * Load current Schema from Database
+     */
+    void loadCurrentSchema();
+
     /**
      * The construction of the table using ddl queries
      * <p>

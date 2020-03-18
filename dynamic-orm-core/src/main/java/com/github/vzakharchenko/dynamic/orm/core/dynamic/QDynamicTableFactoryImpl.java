@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.DatabaseSchemaLoader;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaLoader;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
@@ -104,18 +105,34 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     }
 
     @Override
-    public void buildSchema() {
+    public void loadCurrentSchema() {
+        dynamicContext.loadSchema(this,
+                new DatabaseSchemaLoader(dataSource), true);
+    }
 
-        DynamicStructureUpdater dynamicStructureSaver = new DynamicStructureSaver(dataSource);
-        LiquibaseHolder liquibaseHolder = LiquibaseHolder.create(dynamicTableMap,
-                sequenceModelMap, viewModelMap);
-        liquibaseHolder.addRemovedTables(removedTables);
-        liquibaseHolder.addRemovedSequences(removedSequences);
-        dynamicStructureSaver.update(liquibaseHolder);
+    public void buildSchema(boolean update) {
+        if (update) {
+            DynamicStructureUpdater dynamicStructureSaver = new DynamicStructureSaver(dataSource);
+            LiquibaseHolder liquibaseHolder = LiquibaseHolder.create(dynamicTableMap,
+                    sequenceModelMap, viewModelMap);
+            liquibaseHolder.addRemovedTables(removedTables);
+            liquibaseHolder.addRemovedSequences(removedSequences);
+            dynamicStructureSaver.update(liquibaseHolder);
+        }
         dynamicContext.registerQTables(dynamicTableMap.values());
         dynamicContext.registerViews(viewModelMap.values());
         dynamicContext.registerSequences(sequenceModelMap);
         clear();
+    }
+
+    @Override
+    public void buildSchema() {
+        buildSchema(true);
+    }
+
+    @Override
+    public void supportSchema() {
+        buildSchema(false);
     }
 
     @Override
@@ -125,7 +142,7 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
 
     @Override
     public void loadSchema(SchemaLoader schemaLoader) {
-        dynamicContext.loadSchema(this, schemaLoader);
+        dynamicContext.loadSchema(this, schemaLoader, false);
     }
 
     @Override

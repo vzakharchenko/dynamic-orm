@@ -7,6 +7,7 @@ public interface QCustomColumnBuilder
         extends QNumberColumnBuilder<RETURN_TYPE, BUILDER_TYPE> {
 
     BUILDER_TYPE jdbcType(LiquibaseDataType dataType);
+    BUILDER_TYPE jdbcType(String liquibaseType);
 
     BUILDER_TYPE column(CustomColumnCreator customColumnCreator);
 }

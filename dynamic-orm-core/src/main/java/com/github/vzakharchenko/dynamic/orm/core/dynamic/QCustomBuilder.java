@@ -52,6 +52,13 @@ public class QCustomBuilder
     }
 
     @Override
+    public QCustomColumnBuilder<QTableColumn, ?> jdbcType(String liquibaseType) {
+        Assert.notNull(liquibaseType, "DataType is null");
+        columnType.setJdbc(liquibaseType);
+        return this;
+    }
+
+    @Override
     public QCustomColumnBuilder<QTableColumn, ?>
     column(CustomColumnCreator customColumnCreator) {
         Path<?> column = customColumnCreator

@@ -42,6 +42,7 @@ public final class SchemaHelper {
         schemaColumn.setDecimalDigits(metaInfo.getDecimalDigits());
         schemaColumn.setNullable(metaInfo.isNullable());
         schemaColumn.setJdbcType(metaInfo.getJdbcType());
+        schemaColumn.setJdbcType(metaInfo.getJdbcType());
         schemaColumn.setSize(metaInfo.getSize());
         return schemaColumn;
     }
@@ -104,6 +105,7 @@ public final class SchemaHelper {
                     .map(ModelHelper::getColumnRealName)
                     .collect(Collectors.toList()));
             schemaIndex.setUniq(indexData.isUnique());
+            schemaIndex.setClustered(indexData.isClustered());
             return schemaIndex;
         }).collect(Collectors.toList()));
     }
