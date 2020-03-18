@@ -5,7 +5,6 @@ import com.github.vzakharchenko.dynamic.orm.core.annotations.QueryDslModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.DynamicTableHelper;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicModel;
-import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Operation;
@@ -76,28 +75,6 @@ public abstract class ModelHelper {
         }
     }
 
-
-//    public static BooleanExpression getWherePart(RelationalPath<?> qTable, DMLModel model) {
-//        ComparableExpressionBase primaryKey = getPrimaryKey(qTable);
-//
-//        if (primaryKey != null) {
-//            return primaryKey.eq(getPrimaryKeyValue(model, qTable));
-//        }
-//
-//        List<Path<?>> columns = qTable.getColumns();
-//        BooleanExpression where = null;
-//        for (Path<?> column : columns) {
-//            if (where == null) {
-//                where = ((SimpleExpression) column).eq(getValueFromModelByColumn(model, column));
-//            } else {
-//                where = where.and(((SimpleExpression) column)
-//                        .eq(getValueFromModelByColumn(model, column)));
-//            }
-//        }
-//        return where;
-//    }
-
-
     public static void setColumnValue(DMLModel modeltype, Path column, Object value) {
         try {
             String columnName = getColumnName(column);
@@ -148,11 +125,6 @@ public abstract class ModelHelper {
         return qTable;
     }
 
-    public static PKGenerator<?> getPrimaryKeyGeneratorFromModel(
-            Class<? extends DMLModel> dmlModel) {
-        return AnnotationHelper.getAnnotationHolder(dmlModel).getPkGenerator();
-    }
-
     public static Path<?> getVersonFromModel(
             RelationalPath<?> qTable, Class<? extends DMLModel> dmlModel) {
         if (qTable instanceof QDynamicTable) {
@@ -182,17 +154,6 @@ public abstract class ModelHelper {
         } else {
             return getQTableFromModel(dmlModel.getClass());
         }
-    }
-
-    public static PKGenerator<?> getPrimaryKeyGeneratorFromModel(DMLModel dmlModel) {
-        if (dmlModel.isDynamicModel()) {
-            DynamicModel dynamicModel = (DynamicModel) dmlModel;
-            return DynamicTableHelper.getPkGenerator(dynamicModel.getQTable());
-        }
-        if (hasQTableInModel(dmlModel.getClass())) {
-            return getPrimaryKeyGeneratorFromModel(dmlModel.getClass());
-        }
-        return null;
     }
 
     public static String getColumnRealName(Path column) {

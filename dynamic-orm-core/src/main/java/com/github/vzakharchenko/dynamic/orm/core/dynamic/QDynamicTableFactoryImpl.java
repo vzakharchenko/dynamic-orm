@@ -10,12 +10,12 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -27,6 +27,8 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     private final Map<String, QDynamicTable> dynamicTableMap = new HashMap<>();
     private final Map<String, SequanceModel> sequenceModelMap = new HashMap<>();
     private final Map<String, ViewModel> viewModelMap = new HashMap<>();
+    private final Set<String> removedTables = new HashSet<>();
+    private final Set<String> removedSequences = new HashSet<>();
     private DynamicContext dynamicContext;
 
     public QDynamicTableFactoryImpl(OrmQueryFactory ormQueryFactory,
@@ -63,10 +65,37 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
         return QDynamicTableBuilder.createBuilder(tableName, dataSource, this);
     }
 
+    @Override
+    public QDynamicTableFactory dropTableOrView(String... tableNames) {
+        Arrays.stream(tableNames).map(StringUtils::upperCase).forEach(
+                tableName -> {
+                    dynamicContext.removeQ(tableName);
+                    removedTables.add(tableName);
+                    dynamicTableMap.remove(tableName);
+                    viewModelMap.remove(tableName);
+                });
+        return this;
+    }
+
+    @Override
+    public boolean isTableExist(String tableName) {
+        return getDynamicContext().isQTableExist(tableName);
+    }
+
 
     @Override
     public QSequenceBuilder createSequence(String sequenceName) {
         return new QSequenceBuilderImpl(sequenceName, this);
+    }
+
+    @Override
+    public QDynamicTableFactory dropSequence(String... sequenceNames) {
+        Arrays.stream(sequenceNames).map(StringUtils::upperCase).forEach(
+                sequenceName -> {
+                    dynamicContext.removeSequence(sequenceName);
+                    removedSequences.add(sequenceName);
+                });
+        return this;
     }
 
     @Override
@@ -78,8 +107,11 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
     public void buildSchema() {
 
         DynamicStructureUpdater dynamicStructureSaver = new DynamicStructureSaver(dataSource);
-        dynamicStructureSaver.update(LiquibaseHolder.create(dynamicTableMap,
-                sequenceModelMap, viewModelMap));
+        LiquibaseHolder liquibaseHolder = LiquibaseHolder.create(dynamicTableMap,
+                sequenceModelMap, viewModelMap);
+        liquibaseHolder.addRemovedTables(removedTables);
+        liquibaseHolder.addRemovedSequences(removedSequences);
+        dynamicStructureSaver.update(liquibaseHolder);
         dynamicContext.registerQTables(dynamicTableMap.values());
         dynamicContext.registerViews(viewModelMap.values());
         dynamicContext.registerSequences(sequenceModelMap);

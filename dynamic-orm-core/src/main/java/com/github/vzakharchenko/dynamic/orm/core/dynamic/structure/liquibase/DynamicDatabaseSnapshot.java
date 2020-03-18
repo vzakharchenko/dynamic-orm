@@ -1,5 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.liquibase;
 
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.LiquibaseHolder;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -19,14 +21,14 @@ import java.util.stream.Collectors;
  */
 public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
 
-    public static final String ORM_DELETE = "orm_delete";
+    private final LiquibaseHolder liquibaseHolder;
 
-
-    protected DynamicDatabaseSnapshot(Class<? extends Database> databaseType)
+    protected DynamicDatabaseSnapshot(Class<? extends Database> databaseType, LiquibaseHolder liquibaseHolder)
             throws NoSuchMethodException, IllegalAccessException,
             InvocationTargetException, InstantiationException,
             DatabaseException, InvalidExampleException {
         super(null, databaseType.getConstructor().newInstance());
+        this.liquibaseHolder = liquibaseHolder;
     }
 
     private DatabaseObjectCollection getDatabaseObjectCollection(
@@ -75,26 +77,35 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
 
     }
 
+
+    private void setSnapshotId(boolean setSnapshotId, DatabaseObject databaseObject) {
+        if (setSnapshotId) {
+            setInitNewObjectByOldObject(databaseObject);
+        }
+    }
+
+    private void addOrMerge(DatabaseObject databaseObject) {
+        DatabaseObjectCollection databaseObjectCollection = getDatabaseObjectCollection();
+        if (!databaseObjectCollection.contains(databaseObject, null)) {
+            addDatabaseObject(databaseObject);
+        } else {
+            mergeDatabase(databaseObject);
+        }
+    }
+
     private void mergedDatabase(DatabaseObjectCollection referenceObjectCollection,
                                 Class<? extends DatabaseObject> databaseObjectClass,
                                 boolean setSnapshotId) {
         Set<? extends DatabaseObject> databaseObjects = referenceObjectCollection
                 .get(databaseObjectClass);
-        DatabaseObjectCollection databaseObjectCollection = getDatabaseObjectCollection();
-        for (DatabaseObject databaseObject : databaseObjects) {
-            //first set snapshotID and init Tables
-            if (setSnapshotId) {
-                setInitNewObjectByOldObject(databaseObject);
-            }
 
-            if (!isDeleted(databaseObject)) {
-                if (!databaseObjectCollection.contains(databaseObject, null)) {
-                    addDatabaseObject(databaseObject);
-                } else {
-                    mergeDatabase(databaseObject);
-                }
+        databaseObjects.forEach((Consumer<DatabaseObject>) databaseObject
+                -> {
+            setSnapshotId(setSnapshotId, databaseObject);
+            if (!liquibaseHolder.isDeletedObject(databaseObject) && !isDeleted(databaseObject)) {
+                addOrMerge(databaseObject);
             }
-        }
+        });
     }
 
     private void mergeDatabase(DatabaseObject databaseObject) {
@@ -108,6 +119,7 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         });
     }
 
+
     private boolean isDeleted(DatabaseObject databaseObject, List<String> removedColumns) {
         if (CollectionUtils.isNotEmpty(removedColumns)) {
             return removedColumns.stream().anyMatch(s ->
@@ -118,8 +130,8 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         return false;
     }
 
-    private boolean isDeleted(DatabaseObject databaseObject, Table table) {
-        Table tableOrigin = getDatabaseObjectCollection().get(table, null);
+    private boolean isDeleted(DatabaseObject databaseObject, Relation table) {
+        Relation tableOrigin = getDatabaseObjectCollection().get(table, null);
         if (tableOrigin != null) {
             return isDeleted(databaseObject, tableOrigin
                     .getAttribute("deletedObjects", List.class));
@@ -128,9 +140,9 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
     }
 
     private boolean isDeleted(DatabaseObject databaseObject) {
-        Table table = databaseObject.getAttribute("relation", Table.class);
+        Relation table = databaseObject.getAttribute("relation", Relation.class);
         if (table != null) {
-            return isDeleted(databaseObject, table);
+            return liquibaseHolder.isDeletedRelation(table) || isDeleted(databaseObject, table);
         }
         return false;
     }
@@ -164,14 +176,19 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         }
     }
 
+    private void snapshotIdInit(DatabaseObject databaseObjectOld,
+                                DatabaseObject databaseObjectNew) {
+        if (databaseObjectNew.getSnapshotId() == null) {
+            databaseObjectNew.setSnapshotId(databaseObjectOld.getSnapshotId());
+        }
+    }
+
     protected void setInitNewObjectByOldObject(DatabaseObject databaseObjectOld) {
         Set<DatabaseObject> databaseObjectSet = (Set<DatabaseObject>) getDatabaseObjectCollection()
                 .get(databaseObjectOld.getClass());
         databaseObjectSet.stream().filter(databaseObjectNew -> Objects
                 .equals(databaseObjectNew, databaseObjectOld)).forEach(databaseObjectNew -> {
-            if (databaseObjectNew.getSnapshotId() == null) {
-                databaseObjectNew.setSnapshotId(databaseObjectOld.getSnapshotId());
-            }
+            snapshotIdInit(databaseObjectOld, databaseObjectNew);
             if (databaseObjectNew instanceof Relation) {
                 initTable((Relation) databaseObjectOld, (Relation) databaseObjectNew);
             }

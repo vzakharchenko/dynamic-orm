@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
 
@@ -30,9 +31,9 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
     public void testDeleteColumnModificationSchema() {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
-                    .modifyColumn()
-                    .removeColumn("TestColumn")
-                    .finish()
+                .modifyColumn()
+                .dropColumns("TestColumn")
+                .finish()
                 .finish()
                 .finish().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
@@ -41,12 +42,43 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
     }
 
     @Test
+    public void testDeleteColumnModificationSchema2() {
+        qDynamicTableFactory.buildTables("DynamicTable")
+                .columns().dropColumns("TestColumn")
+                .finish()
+                .finish().buildSchema();
+        QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
+        ormQueryFactory.insert(dynamicTableModel);
+    }
+
+    @Test
+    public void testDropDynamicTable() {
+        qDynamicTableFactory.dropTableOrView("DynamicTable").buildSchema();
+        assertFalse(qDynamicTableFactory.isTableExist("DynamicTable"));
+    }
+
+    @Test()
+    public void testDropStaticTable() {
+        qDynamicTableFactory
+                .dropTableOrView("TEST_Delete_TABLE").buildSchema();
+    }
+
+    @Test()
+    public void testDropSequenceTable() {
+        qDynamicTableFactory
+                .createSequence("sequence1").finish()
+                .buildSchema();
+        qDynamicTableFactory.dropSequence("sequence1").buildSchema();
+    }
+
+    @Test
     public void testColumnModificationSchema() {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
-                    .modifyColumn()
-                    .size("TestColumn", 1)
-                    .finish()
+                .modifyColumn()
+                .size("TestColumn", 1)
+                .finish()
                 .finish()
                 .finish()
                 .buildSchema();

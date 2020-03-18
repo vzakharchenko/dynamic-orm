@@ -56,7 +56,7 @@ public abstract class DynamicDatabaseSnapshotFactory {
             InstantiationException, DatabaseException,
             InvalidExampleException, InvocationTargetException {
         DynamicDatabaseSnapshot databaseSnapshot = new DynamicDatabaseSnapshot(
-                databaseType.getClass());
+                databaseType.getClass(), liquibaseHolder);
         addTables(databaseSnapshot, liquibaseHolder.getTables());
         addSequences(databaseSnapshot, liquibaseHolder.getSequencies());
         addViews(databaseSnapshot, liquibaseHolder.getViews());

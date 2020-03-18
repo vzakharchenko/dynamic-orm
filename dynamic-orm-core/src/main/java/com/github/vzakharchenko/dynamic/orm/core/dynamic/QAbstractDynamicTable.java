@@ -1,17 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QColumn;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QNumberColumn;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QSizeColumn;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
-import com.querydsl.core.types.dsl.*;
 import com.querydsl.sql.*;
-import liquibase.database.Database;
-import liquibase.datatype.DatabaseDataType;
-import liquibase.datatype.core.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,77 +29,6 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     protected QAbstractDynamicTable(String tableName) {
         super(Object.class, PathMetadataFactory.forVariable(tableName), "", tableName);
     }
-
-    protected DYNAMIC_TABLE createStringColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType databaseDataType = new VarcharType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
-                databaseDataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createCharColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType databaseDataType = new CharType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
-                databaseDataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createClobColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType databaseDataType = new ClobType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(createString(sizeColumn.columnName()),
-                databaseDataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createBooleanColumn(
-            Database database, QColumn column) {
-        DatabaseDataType databaseDataType = new BooleanType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(createBoolean(column.columnName()),
-                databaseDataType.getType(), 1, column));
-    }
-
-
-    protected DYNAMIC_TABLE createBlobColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType dataType = new BlobType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(
-                createSimple(sizeColumn.columnName(), byte[].class),
-                dataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createNumberColumn(
-            Database database, QNumberColumn numberColumn) {
-        DatabaseDataType databaseDataType = new NumberType().toDatabaseDataType(database);
-        return addColumn(new NumberColumnMetaDataInfo(
-                createNumber(numberColumn.columnName(),
-                        numberColumn.numberClass()),
-                databaseDataType.getType(), numberColumn));
-    }
-
-    protected DYNAMIC_TABLE createDateColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType dataType = new DateType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(
-                createDate(sizeColumn.columnName(), Date.class),
-                dataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createDateTimeColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType dataType = new TimestampType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(
-                createDateTime(sizeColumn.columnName(), Date.class),
-                dataType.getType(), sizeColumn));
-    }
-
-    protected DYNAMIC_TABLE createTimeColumn(
-            Database database, QSizeColumn sizeColumn) {
-        DatabaseDataType dataType = new TimeType().toDatabaseDataType(database);
-        return addColumn(new SizeColumnMetaDataInfo(
-                createTime(sizeColumn.columnName(), Date.class),
-                dataType.getType(), sizeColumn));
-    }
-
 
     protected DYNAMIC_TABLE addPrimaryKey(
             Path path) {
@@ -220,62 +142,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         }
     }
 
-    public Path<?> getColumnByName(String columnName) {
-        return columns.get(StringUtils.upperCase(columnName));
-    }
-
-    public <T> SimpleExpression<T> getColumnByName(String columnName, Class<T> tClass) {
-        Path<?> column = getColumnByName(columnName);
-        if (column == null) {
-            throw new IllegalStateException("column " + columnName +
-                    " is not found in table " + getTableName());
-        }
-        Assert.isTrue(tClass.isAssignableFrom(column.getType()));
-        return (SimpleExpression<T>) column;
-    }
-
-    public StringPath getStringColumnByName(String columnName) {
-        return (StringPath) getColumnByName(columnName, String.class);
-    }
-
-    public StringPath getCharColumnByName(String columnName) {
-        return getStringColumnByName(columnName);
-    }
-
-    public StringPath getClobColumnByName(String columnName) {
-        return getStringColumnByName(columnName);
-    }
-
-    public BooleanPath getBooleanColumnByName(String columnName) {
-        return (BooleanPath) getColumnByName(columnName, Boolean.class);
-    }
-
-    public SimplePath<byte[]> getBlobColumnByName(String columnName) {
-        return (SimplePath<byte[]>) getColumnByName(columnName, byte[].class);
-    }
-
-    public DatePath<Date> getDateColumnByName(String columnName) {
-        return (DatePath<Date>) getColumnByName(columnName, Date.class);
-    }
-
-    public DateTimePath<Date> getDateTimeColumnByName(String columnName) {
-        return (DateTimePath<Date>) getColumnByName(columnName, Date.class);
-    }
-
-    public TimePath<Date> getTimeColumnByName(String columnName) {
-        return (TimePath<Date>) getColumnByName(columnName, Date.class);
-    }
-
-    public <T extends Number & Comparable<?>> NumberPath<T> getNumberColumnByName(
-            String columnName, Class<T> tClass) {
-        return (NumberPath<T>) getColumnByName(columnName, tClass);
-    }
-
-    public <T extends Number & Comparable<?>> NumberPath<T> getNumberColumnByName(
-            String columnName) {
-        return (NumberPath) getColumnByName(columnName, Number.class);
-    }
-
+    public abstract Path<?> getColumnByName(String columnName);
 
     public List<String> deletedColumns() {
         return new ArrayList<>(removedColumns.keySet());

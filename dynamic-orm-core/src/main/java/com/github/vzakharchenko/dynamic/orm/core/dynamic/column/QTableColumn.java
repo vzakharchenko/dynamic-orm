@@ -36,6 +36,8 @@ public interface QTableColumn {
 
     QModifyColumn modifyColumn();
 
+    QTableColumn dropColumns(String... columns);
+
     QTableBuilder finish();
 
 }

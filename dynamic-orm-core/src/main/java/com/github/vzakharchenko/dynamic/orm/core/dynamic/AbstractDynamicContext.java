@@ -113,6 +113,15 @@ public class AbstractDynamicContext {
                 .putToCache(DYNAMIC_SEQUENCE_METADATA, cacheStorage);
     }
 
+    public void removeQ(String name) {
+        dynamicTableMap.remove(StringUtils.upperCase(name));
+        viewMap.remove(StringUtils.upperCase(name));
+    }
+
+    public void removeSequence(String name) {
+        sequenceModelMap.remove(StringUtils.upperCase(name));
+    }
+
     protected void updateSequences() {
         CacheStorage<SequanceModel> cacheStorage = ormQueryFactory.getContext().getTransactionCache()
                 .getFromCache(DYNAMIC_SEQUENCE_METADATA, CacheStorage.class);

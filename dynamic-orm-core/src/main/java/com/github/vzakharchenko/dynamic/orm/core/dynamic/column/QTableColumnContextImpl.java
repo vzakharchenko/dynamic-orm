@@ -109,6 +109,11 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     }
 
     @Override
+    public QTableColumn dropColumns(String... columns) {
+        return modifyColumn().dropColumns(columns).finish();
+    }
+
+    @Override
     public QTableBuilder finish() {
         return qTableBuilder;
     }

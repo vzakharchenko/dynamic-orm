@@ -2,7 +2,7 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.column;
 
 public interface QModifyColumn {
 
-    QModifyColumn removeColumn(String... column);
+    QModifyColumn dropColumns(String... column);
 
     QModifyColumn size(String column, int newSize);
 
