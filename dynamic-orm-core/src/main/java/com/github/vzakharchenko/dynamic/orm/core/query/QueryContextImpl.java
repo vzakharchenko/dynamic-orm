@@ -28,7 +28,7 @@ public class QueryContextImpl implements Cloneable, QueryContext {
     private final DefaultTransactionDefinition transactionDefinition;
     private final DataSource dataSource;
     private final Configuration configuration;
-    private final CacheContext cacheContext = new CacheContext();
+    private final CacheContext cacheContext;
     private final ModelMapper modelMapper = new ModelMapper();
     private final String cacheName;
     private final OrmQueryFactory ormQueryFactory;
@@ -57,6 +57,7 @@ public class QueryContextImpl implements Cloneable, QueryContext {
         this.ormQueryFactory = ormQueryFactory;
         this.transactionManager = transactionManager;
         transactionDefinition = new TransactionTemplate(transactionManager);
+        cacheContext = new CacheContext(getTransactionCache());
     }
 // CHECKSTYLE:ON
 
@@ -107,7 +108,6 @@ public class QueryContextImpl implements Cloneable, QueryContext {
 
     public void clearCache() {
         getTransactionCache().clearAll();
-        cacheContext.clear();
         modelMapper.clear();
     }
 
