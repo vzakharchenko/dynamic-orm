@@ -15,7 +15,7 @@ import java.sql.Connection;
 /**
  *
  */
-public class DynamicContext extends AbstractDynamicContext {
+public class DynamicContext extends AbstractRemoveDynamicContext {
 
 
     public DynamicContext(Database database, OrmQueryFactory queryFactory) {

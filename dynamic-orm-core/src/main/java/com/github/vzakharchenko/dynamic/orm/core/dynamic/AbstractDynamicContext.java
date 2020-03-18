@@ -20,7 +20,7 @@ public class AbstractDynamicContext {
     protected final Map<String, ViewDataHolder> viewMap = new ConcurrentHashMap<>();
     protected final Map<String, SequanceModel> sequenceModelMap = new ConcurrentHashMap<>();
     protected final Database database;
-    private final OrmQueryFactory ormQueryFactory;
+    protected final OrmQueryFactory ormQueryFactory;
 
     public AbstractDynamicContext(Database database, OrmQueryFactory ormQueryFactory) {
         this.ormQueryFactory = ormQueryFactory;
@@ -84,12 +84,6 @@ public class AbstractDynamicContext {
         }
     }
 
-    public QDynamicTable createQTable(String tableName) {
-        updateDynamicTables();
-        QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
-        return qDynamicTable != null ? qDynamicTable : new QDynamicTable(tableName);
-    }
-
     public OrmQueryFactory getOrmQueryFactory() {
         return ormQueryFactory;
     }
@@ -111,15 +105,6 @@ public class AbstractDynamicContext {
         cacheStorage.setSequenceModels(new ArrayList<>(sequenceModels.values()));
         ormQueryFactory.getContext().getTransactionCache()
                 .putToCache(DYNAMIC_SEQUENCE_METADATA, cacheStorage);
-    }
-
-    public void removeQ(String name) {
-        dynamicTableMap.remove(StringUtils.upperCase(name));
-        viewMap.remove(StringUtils.upperCase(name));
-    }
-
-    public void removeSequence(String name) {
-        sequenceModelMap.remove(StringUtils.upperCase(name));
     }
 
     protected void updateSequences() {
