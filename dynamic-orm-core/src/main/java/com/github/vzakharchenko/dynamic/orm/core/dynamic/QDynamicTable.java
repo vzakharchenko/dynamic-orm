@@ -21,7 +21,7 @@ import static com.github.vzakharchenko.dynamic.orm.core.RawModelBuilderImpl.SIZE
 /**
  *
  */
-public class QDynamicTable extends QAbstractDynamicTable<QDynamicTable> {
+public class QDynamicTable extends QAbstractSetColumnDynamicTable<QDynamicTable> {
 
     public static final String WRONG_COLUMN = "Wrong column ";
     private final List<IndexData> indexDatas = new ArrayList<>();

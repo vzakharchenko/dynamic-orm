@@ -28,12 +28,39 @@ public interface QDynamicTableFactory {
     QTableBuilder buildTables(String tableName);
 
     /**
+     * drop a table
+     *
+     * @param tableNames
+     * @return tableBuilder
+     * @see QDynamicTableFactory
+     */
+    QDynamicTableFactory dropTableOrView(String... tableNames);
+
+
+    /**
+     * Is table exists
+     * @param tableName
+     * @return true if exists otherwise false
+     */
+    boolean isTableExist(String tableName);
+
+    /**
      * add sequance
      *
-     * @param sequanceName
+     * @param sequenceName
      * @return builder
      */
-    QSequenceBuilder createSequence(String sequanceName);
+    QSequenceBuilder createSequence(String sequenceName);
+
+    /**
+     * drop sequence
+     *
+     * @param  sequenceNames
+     * @return tableBuilder
+     * @see QDynamicTableFactory
+     */
+    QDynamicTableFactory dropSequence(String... sequenceNames);
+
 
     /**
      * create SQL View (Virtual table)

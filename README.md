@@ -618,12 +618,11 @@ Annotations:
         assertEquals(tableModel.getValue("Id"), relatedTableData.getValue("Id"));
 ```
 
- - remove column
+ - drop column
 ```java
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
-                    .modifyColumn()
-                    .removeColumn("TestColumn")
+                    .dropColumns("TestColumn")
                     .finish()
                 .finish()
                 .finish().buildSchema();
@@ -638,6 +637,16 @@ Annotations:
                 .finish()
                 .finish()
                 .buildSchema();
+```
+ - drop table or View
+```java
+        qDynamicTableFactory
+                .dropTableOrView("TABLE_OR_VIEW_NAME").buildSchema();
+```
+ - drop Sequence
+```java
+        qDynamicTableFactory
+                .dropSequence("sequence_name").buildSchema();
 ```
 ## Generate QueryDslModel
 [Example](dynamic-orm-examples/example-test-qmodels/pom.xml)

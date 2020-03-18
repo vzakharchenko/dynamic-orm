@@ -4,6 +4,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
 import com.github.vzakharchenko.dynamic.orm.core.exception.EmptyBatchException;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyGeneratorHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
@@ -100,7 +101,7 @@ public abstract class CrudOrmQueryFactoryImpl implements OrmQueryFactory, Access
             throw new EmptyBatchException();
         }
         MODEL model = models.get(0);
-        PKGenerator<?> pkGenerator = ModelHelper.getPrimaryKeyGeneratorFromModel(model);
+        PKGenerator<?> pkGenerator = PrimaryKeyGeneratorHelper.getPrimaryKeyGeneratorFromModel(model);
         RelationalPath<?> qTableFromModel = ModelHelper.getQTableFromModel(model);
         CrudBuilder<MODEL> modify = modify(qTableFromModel, (Class<MODEL>) model.getClass());
         return modify.primaryKeyGenerator(pkGenerator).insert(models);

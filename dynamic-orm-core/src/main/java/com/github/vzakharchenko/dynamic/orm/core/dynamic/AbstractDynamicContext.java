@@ -20,7 +20,7 @@ public class AbstractDynamicContext {
     protected final Map<String, ViewDataHolder> viewMap = new ConcurrentHashMap<>();
     protected final Map<String, SequanceModel> sequenceModelMap = new ConcurrentHashMap<>();
     protected final Database database;
-    private final OrmQueryFactory ormQueryFactory;
+    protected final OrmQueryFactory ormQueryFactory;
 
     public AbstractDynamicContext(Database database, OrmQueryFactory ormQueryFactory) {
         this.ormQueryFactory = ormQueryFactory;
@@ -82,12 +82,6 @@ public class AbstractDynamicContext {
         if (cacheStorage != null) {
             cacheStorage.getDynamicObjects().forEach(this::registerQView);
         }
-    }
-
-    public QDynamicTable createQTable(String tableName) {
-        updateDynamicTables();
-        QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
-        return qDynamicTable != null ? qDynamicTable : new QDynamicTable(tableName);
     }
 
     public OrmQueryFactory getOrmQueryFactory() {

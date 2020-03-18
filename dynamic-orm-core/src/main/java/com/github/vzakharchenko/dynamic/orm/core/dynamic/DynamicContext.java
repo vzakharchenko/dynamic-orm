@@ -15,23 +15,36 @@ import java.sql.Connection;
 /**
  *
  */
-public class DynamicContext extends AbstractDynamicContext {
+public class DynamicContext extends AbstractRemoveDynamicContext {
 
 
     public DynamicContext(Database database, OrmQueryFactory queryFactory) {
         super(database, queryFactory);
     }
 
-    public QDynamicTable getQTable(String tableName) {
+    public QDynamicTable getQTable0(String tableName) {
         updateDynamicTables();
         updateDynamicViews();
         QDynamicTable qDynamicTable = dynamicTableMap.get(StringUtils.upperCase(tableName));
         ViewDataHolder qViewTable = viewMap.get(StringUtils.upperCase(tableName));
         if (qDynamicTable == null && qViewTable == null) {
+            return null;
+        }
+        return qDynamicTable != null ? qDynamicTable : qViewTable.getDynamicTable();
+    }
+
+    public QDynamicTable getQTable(String tableName) {
+        QDynamicTable qTable = getQTable0(tableName);
+        if (qTable == null) {
             throw new IllegalStateException("dynamic table with name " + tableName +
                     " is not found. May be you should Build this table first ");
         }
-        return qDynamicTable != null ? qDynamicTable : qViewTable.getDynamicTable();
+        return qTable;
+    }
+
+    public boolean isQTableExist(String tableName) {
+        QDynamicTable qTable = getQTable0(tableName);
+        return qTable != null;
     }
 
     public Database getDatabase(Connection connection) {

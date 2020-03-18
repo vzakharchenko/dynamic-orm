@@ -22,7 +22,7 @@ public class QModifyColumnImpl implements QModifyColumn {
     }
 
     @Override
-    public QModifyColumn removeColumn(String... columns) {
+    public QModifyColumn dropColumns(String... columns) {
         Assert.notNull(columns, "columns are null");
         for (String column : columns) {
             dynamicTable.removeColumn(column);

@@ -100,4 +100,15 @@
         </createTable>
         <addPrimaryKey columnNames="id1,id2" constraintName="ID_Version4_PK" tableName="TEST_COMPOSITE_PK_TABLE"/>
     </changeSet>
+
+    <changeSet author="queryorm table for deletion" context="production" id="test-10">
+        <createTable tableName="TEST_Delete_TABLE">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test_column" type="INT"/>
+
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_TEST_DELETE_TABLE_PK" tableName="TEST_Delete_TABLE"/>
+    </changeSet>
 </databaseChangeLog>

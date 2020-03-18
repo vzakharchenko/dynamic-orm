@@ -126,7 +126,7 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
             CompositeKey compositeKey = PrimaryKeyHelper
                     .getOnePrimaryKeyValues(batchModel, qTable);
             if (pkGenerator0 == null) {
-                pkGenerator0 = ModelHelper.getPrimaryKeyGeneratorFromModel(batchModel);
+                pkGenerator0 = PrimaryKeyGeneratorHelper.getPrimaryKeyGeneratorFromModel(batchModel);
             }
             if (pkGenerator0 != null && compositeKey == null) {
                 pkGenerator0.generate(queryContext.getOrmQueryFactory(), qTable, batchModel);
