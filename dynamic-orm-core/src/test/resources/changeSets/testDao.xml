@@ -111,4 +111,31 @@
         </createTable>
         <addPrimaryKey columnNames="id" constraintName="ID_TEST_DELETE_TABLE_PK" tableName="TEST_Delete_TABLE"/>
     </changeSet>
+
+    <changeSet author="queryorm load schema" context="production" id="test-11">
+        <createTable tableName="TEST_LOAD_TABLE1">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test_column" type="INT"/>
+
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_TTEST_LOAD_TABLE1_PK" tableName="TEST_LOAD_TABLE1"/>
+
+        <createTable tableName="TEST_LOAD_TABLE2">
+            <column name="id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="test_column" type="INT"/>
+
+        </createTable>
+        <addPrimaryKey columnNames="id" constraintName="ID_TEST_LOAD_TABLE2_PK" tableName="TEST_LOAD_TABLE2"/>
+        <addForeignKeyConstraint baseTableName="TEST_LOAD_TABLE2" baseColumnNames="id"
+                                 constraintName="fk_TEST_LOAD_TABLE2"
+                                 referencedTableName="TEST_LOAD_TABLE1"
+                                 referencedColumnNames="id"/>
+        <createIndex tableName="TEST_LOAD_TABLE1" indexName="IDX_TEST_LOAD_TABLE1" unique="true">
+            <column name="test_column"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>

@@ -110,12 +110,7 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
         DynamicDatabaseSnapshot databaseSnapshot = DynamicDatabaseSnapshotFactory
                 .build(referenceDatabase, liquibaseHolder);
         // create snapshot for current database
-        Set<Class<? extends DatabaseObject>> compareTypes = getCompareTypes();
-        DatabaseSnapshot referenceSnapshot = SnapshotGeneratorFactory.getInstance()
-                .createSnapshot(
-                        referenceDatabase.getDefaultSchema(), referenceDatabase,
-                        new SnapshotControl(referenceDatabase,
-                                compareTypes.toArray(new Class[compareTypes.size()])));
+        DatabaseSnapshot referenceSnapshot = getDatabaseSnapshot(referenceDatabase);
         // merge definition base and reference database(origin is definition)
         databaseSnapshot.mergedDatabase(referenceSnapshot);
         // generate DiFF
@@ -135,6 +130,34 @@ public class DynamicStructureSaver extends SimpleDbStructure implements DynamicS
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
+
+
+    public DatabaseSnapshot getDatabaseSnapshot(Database referenceDatabase)
+            throws DatabaseException, InvalidExampleException {
+        Set<Class<? extends DatabaseObject>> compareTypes = getCompareTypes();
+        return SnapshotGeneratorFactory.getInstance()
+                .createSnapshot(
+                        referenceDatabase.getDefaultSchema(), referenceDatabase,
+                        new SnapshotControl(referenceDatabase,
+                                compareTypes.toArray(new Class[compareTypes.size()])));
+    }
+
+    @Override
+    public DatabaseSnapshot getDatabaseSnapshot() {
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try {
+            Database referenceDatabase = currentDataBase(connection);
+            // create snapshot for current database
+            return getDatabaseSnapshot(referenceDatabase);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
+        }
+    }
+
 
     protected void createTempDir() throws IOException {
         FileUtils.forceMkdir(TEMP_DIR);

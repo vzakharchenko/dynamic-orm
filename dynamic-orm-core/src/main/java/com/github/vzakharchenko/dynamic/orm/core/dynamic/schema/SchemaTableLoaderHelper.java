@@ -3,17 +3,14 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic.schema;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTableFactory;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.QTableColumn;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QColumnBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QNumberColumnBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QSizeColumnBuilder;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.SchemaColumn;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.SchemaPrimaryKey;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.SchemaSoftDelete;
-import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.SchemaTable;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.column.builder.QCustomColumnBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.index.QIndexBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.models.*;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ClassHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorSequence;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,83 +22,14 @@ public final class SchemaTableLoaderHelper {
     private SchemaTableLoaderHelper() {
     }
 
-    private static QColumnBuilder<QTableColumn, ?>
-    loadSizeColumn(QSizeColumnBuilder<QTableColumn, ?> sizeColumnBuilder,
-                   SchemaColumn schemaColumn) {
-        return sizeColumnBuilder.size(schemaColumn.getSize());
-    }
-
-    private static QColumnBuilder<QTableColumn, ?>
-    loadNumberColumn(QNumberColumnBuilder<QTableColumn, ?> numberColumnBuilder,
-                     SchemaColumn schemaColumn) {
-        numberColumnBuilder.decimalDigits(schemaColumn.getDecimalDigits());
-        return loadSizeColumn(numberColumnBuilder, schemaColumn);
-    }
-
-    private static QColumnBuilder<QTableColumn, ?> stringPathLoader(
-            QTableColumn columnBuilder, SchemaColumn schemaColumn
-    ) {
-        QSizeColumnBuilder<QTableColumn, ?> qSizeBuilder;
-        switch (schemaColumn.getJdbcType()) {
-            case "VARCHAR2":
-            case "VARCHAR":
-                qSizeBuilder = columnBuilder.addStringColumn(schemaColumn.getName());
-                break;
-            case "CHAR":
-                qSizeBuilder = columnBuilder.addCharColumn(schemaColumn.getName());
-                break;
-            case "CLOB":
-                qSizeBuilder = columnBuilder.addClobColumn(schemaColumn.getName());
-                break;
-            default:
-                throw new IllegalStateException("Unsupported JDBC Type: " +
-                        schemaColumn.getJdbcType());
-        }
-        return loadSizeColumn(qSizeBuilder, schemaColumn);
-    }
-
-    // CHECKSTYLE:OFF
     private static void loadColumn(QTableColumn columnBuilder, SchemaColumn schemaColumn) {
-        QColumnBuilder<QTableColumn, ?> qSimpleBuilder;
-
-        switch (schemaColumn.getClassName()) {
-            case "StringPath":
-                qSimpleBuilder = stringPathLoader(
-                        columnBuilder, schemaColumn);
-                break;
-            case "TimePath":
-                qSimpleBuilder = loadSizeColumn(
-                        columnBuilder.addTimeColumn(schemaColumn.getName()), schemaColumn);
-                break;
-            case "DatePath":
-                qSimpleBuilder = loadSizeColumn(
-                        columnBuilder.addDateColumn(schemaColumn.getName()), schemaColumn);
-                break;
-            case "DateTimePath":
-                qSimpleBuilder = loadSizeColumn(
-                        columnBuilder.addDateTimeColumn(schemaColumn.getName()), schemaColumn);
-                break;
-            case "SimplePath":
-                qSimpleBuilder = loadSizeColumn(
-                        columnBuilder.addBlobColumn(schemaColumn.getName()), schemaColumn);
-                break;
-            case "BooleanPath":
-                qSimpleBuilder =
-                        columnBuilder.addBooleanColumn(schemaColumn.getName());
-                break;
-            case "NumberPath":
-                qSimpleBuilder =
-                        loadNumberColumn(columnBuilder.addNumberColumn(schemaColumn.getName(),
-                                ClassHelper.getNumberClass(schemaColumn.getaType())), schemaColumn);
-                break;
-            default:
-                throw new IllegalStateException("Unsupported column Type: " +
-                        schemaColumn.getClassName());
-
-        }
-        qSimpleBuilder.nullable(schemaColumn.getNullable()).create();
+        QCustomColumnBuilder<QTableColumn, ?> builder = columnBuilder.addCustomColumn(schemaColumn.getName()).column(
+                metadata -> JavaTypeUtils.createPath(schemaColumn.getClassName(),
+                        ClassHelper.getClassType(schemaColumn.getaType()), metadata));
+        builder.jdbcType(schemaColumn.getJdbcType()).nullable(schemaColumn.getNullable())
+                .size(schemaColumn.getSize())
+                .decimalDigits(schemaColumn.getDecimalDigits()).create();
     }
-    // CHECKSTYLE:ON
 
     private static void loadGenerator(QTableBuilder qTableBuilder, SchemaTable schemaTable) {
         String primaryGeneratorType = schemaTable.getPrimaryGeneratorType();
@@ -130,6 +58,38 @@ public final class SchemaTableLoaderHelper {
             loadGenerator(qTableBuilder, schemaTable);
         }
     }
+
+    private static void clusteredIndex(QIndexBuilder builder, SchemaIndex schemaIndex) {
+        if (BooleanUtils.isTrue(schemaIndex.isClustered())) {
+            builder.clustered();
+        }
+    }
+
+    private static void loadIndices(QTableBuilder qTableBuilder, List<SchemaIndex> indices) {
+        if (indices != null) {
+            indices.forEach(schemaIndex -> {
+                QIndexBuilder builder = qTableBuilder
+                        .addIndex(schemaIndex.getColumns().toArray(new String[0]));
+                clusteredIndex(builder, schemaIndex);
+                if (schemaIndex.getUniq()) {
+                    builder.buildUniqueIndex();
+                } else {
+                    builder.buildIndex();
+                }
+            });
+        }
+    }
+
+//    private static void loadForeignKey(QTableBuilder qTableBuilder, List<SchemaForeignKey> foreignKeys) {
+//        if (foreignKeys != null) {
+//            foreignKeys.forEach(foreignKey -> {
+//                QForeignKeyBuilder builder = qTableBuilder
+//                        .addForeignKey(foreignKey.getLocalColumns().toArray(new String[0]));
+//                builder.buildForeignKey(foreignKey.getTable(),
+//                        foreignKey.getRemoteColumns().toArray(new String[0]));
+//            });
+//        }
+//    }
 
     private static void loadColumns(QTableBuilder qTableBuilder, List<SchemaColumn> columns) {
         if (columns != null) {
@@ -162,6 +122,7 @@ public final class SchemaTableLoaderHelper {
                     .buildTables(schemaTable.getName());
             loadColumns(qTableBuilder, schemaTable.getColumns());
             loadPrimaryKeys(qTableBuilder, schemaTable, schemaTable.getPrimaryKeys());
+            loadIndices(qTableBuilder, schemaTable.getIndices());
             softDeletedColumn(qTableBuilder, schemaTable.getSoftDeleteColumn());
             versionColumn(qTableBuilder, schemaTable.getVersionColumn());
             qTableBuilder.finish();

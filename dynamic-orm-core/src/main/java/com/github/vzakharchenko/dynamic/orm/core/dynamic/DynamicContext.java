@@ -64,14 +64,19 @@ public class DynamicContext extends AbstractRemoveDynamicContext {
         schemaSaver.save(schema);
     }
 
-    public void loadSchema(QDynamicTableFactory dynamicTableFactory,
-                           SchemaLoader schemaLoader) {
+    public void loadSchema(QDynamicBuilderContext dynamicTableFactory,
+                           SchemaLoader schemaLoader, boolean readOnly) {
         updateDynamicTables();
         updateDynamicViews();
         updateSequences();
         Schema schema = schemaLoader.load();
         SchemaLoaderHelper.loadStructure(dynamicTableFactory, schema);
-        dynamicTableFactory
-                .buildSchema();
+        if (readOnly) {
+            dynamicTableFactory
+                    .supportSchema();
+        } else {
+            dynamicTableFactory
+                    .buildSchema();
+        }
     }
 }

@@ -9,6 +9,7 @@ public class SchemaColumn implements Serializable {
 
     private Integer size;
     private String jdbcType;
+    private Integer jdbcTypeid;
     private Integer decimalDigits;
     private Boolean nullable;
 
@@ -50,6 +51,14 @@ public class SchemaColumn implements Serializable {
 
     public void setJdbcType(String jdbcType) {
         this.jdbcType = jdbcType;
+    }
+
+    public Integer getJdbcTypeid() {
+        return jdbcTypeid;
+    }
+
+    public void setJdbcTypeid(Integer jdbcTypeid) {
+        this.jdbcTypeid = jdbcTypeid;
     }
 
     public Integer getDecimalDigits() {

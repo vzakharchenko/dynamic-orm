@@ -218,6 +218,11 @@ public void testQuery() {
                 .finish().buildSchema();
 }
 ```
+ - load dynamic structure from current connection
+```java
+        qDynamicTableFactory.loadCurrentSchema();
+```
+
  - save dynamic structure to file
 ```java
         File file = new File(".", "testSchema.json");
