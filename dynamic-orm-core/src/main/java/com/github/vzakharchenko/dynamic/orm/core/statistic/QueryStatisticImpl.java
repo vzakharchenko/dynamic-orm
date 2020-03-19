@@ -35,9 +35,11 @@ public class QueryStatisticImpl implements QueryStatistic, QueryStatisticRegistr
                                     String sql,
                                     List<? extends Serializable> primaryKeys) {
         String uuid = UUID.randomUUID().toString();
-        qTables.forEach(qTable -> transactionalCache
+        getTables().forEach(qTable -> transactionalCache
                 .putToCache(StringUtils.upperCase(qTable.getTableName()), uuid));
-        return new StatisticCacheHolder(primaryKeys, uuid);
+        StatisticCacheHolder statisticCacheHolder = new StatisticCacheHolder(primaryKeys, uuid);
+        transactionalCache.putToCache(sql, statisticCacheHolder);
+        return statisticCacheHolder;
     }
 
 

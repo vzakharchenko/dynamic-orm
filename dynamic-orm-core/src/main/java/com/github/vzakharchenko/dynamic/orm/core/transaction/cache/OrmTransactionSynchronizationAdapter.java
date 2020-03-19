@@ -10,6 +10,7 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.Serializable;
+import java.util.function.BiConsumer;
 
 public class OrmTransactionSynchronizationAdapter extends TransactionSynchronizationAdapter {
 
@@ -43,7 +44,17 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
 
     private void afterCompletion(TransactionalCache transactionalCache) {
         if (transactionalCache != null) {
-            transactionalCache.getInternalCache().forEach(targetCache::put);
+            transactionalCache.getInternalCache().forEach(new BiConsumer<Serializable, Serializable>() {
+                @Override
+                public void accept(Serializable key, Serializable value) {
+                    Cache.ValueWrapper valueWrapper = targetCache.get(key);
+                    if (valueWrapper != null && valueWrapper.get() != null) {
+                        targetCache.evict(key);
+                    } else {
+                        targetCache.put(key, value);
+                    }
+                }
+            });
             transactionalCache.getEvictObjects().forEach(evictKey ->
                     evict("Cleaning ", evictKey));
             transactionalCache.getDeletedObjects().forEach(evictKey ->

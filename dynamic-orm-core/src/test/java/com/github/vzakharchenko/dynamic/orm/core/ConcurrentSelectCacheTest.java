@@ -45,11 +45,13 @@ public class ConcurrentSelectCacheTest extends DebugAnnotationTestQueryOrm {
 
 
     public void selectThread() throws InterruptedException {
+        ormQueryFactory.transactionManager().startTransactionIfNeeded();
+        for (int i = 0; i < 400; i++) {
 
             QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
-                //  ormQueryFactory.transactionManager().startTransactionIfNeeded();
             List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(dynamicTable);
-              //     ormQueryFactory.transactionManager().commit();
+        }
+        ormQueryFactory.transactionManager().commit();
     }
 
 
@@ -71,16 +73,14 @@ public class ConcurrentSelectCacheTest extends DebugAnnotationTestQueryOrm {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void testConcurrent() throws InterruptedException {
         createSchema();
-        ExecutorService executorServiceSelect = Executors.newFixedThreadPool(3);
-        for (int i = 0; i < 400; i++) {
-            Future<?> future = executorServiceSelect.submit(() -> {
-                try {
-                    selectThread();
-                } catch (InterruptedException e) {
-                    throw new IllegalStateException();
-                }
-            });
-        }
+        ExecutorService executorServiceSelect = Executors.newFixedThreadPool(1);
+        Future<?> future = executorServiceSelect.submit(() -> {
+            try {
+                selectThread();
+            } catch (InterruptedException e) {
+                throw new IllegalStateException();
+            }
+        });
         executorServiceSelect.shutdown();
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         List<Future> futures = new ArrayList<>();

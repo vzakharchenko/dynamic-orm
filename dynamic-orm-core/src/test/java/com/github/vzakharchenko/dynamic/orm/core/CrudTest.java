@@ -3,6 +3,7 @@ package com.github.vzakharchenko.dynamic.orm.core;
 import com.github.vzakharchenko.dynamic.orm.DebugAnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKeyBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PrimaryKeyGenerators;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
@@ -64,6 +65,77 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
         ormQueryFactory.updateById(tableModel);
         DynamicTableModel tableModel2 = ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable);
         assertEquals(tableModel2.getValue("TestColumn", String.class), "newValue");
+    }
+
+    @Test
+    public void testDeleteDynamicCompositeIds() {
+        qDynamicTableFactory.buildTables("DynamicTable2")
+                .columns()
+                .addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .addStringColumn("TestColumn").size(255).create()
+                .finish()
+                .addVersionColumn("modificationTime").finish().buildSchema();
+
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
+        DynamicTableModel dynamicTableModel1 = new DynamicTableModel(dynamicTable);
+        dynamicTableModel1.addColumnValue("Id1", "10");
+        dynamicTableModel1.addColumnValue("Id2", "11");
+        dynamicTableModel1.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel1);
+
+        DynamicTableModel dynamicTableModel2 = new DynamicTableModel(dynamicTable);
+        dynamicTableModel2.addColumnValue("Id1", "20");
+        dynamicTableModel2.addColumnValue("Id2", "21");
+        dynamicTableModel2.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel2);
+        ormQueryFactory.modify(dynamicTable).deleteByIds(
+                CompositeKeyBuilder.create(dynamicTable)
+                        .addPrimaryKey("Id1","10")
+                        .addPrimaryKey("Id2","11").build(),
+                CompositeKeyBuilder.create(dynamicTable)
+                        .addPrimaryKey("Id1","20")
+                        .addPrimaryKey("Id2","21").build()
+
+        );
+        assertNull(ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable));
+    }
+    @Test
+    public void testSoftDeleteDynamicCompositeIds() {
+        qDynamicTableFactory.buildTables("DynamicTable2")
+                .columns()
+                .addStringColumn("Id1").size(255).useAsPrimaryKey().create()
+                .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
+                .addDateTimeColumn("modificationTime").notNull().create()
+                .addBooleanColumn("softDelete").create()
+                .addStringColumn("TestColumn").size(255).create()
+                .finish()
+                .addSoftDeleteColumn("softDelete",true,false)
+                .addVersionColumn("modificationTime").finish().buildSchema();
+
+        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
+        DynamicTableModel dynamicTableModel1 = new DynamicTableModel(dynamicTable);
+        dynamicTableModel1.addColumnValue("Id1", "10");
+        dynamicTableModel1.addColumnValue("Id2", "11");
+        dynamicTableModel1.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel1);
+
+        DynamicTableModel dynamicTableModel2 = new DynamicTableModel(dynamicTable);
+        dynamicTableModel2.addColumnValue("Id1", "20");
+        dynamicTableModel2.addColumnValue("Id2", "21");
+        dynamicTableModel2.addColumnValue("TestColumn", "testData");
+        ormQueryFactory.insert(dynamicTableModel2);
+        ormQueryFactory.modify(dynamicTable).softDeleteByIds(
+                CompositeKeyBuilder.create(dynamicTable)
+                        .addPrimaryKey("Id1","10")
+                        .addPrimaryKey("Id2","11").build(),
+                CompositeKeyBuilder.create(dynamicTable)
+                        .addPrimaryKey("Id1","20")
+                        .addPrimaryKey("Id2","21").build()
+
+        );
+        assertNull(ormQueryFactory.select().findOne(ormQueryFactory.buildQuery(), dynamicTable));
     }
 
     @Test

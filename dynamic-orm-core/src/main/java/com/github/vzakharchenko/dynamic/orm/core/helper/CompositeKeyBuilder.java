@@ -23,6 +23,11 @@ public final class CompositeKeyBuilder {
     }
 
     public CompositeKeyBuilder addPrimaryKey(
+            String column, Object value) {
+        return addPrimaryKey(ModelHelper.getColumnByName(qTable, column), value);
+    }
+
+    public CompositeKeyBuilder addPrimaryKey(
             Path column, Object value) {
         Assert.notNull(column, "Column is Null");
         Assert.notNull(value, "Value is Null");

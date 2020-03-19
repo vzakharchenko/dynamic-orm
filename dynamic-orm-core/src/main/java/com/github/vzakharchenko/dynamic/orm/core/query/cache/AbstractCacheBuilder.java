@@ -8,6 +8,7 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
@@ -53,10 +54,6 @@ public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
                 PrimaryKeyHelper.getOnePrimaryKey(qTable, key);
         return findByIdQuery0(compositeKey);
     }
-
-//    private BooleanExpression buildWhereWithSoftDelete(BooleanExpression where) {
-//        return softDelete != null ? softDelete.getActiveExpression().and(where) : where;
-//    }
 
 
     protected List<CompositeKey> skippedList(List<CompositeKey> keys,
@@ -113,19 +110,22 @@ public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
         ComparableExpressionBase columnExpression = (ComparableExpressionBase) column;
         return queryContext.getOrmQueryFactory().select()
                 .findAll(queryContext.getOrmQueryFactory().buildQuery().from(qTable)
-                        .where(columnExpression.in(keys.stream()
+                        .where(buildWhereWithSoftDelete(columnExpression.in(keys.stream()
                                 .map((Function<CompositeKey, Object>)
                                         compositeKey -> compositeKey.getColumn(column))
-                                .collect(Collectors.toList()))), qTable, modelClass);
+                                .collect(Collectors.toList())))), qTable, modelClass);
     }
 
     //
     private MODEL findByIdsQueryComposite(CompositeKey column) {
         return queryContext.getOrmQueryFactory().select()
                 .findOne(queryContext.getOrmQueryFactory().buildQuery().from(qTable)
-                        .where(column.getWherePart()), qTable, modelClass);
+                        .where(buildWhereWithSoftDelete(column.getWherePart())), qTable, modelClass);
     }
 
+    private BooleanExpression buildWhereWithSoftDelete(BooleanExpression where) {
+        return softDelete != null ? softDelete.getActiveExpression().and(where) : where;
+    }
 
 //    private SQLCommonQuery<?> expressionQuery(BooleanExpression expression) {
 //        return queryContext.getOrmQueryFactory().buildQuery().from(qTable)
