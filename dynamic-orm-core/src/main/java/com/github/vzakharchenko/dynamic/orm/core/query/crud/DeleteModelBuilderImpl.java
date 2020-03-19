@@ -9,13 +9,13 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.dml.SQLDeleteClause;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     private final Class<MODEL> modelClass;
 
     private final RelationalPath<?> qTable;
-    private final LinkedList<ModifyItem<MODEL>> batch0 = new LinkedList<>();
+    private final List<ModifyItem<MODEL>> batch0 = new ArrayList<>();
     private final AfterModify<MODEL> afterModify;
     private final Path<?> versionColumn;
 
@@ -59,7 +59,7 @@ public class DeleteModelBuilderImpl<MODEL extends DMLModel>
     }
 
     private ModifyItem<MODEL> getCurrentItem() {
-        return batch0.getLast();
+        return CollectionUtils.isEmpty(batch0) ? batch0.get(batch0.size() - 1) : null;
     }
 
     private void whereAnd(BooleanExpression and) {

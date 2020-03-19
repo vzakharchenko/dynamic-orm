@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @param <EVENT>
  */
-public interface ModifyEventBuilder<EVENT extends ModifyEvent<EVENT>> {
+public interface ModifyEventBuilder<EVENT extends AbstractModifyEvent<EVENT>> {
     /**
      * pojo model.
      *
