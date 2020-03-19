@@ -3,9 +3,6 @@ package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import org.springframework.cache.Cache;
-import org.springframework.core.Ordered;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,16 +20,11 @@ public class TransactionalCacheImpl implements TransactionalCache {
     private final Map<Serializable, Serializable> insertedObjects = new HashMap<>();
     private final Map<Serializable, Serializable> updatedObjects = new HashMap<>();
 
-    private final Map<Serializable, Serializable> transactionalLockedKey = new HashMap<>();
-
     private final Cache targetCache;
 
-    private final CacheKeyLockStrategy cacheKeyLockStrategy;
 
-    public TransactionalCacheImpl(Cache targetCache,
-                                  CacheKeyLockStrategy cacheKeyLockStrategy) {
+    public TransactionalCacheImpl(Cache targetCache) {
         this.targetCache = targetCache;
-        this.cacheKeyLockStrategy = cacheKeyLockStrategy;
     }
 
     @Override
@@ -67,16 +59,9 @@ public class TransactionalCacheImpl implements TransactionalCache {
     }
 
     @Override
-    public void putToTargetCache(Serializable key, Serializable value) {
-        targetCache.put(key, value);
-    }
-
-    @Override
     public void cacheEvict(Serializable key) {
         transactionCache.remove(key);
         evictValues.put(key, key);
-//        lock(key);
-        unLock(key);
     }
 
     @Override
@@ -111,33 +96,6 @@ public class TransactionalCacheImpl implements TransactionalCache {
             return (T) valueWrapper.get();
         }
         return null;
-    }
-
-    @Override
-    public void lock(Serializable key) {
-        if (!transactionalLockedKey.containsKey(key)) {
-            cacheKeyLockStrategy.lock(key);
-        }
-    }
-
-    @Override
-    public void unLock(Serializable key) {
-        if (!transactionalLockedKey.containsKey(key)) {
-            TransactionSynchronizationManager.registerSynchronization(
-                    new TransactionSynchronizationAdapter() {
-                        @Override
-                        public void afterCompletion(int status) {
-                            cacheKeyLockStrategy.unLock(key);
-                        }
-
-                        @Override
-                        public int getOrder() {
-                            return Ordered.HIGHEST_PRECEDENCE + 1;
-                        }
-                    });
-            transactionalLockedKey.put(key, key);
-        }
-
     }
 
     @Override

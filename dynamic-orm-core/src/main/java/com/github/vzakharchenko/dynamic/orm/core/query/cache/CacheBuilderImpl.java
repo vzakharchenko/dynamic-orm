@@ -90,25 +90,20 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     public LazyList<MODEL> findAll() {
         CachedAllData cachedAllData = CacheHelper.buildAllDataCache(qTable);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(cachedAllData);
-        try {
-            List<CompositeKey> primaryKeys =
-                    transactionCache.getFromCache(cachedAllData, List.class);
+        List<CompositeKey> primaryKeys =
+                transactionCache.getFromCache(cachedAllData, List.class);
 
-            if (primaryKeys == null) {
-                List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
-                        .rawSelect(queryContext.getOrmQueryFactory()
-                                .buildQuery().from(qTable)).findAll(PrimaryKeyExpressionHelper
-                                .getPrimaryKeyExpressionColumns(qTable));
-                primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable);
-                transactionCache.putToCache(cachedAllData, (Serializable) primaryKeys);
-            }
-
-            return ModelLazyListFactory
-                    .buildLazyList(qTable, primaryKeys, modelClass, queryContext);
-        } finally {
-            transactionCache.unLock(cachedAllData);
+        if (primaryKeys == null) {
+            List<RawModel> rawModels = queryContext.getOrmQueryFactory().select()
+                    .rawSelect(queryContext.getOrmQueryFactory()
+                            .buildQuery().from(qTable)).findAll(PrimaryKeyExpressionHelper
+                            .getPrimaryKeyExpressionColumns(qTable));
+            primaryKeys = PrimaryKeyHelper.getPrimaryKeyValues(rawModels, qTable);
+            transactionCache.putToCache(cachedAllData, (Serializable) primaryKeys);
         }
+
+        return ModelLazyListFactory
+                .buildLazyList(qTable, primaryKeys, modelClass, queryContext);
     }
 
     @Override

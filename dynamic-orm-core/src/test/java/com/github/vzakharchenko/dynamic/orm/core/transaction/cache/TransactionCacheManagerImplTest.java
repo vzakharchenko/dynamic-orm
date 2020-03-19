@@ -29,7 +29,6 @@ public class TransactionCacheManagerImplTest {
 
     @Test
     public void testTransactionCacheManagerImpl() {
-        transactionCacheManager.setCacheKeyLockStrategy(mock(CacheKeyLockStrategy.class));
         assertNotNull(transactionCacheManager.getCacheNames());
     }
 }

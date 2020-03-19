@@ -24,13 +24,8 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     private final Cache targetCache;
 
 
-    private final CacheKeyLockStrategy cacheKeyLockStrategy;
-
-
-    public TransactionalCacheDecorator(Cache targetCache,
-                                       CacheKeyLockStrategy cacheKeyLockStrategy) {
+    public TransactionalCacheDecorator(Cache targetCache) {
         this.targetCache = targetCache;
-        this.cacheKeyLockStrategy = cacheKeyLockStrategy;
     }
 
     private TransactionalCache getTransactionCache() {
@@ -47,7 +42,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         LOGGER.info("Starting Transaction cache for " +
                 cacheName + " transactionName:" + transactionName);
 
-        transactionalCache = new TransactionalCacheImpl(targetCache, cacheKeyLockStrategy);
+        transactionalCache = new TransactionalCacheImpl(targetCache);
         TransactionSynchronizationManager.registerSynchronization(
                 new OrmTransactionSynchronizationAdapter(cacheName, transactionName, targetCache));
         TransactionSynchronizationManager.bindResource(cacheName, transactionalCache);
@@ -115,11 +110,6 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         } else {
             targetCache.put(key, value);
         }
-    }
-
-    @Override
-    public void putToTargetCache(Serializable key, Serializable value) {
-        targetCache.put(key, value);
     }
 
     @Override
@@ -227,27 +217,6 @@ public class TransactionalCacheDecorator implements TransactionalCache {
             return null;
         }
 
-    }
-
-
-    @Override
-    public void lock(Serializable key) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionalCache transactionalCache = getTransactionCache();
-            transactionalCache.lock(key);
-        } else {
-            cacheKeyLockStrategy.lock(key);
-        }
-    }
-
-    @Override
-    public void unLock(Serializable key) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionalCache transactionalCache = getTransactionCache();
-            transactionalCache.unLock(key);
-        } else {
-            cacheKeyLockStrategy.unLock(key);
-        }
     }
 
     @Override

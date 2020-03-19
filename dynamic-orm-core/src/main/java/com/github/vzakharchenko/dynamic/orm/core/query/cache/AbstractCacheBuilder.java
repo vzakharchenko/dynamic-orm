@@ -79,14 +79,9 @@ public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
                 .getPrimaryKeyValues(model, qTable);
         Map<Path<?>, Object> modelMap = CacheHelper.buildMapFromModel(qTable, model);
         models.put(primaryKeyValue, modelMap);
-        transactionCache.lock(primaryKeyValue);
-        try {
-            if (softDelete == null || Objects.equals(
-                    modelMap.get(softDelete.getColumn()), softDelete.getDeletedValue())) {
-                transactionCache.putToCache(primaryKeyValue, (Serializable) modelMap);
-            }
-        } finally {
-            transactionCache.unLock(primaryKeyValue);
+        if (softDelete == null || Objects.equals(
+                modelMap.get(softDelete.getColumn()), softDelete.getDeletedValue())) {
+            transactionCache.putToCache(primaryKeyValue, (Serializable) modelMap);
         }
     }
 

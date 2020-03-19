@@ -7,7 +7,6 @@ import com.github.vzakharchenko.dynamic.orm.core.SelectBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Expression;
 import com.querydsl.sql.SQLQuery;
 
@@ -38,14 +37,8 @@ public class RawModelCacheBuilderImpl extends RawModelBuilderImpl {
         String sqlString = showSql(columns);
         StatisticCacheManagerImpl<RawModel> manager = new StatisticCacheManagerImpl<>(
                 queryContext.getTransactionCache());
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(sqlString);
-        try {
-            return manager.get(sqlString, queryStatistic,
-                    () -> rawModelBuilder.findAll(columns));
-        } finally {
-            transactionCache.unLock(sqlString);
-        }
+        return manager.get(sqlString, queryStatistic,
+                () -> rawModelBuilder.findAll(columns));
     }
 
 }

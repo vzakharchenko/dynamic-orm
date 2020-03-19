@@ -16,8 +16,6 @@ public class TransactionCacheManagerImpl implements TransactionCacheManager {
 
     private final CacheManager targetCacheManager;
 
-    private CacheKeyLockStrategy cacheKeyLockStrategy = new DisabledCacheKeyLockStrategy();
-
     @Autowired
     public TransactionCacheManagerImpl(CacheManager targetCacheManager) {
         this.targetCacheManager = targetCacheManager;
@@ -27,8 +25,8 @@ public class TransactionCacheManagerImpl implements TransactionCacheManager {
     public TransactionalCache getTransactionalCache(String name) {
         if (cacheNames.get(name) == null) {
             Cache cache = targetCacheManager.getCache(name);
-            TransactionalCache transactionalCache = new TransactionalCacheDecorator(cache,
-                    cacheKeyLockStrategy);
+            TransactionalCache transactionalCache = new TransactionalCacheDecorator(cache
+            );
             cacheNames.put(name, transactionalCache);
         }
 
@@ -40,7 +38,4 @@ public class TransactionCacheManagerImpl implements TransactionCacheManager {
         return cacheNames.keySet();
     }
 
-    public void setCacheKeyLockStrategy(CacheKeyLockStrategy cacheKeyLockStrategy) {
-        this.cacheKeyLockStrategy = cacheKeyLockStrategy;
-    }
 }

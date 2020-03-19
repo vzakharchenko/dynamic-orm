@@ -19,8 +19,6 @@ public interface TransactionalCache {
 
     void putToCache(Serializable key, Serializable value);
 
-    void putToTargetCache(Serializable key, Serializable value);
-
     void cacheEvict(Serializable key);
 
     void deleteModel(CompositeKey key);
@@ -40,10 +38,6 @@ public interface TransactionalCache {
     Set<Serializable> getDeletedObjects();
 
     <T> T getFromTargetCache(Serializable key, Class<T> tClass);
-
-    void lock(Serializable key);
-
-    void unLock(Serializable key);
 
     void clearAll();
 }

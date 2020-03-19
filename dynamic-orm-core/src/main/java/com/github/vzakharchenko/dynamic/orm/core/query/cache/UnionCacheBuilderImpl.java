@@ -5,7 +5,6 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.sql.SQLQuery;
 
@@ -35,13 +34,7 @@ public class UnionCacheBuilderImpl extends UnionBuilderImpl {
         String sqlString = showSql();
         StatisticCacheManagerImpl<RawModel> manager = new StatisticCacheManagerImpl<>(
                 queryContext.getTransactionCache());
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(sqlString);
-        try {
-            return manager.get(sqlString, queryStatistic, super::findAll);
-        } finally {
-            transactionCache.unLock(sqlString);
-        }
+        return manager.get(sqlString, queryStatistic, super::findAll);
     }
 
     private Long count0() {
@@ -55,14 +48,8 @@ public class UnionCacheBuilderImpl extends UnionBuilderImpl {
         String sqlString = showCountSql();
         StatisticCacheManagerImpl<Long> manager = new StatisticCacheManagerImpl<>(
                 queryContext.getTransactionCache());
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(sqlString);
-        try {
-            List<Long> longs = manager.get(sqlString, queryStatistic,
-                    () -> Collections.singletonList(count0()));
-            return longs.get(0);
-        } finally {
-            transactionCache.unLock(sqlString);
-        }
+        List<Long> longs = manager.get(sqlString, queryStatistic,
+                () -> Collections.singletonList(count0()));
+        return longs.get(0);
     }
 }

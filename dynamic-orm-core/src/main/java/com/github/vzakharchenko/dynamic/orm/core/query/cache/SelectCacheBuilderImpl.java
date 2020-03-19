@@ -8,7 +8,6 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.SubQueryExpression;
@@ -47,17 +46,11 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
                 queryContext.getTransactionCache());
         List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper.getPrimaryKeyColumns(qTable);
         String sqlString = showListSql(sqlQuery0, primaryKeyColumns);
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(sqlString);
-        try {
-            List<CompositeKey> compositeKeys = manager.get(sqlString, queryStatistic, () ->
-                    selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns));
-            LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
-                    compositeKeys, modelClass, queryContext);
-            return lazyList.getModelList();
-        } finally {
-            transactionCache.unLock(sqlString);
-        }
+        List<CompositeKey> compositeKeys = manager.get(sqlString, queryStatistic, () ->
+                selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns));
+        LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
+                compositeKeys, modelClass, queryContext);
+        return lazyList.getModelList();
     }
 
     private List<CompositeKey> selectPrimaryKeys(SQLCommonQuery<?> sqlQuery,
@@ -86,14 +79,8 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
         StatisticCacheManagerImpl<TYPE> manager = new StatisticCacheManagerImpl<>(
                 queryContext.getTransactionCache());
         String key = showSql(sqlQuery, expression);
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(key);
-        try {
-            return manager.get(key, queryStatistic, () -> selectBuilder
-                    .findAll(sqlQuery, expression));
-        } finally {
-            transactionCache.unLock(key);
-        }
+        return manager.get(key, queryStatistic, () -> selectBuilder
+                .findAll(sqlQuery, expression));
     }
 
     @Override

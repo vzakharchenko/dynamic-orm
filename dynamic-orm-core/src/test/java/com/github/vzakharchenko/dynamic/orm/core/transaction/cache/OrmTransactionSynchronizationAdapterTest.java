@@ -22,7 +22,6 @@ import static org.testng.Assert.assertNull;
 public class OrmTransactionSynchronizationAdapterTest {
 
     private Cache cache = mock(Cache.class);
-    private CacheKeyLockStrategy cacheKeyLockStrategy = mock(CacheKeyLockStrategy.class);
     private TransactionalCache transactionalCache = mock(TransactionalCache.class);
 
     private OrmTransactionSynchronizationAdapter ormTransactionSynchronizationAdapter;
@@ -30,7 +29,6 @@ public class OrmTransactionSynchronizationAdapterTest {
     @BeforeMethod
     public void beforeMethods() {
         reset(cache);
-        reset(cacheKeyLockStrategy);
         reset(transactionalCache);
         TransactionSynchronizationManager.bindResource("test", transactionalCache);
         ormTransactionSynchronizationAdapter = new OrmTransactionSynchronizationAdapter(
@@ -71,7 +69,7 @@ public class OrmTransactionSynchronizationAdapterTest {
     @Test
     public void testTransactionalCacheDecorator() {
         CompositeKey primaryKeyCacheKey = PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion);
-        TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache, cacheKeyLockStrategy);
+        TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache);
         transactionalCacheDecorator.deleteModel(primaryKeyCacheKey);
         transactionalCacheDecorator.insertModel(primaryKeyCacheKey);
         transactionalCacheDecorator.updateModel(primaryKeyCacheKey);
@@ -80,7 +78,7 @@ public class OrmTransactionSynchronizationAdapterTest {
     @Test
     public void testTransactionalCacheDecorator2() {
         CompositeKey compositeKey = PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion);
-        TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache, cacheKeyLockStrategy);
+        TransactionalCacheDecorator transactionalCacheDecorator = new TransactionalCacheDecorator(cache);
         try {
             TransactionSynchronizationManager.initSynchronization();
             transactionalCacheDecorator.deleteModel(compositeKey);
@@ -101,7 +99,7 @@ public class OrmTransactionSynchronizationAdapterTest {
 
     @Test
     public void testTransactionalCacheImpl() {
-        TransactionalCacheImpl transactionalCacheImpl = new TransactionalCacheImpl(cache, cacheKeyLockStrategy);
+        TransactionalCacheImpl transactionalCacheImpl = new TransactionalCacheImpl(cache);
         CompositeKey compositeKey = PrimaryKeyHelper.getCompositeKey(1, QTestTableVersion.qTestTableVersion);
         try {
             TransactionSynchronizationManager.initSynchronization();
