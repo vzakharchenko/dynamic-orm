@@ -30,14 +30,27 @@ public class QueryStatisticImpl implements QueryStatistic, QueryStatisticRegistr
         return ImmutableList.copyOf(qTables);
     }
 
+    private String getUuid(TransactionalCache transactionalCache, StatisticCacheKey key) {
+        String uuid = transactionalCache.getFromCache(key, String.class);
+        if (uuid == null) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
+    }
+
     @Override
     public StatisticCacheHolder get(TransactionalCache transactionalCache,
                                     String sql,
                                     List<? extends Serializable> primaryKeys) {
-        String uuid = UUID.randomUUID().toString();
-        getTables().forEach(qTable -> transactionalCache
-                .putToCache(new StatisticCacheKey(qTable.getTableName()), uuid));
-        StatisticCacheHolder statisticCacheHolder = new StatisticCacheHolder(primaryKeys, uuid);
+        Map<StatisticCacheKey, String> uuids = new HashMap<>();
+        getTables().forEach(qTable -> {
+            StatisticCacheKey key = new StatisticCacheKey(qTable.getTableName());
+            String uuid = getUuid(transactionalCache, key);
+            transactionalCache
+                    .putToCache(key, uuid);
+            uuids.put(key, uuid);
+        });
+        StatisticCacheHolder statisticCacheHolder = new StatisticCacheHolder(primaryKeys, uuids);
         transactionalCache.putToCache(sql, statisticCacheHolder);
         return statisticCacheHolder;
     }

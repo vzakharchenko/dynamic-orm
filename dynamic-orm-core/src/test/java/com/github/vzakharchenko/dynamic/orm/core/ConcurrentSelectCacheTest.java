@@ -91,6 +91,7 @@ public class ConcurrentSelectCacheTest extends DebugAnnotationTestQueryOrm {
                             dynamicTable2.getStringColumnByName("TestColumn").eq(
                                     dynamicTable1.getStringColumnByName("TestColumn")
                             ))).findAll(ListUtils.union(dynamicTable1.getColumns(), dynamicTable2.getColumns()));
+            List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(dynamicTable1);
             ormQueryFactory.transactionManager().commit();
         }
         Thread.sleep(1000);
@@ -101,6 +102,7 @@ public class ConcurrentSelectCacheTest extends DebugAnnotationTestQueryOrm {
                             dynamicTable2.getStringColumnByName("TestColumn").eq(
                                     dynamicTable1.getStringColumnByName("TestColumn")
                             ))).findAll(ListUtils.union(dynamicTable1.getColumns(), dynamicTable2.getColumns()));
+            List<DynamicTableModel> tableModels = ormQueryFactory.selectCache().findAll(dynamicTable1);
             ormQueryFactory.transactionManager().commit();
 
         }
