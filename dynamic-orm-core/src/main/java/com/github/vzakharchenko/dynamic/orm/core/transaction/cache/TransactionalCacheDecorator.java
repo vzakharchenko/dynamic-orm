@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import org.slf4j.Logger;
@@ -24,13 +24,8 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     private final Cache targetCache;
 
 
-    private final CacheKeyLockStrategy cacheKeyLockStrategy;
-
-
-    public TransactionalCacheDecorator(Cache targetCache,
-                                       CacheKeyLockStrategy cacheKeyLockStrategy) {
+    public TransactionalCacheDecorator(Cache targetCache) {
         this.targetCache = targetCache;
-        this.cacheKeyLockStrategy = cacheKeyLockStrategy;
     }
 
     private TransactionalCache getTransactionCache() {
@@ -47,7 +42,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
         LOGGER.info("Starting Transaction cache for " +
                 cacheName + " transactionName:" + transactionName);
 
-        transactionalCache = new TransactionalCacheImpl(targetCache, cacheKeyLockStrategy);
+        transactionalCache = new TransactionalCacheImpl(targetCache);
         TransactionSynchronizationManager.registerSynchronization(
                 new OrmTransactionSynchronizationAdapter(cacheName, transactionName, targetCache));
         TransactionSynchronizationManager.bindResource(cacheName, transactionalCache);
@@ -128,7 +123,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void deleteModel(PrimaryKeyCacheKey key) {
+    public void deleteModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.deleteModel(key);
@@ -138,7 +133,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void insertModel(PrimaryKeyCacheKey key) {
+    public void insertModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.insertModel(key);
@@ -148,7 +143,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void updateModel(PrimaryKeyCacheKey key) {
+    public void updateModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.updateModel(key);
@@ -222,27 +217,6 @@ public class TransactionalCacheDecorator implements TransactionalCache {
             return null;
         }
 
-    }
-
-
-    @Override
-    public void lock(Serializable key) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionalCache transactionalCache = getTransactionCache();
-            transactionalCache.lock(key);
-        } else {
-            cacheKeyLockStrategy.lock(key);
-        }
-    }
-
-    @Override
-    public void unLock(Serializable key) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionalCache transactionalCache = getTransactionCache();
-            transactionalCache.unLock(key);
-        } else {
-            cacheKeyLockStrategy.unLock(key);
-        }
     }
 
     @Override

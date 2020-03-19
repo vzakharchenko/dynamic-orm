@@ -169,57 +169,6 @@ public class CacheBuilderTest extends OracleTestQueryOrm {
         }
     }
 
-    @Test
-    public void testUpdate() {
-
-
-        CacheBuilder<Testtable> cacheQuery = ormQueryFactory.modelCacheBuilder(QTesttable.testtable, Testtable.class);
-
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                Testtable testtable = new Testtable();
-                testtable.setId(0);
-                testtable.setTest2(2);
-
-                CrudBuilder<Testtable> crudBuilder = ormQueryFactory.modify(QTesttable.testtable, Testtable.class);
-                crudBuilder.insert(testtable);
-            }
-        });
-
-
-        LazyList<Testtable> lazyList = cacheQuery.findAllByColumn(QTesttable.testtable.test2, 2);
-        assertEquals(lazyList.size(), 1);
-        lazyList = cacheQuery.findAllByColumn(QTesttable.testtable.test2, 23423);
-        assertEquals(lazyList.size(), 0);
-        lazyList = cacheQuery.findAllByColumnIsNotNull(QTesttable.testtable.test2);
-        assertEquals(lazyList.size(), 1);
-        assertEquals(lazyList.getModelList().get(0).getTest2(), Integer.valueOf(2));
-
-
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-                Testtable testtable = new Testtable();
-                testtable.setId(0);
-                testtable.setTest2(23423);
-
-                CrudBuilder<Testtable> crudBuilder = ormQueryFactory.modify(QTesttable.testtable, Testtable.class);
-                crudBuilder.updateBuilder().updateModel(testtable).update();
-            }
-        });
-
-        lazyList = cacheQuery.findAllByColumn(QTesttable.testtable.test2, 2);
-        assertEquals(lazyList.size(), 0);
-        lazyList = cacheQuery.findAllByColumn(QTesttable.testtable.test2, 23423);
-        assertEquals(lazyList.size(), 1);
-        lazyList = cacheQuery.findAllByColumnIsNotNull(QTesttable.testtable.test2);
-        LazyList lazyList2 = cacheQuery.findAllByColumnIsNotNull(QTesttable.testtable.test2);
-        assertEquals(lazyList.size(), 1);
-
-        assertEquals(lazyList.getModelList().get(0).getTest2(), Integer.valueOf(23423));
-    }
-
 
     @Test
     @Transactional

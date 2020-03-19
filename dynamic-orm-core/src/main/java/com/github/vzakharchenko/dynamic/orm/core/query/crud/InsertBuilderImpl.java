@@ -66,13 +66,12 @@ public class InsertBuilderImpl<MODEL extends DMLModel> implements InsertBuilder<
             setNextPrimaryKey(models);
         }
         for (MODEL model : models) {
-            if (PrimaryKeyHelper.hasPrimaryKey(qTable)) {
-                if (PrimaryKeyHelper.isPrimaryKeyValueNull(qTable, model)) {
-                    throw new IllegalStateException("model for " + qTable.getTableName() +
-                            " has empty Primary Key : " + model.getClass());
-                }
-                CacheHelper.checkModelIsDeleted(queryContext, model, qTable);
+
+            if (PrimaryKeyHelper.isPrimaryKeyValueNull(qTable, model)) {
+                throw new IllegalStateException("model for " + qTable.getTableName() +
+                        " has empty Primary Key : " + model.getClass());
             }
+            //CacheHelper.checkModelIsDeleted(queryContext, model, qTable);
             if (versionColumn != null) {
                 Serializable currentVersion = VersionHelper.getCurrentVersion(
                         versionColumn, model);

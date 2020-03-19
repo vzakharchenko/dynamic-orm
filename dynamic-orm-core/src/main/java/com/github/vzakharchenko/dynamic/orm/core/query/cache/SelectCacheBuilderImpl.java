@@ -8,7 +8,6 @@ import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatistic;
 import com.github.vzakharchenko.dynamic.orm.core.statistic.QueryStatisticFactory;
-import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.SubQueryExpression;
@@ -39,29 +38,19 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     public <MODEL extends DMLModel> List<MODEL> findAll(SQLCommonQuery<?> sqlQuery,
                                                         RelationalPath<?> qTable,
                                                         Class<MODEL> modelClass) {
-        SQLCommonQuery<?> sqlQuery0 = sqlQuery;
-        sqlQuery0 = validateQuery(sqlQuery0, qTable, modelClass);
+        SQLCommonQuery<?> sqlQuery0 = validateQuery(sqlQuery, qTable, modelClass);
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(DBHelper.castProjectionQueryToSqlQuery(sqlQuery0),
                         queryCacheContext.getqRelatedTables());
+        StatisticCacheManagerImpl<CompositeKey> manager = new StatisticCacheManagerImpl<>(
+                queryContext.getTransactionCache());
         List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper.getPrimaryKeyColumns(qTable);
         String sqlString = showListSql(sqlQuery0, primaryKeyColumns);
-        queryContext.getCacheContext().register(sqlString, queryStatistic);
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(sqlString);
-        try {
-            List<CompositeKey> primaryKeys = transactionCache.getFromCache(sqlString, List.class);
-
-            if (primaryKeys == null) {
-                primaryKeys = selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns);
-                transactionCache.putToCache(sqlString, (Serializable) primaryKeys);
-            }
-            LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
-                    primaryKeys, modelClass, queryContext);
-            return lazyList.getModelList();
-        } finally {
-            transactionCache.unLock(sqlString);
-        }
+        List<CompositeKey> compositeKeys = manager.get(sqlString, queryStatistic, () ->
+                selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns));
+        LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
+                compositeKeys, modelClass, queryContext);
+        return lazyList.getModelList();
     }
 
     private List<CompositeKey> selectPrimaryKeys(SQLCommonQuery<?> sqlQuery,
@@ -81,27 +70,17 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     }
 
     @Override
-    public <TYPE> List<TYPE> findAll(SQLCommonQuery<?> sqlQuery,
-                                     Expression<TYPE> expression) {
+    public <TYPE extends Serializable>
+    List<TYPE> findAll(SQLCommonQuery<?> sqlQuery,
+                       Expression<TYPE> expression) {
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(DBHelper.castProjectionQueryToSqlQuery(sqlQuery),
                         queryCacheContext.getqRelatedTables());
+        StatisticCacheManagerImpl<TYPE> manager = new StatisticCacheManagerImpl<>(
+                queryContext.getTransactionCache());
         String key = showSql(sqlQuery, expression);
-        queryContext.getCacheContext().register(key, queryStatistic);
-        TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.lock(key);
-        try {
-            List<TYPE> cached = transactionCache.getFromCache(key, List.class);
-
-            if (cached == null) {
-                cached = selectBuilder.findAll(sqlQuery, expression);
-                transactionCache.putToCache(key, (Serializable) cached);
-            }
-
-            return cached;
-        } finally {
-            transactionCache.unLock(key);
-        }
+        return manager.get(key, queryStatistic, () -> selectBuilder
+                .findAll(sqlQuery, expression));
     }
 
     @Override

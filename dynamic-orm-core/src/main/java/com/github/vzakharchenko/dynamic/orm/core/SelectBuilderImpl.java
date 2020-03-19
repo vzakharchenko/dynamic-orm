@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.util.List;
 
@@ -73,7 +74,8 @@ public class SelectBuilderImpl extends AbstractSelectBuilder {
     }
 
     @Override
-    public <TYPE> List<TYPE> findAll(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression) {
+    public <TYPE extends Serializable>
+    List<TYPE> findAll(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression) {
 
         try {
             Connection connection = DataSourceUtils.getConnection(queryContext.getDataSource());
@@ -120,7 +122,8 @@ public class SelectBuilderImpl extends AbstractSelectBuilder {
     }
 
     @Override
-    public <TYPE> TYPE findOne(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression) {
+    public <TYPE extends Serializable> TYPE findOne(SQLCommonQuery<?> sqlQuery,
+                                                    Expression<TYPE> expression) {
         List<TYPE> list = findAll(sqlQuery, expression);
         if (list.isEmpty()) {
             return null;

@@ -24,12 +24,16 @@ public class AccountServiceImpl implements AccountDAO {
 
     @Override
     public Userdata getUserByName(String name) {
-        return ormQueryFactory.modelCacheBuilder(Userdata.class).findOneByColumn(QUserdata.userdata.name, name);
+        return ormQueryFactory.selectCache()
+                .findOne(ormQueryFactory.buildQuery()
+                        .where(QUserdata.userdata.name.eq(name)), Userdata.class);
     }
 
     @Override
     public Role getRoleByName(String name) {
-        return ormQueryFactory.modelCacheBuilder(Role.class).findOneByColumn(QRole.role.name, name);
+        return ormQueryFactory.selectCache()
+                .findOne(ormQueryFactory.buildQuery()
+                        .where(QRole.role.name.eq(name)), Role.class);
     }
 
     @Override

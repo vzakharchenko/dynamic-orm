@@ -11,16 +11,16 @@ public class QCustomColumnImpl
 
     private String jdbc;
 
+    public QCustomColumnImpl(String name) {
+        super(name);
+    }
+
     public void setColumn(Path<?> column) {
         this.column = column;
     }
 
     public void setJdbc(String jdbc) {
         this.jdbc = jdbc;
-    }
-
-    public QCustomColumnImpl(String name) {
-        super(name);
     }
 
     public void setDecimalDigits(Integer d) {

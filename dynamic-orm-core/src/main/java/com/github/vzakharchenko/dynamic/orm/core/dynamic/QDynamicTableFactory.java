@@ -39,6 +39,7 @@ public interface QDynamicTableFactory {
 
     /**
      * Is table exists
+     *
      * @param tableName
      * @return true if exists otherwise false
      */
@@ -55,7 +56,7 @@ public interface QDynamicTableFactory {
     /**
      * drop sequence
      *
-     * @param  sequenceNames
+     * @param sequenceNames
      * @return tableBuilder
      * @see QDynamicTableFactory
      */

@@ -2,7 +2,6 @@ package com.github.vzakharchenko.dynamic.orm.core.query;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheContext;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionCacheManager;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
@@ -28,7 +27,6 @@ public class QueryContextImpl implements Cloneable, QueryContext {
     private final DefaultTransactionDefinition transactionDefinition;
     private final DataSource dataSource;
     private final Configuration configuration;
-    private final CacheContext cacheContext = new CacheContext();
     private final ModelMapper modelMapper = new ModelMapper();
     private final String cacheName;
     private final OrmQueryFactory ormQueryFactory;
@@ -78,11 +76,6 @@ public class QueryContextImpl implements Cloneable, QueryContext {
         return transactionalEventPublisher;
     }
 
-
-    public CacheContext getCacheContext() {
-        return cacheContext;
-    }
-
     public OrmQueryFactory getOrmQueryFactory() {
         return ormQueryFactory;
     }
@@ -107,7 +100,6 @@ public class QueryContextImpl implements Cloneable, QueryContext {
 
     public void clearCache() {
         getTransactionCache().clearAll();
-        cacheContext.clear();
         modelMapper.clear();
     }
 

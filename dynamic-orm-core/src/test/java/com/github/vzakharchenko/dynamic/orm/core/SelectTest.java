@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.AnnotationTestQueryOrm;
+import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
@@ -11,6 +12,8 @@ import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.core.types.dsl.Wildcard;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -19,7 +22,7 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public class SelectTest extends AnnotationTestQueryOrm {
+public class SelectTest extends OracleTestQueryOrm {
 
     @BeforeMethod
     public void beforeMethod() {
@@ -36,7 +39,7 @@ public class SelectTest extends AnnotationTestQueryOrm {
     public void existTest() {
         TestTableVersionAnnotation value = new TestTableVersionAnnotation();
         ormQueryFactory.insert(value);
-        assertTrue(ormQueryFactory.select().exist(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)));
+        assertTrue(ormQueryFactory.selectCache().exist(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)));
         assertFalse(ormQueryFactory.select().notExist(ormQueryFactory.buildQuery().from(QTestTableVersionAnnotation.qTestTableVersionAnnotation)));
     }
 
@@ -225,41 +228,6 @@ public class SelectTest extends AnnotationTestQueryOrm {
         assertEquals(list.size(), 2);
     }
 
-    @Test
-    public void testCacheByColumn() {
-        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
-        StringPath testColumn = dynamicTable.getStringColumnByName("TestColumn");
-        DynamicTableModel value1 = createDynamicModel("1");
-        ormQueryFactory.insert(value1);
-        LazyList<DynamicTableModel> list = ormQueryFactory.modelCacheBuilder(dynamicTable).findAllByColumn(testColumn, "1");
-        assertNotNull(list);
-        assertEquals(list.size(), 1);
-        DynamicTableModel value2 = createDynamicModel("2");
-        ormQueryFactory.insert(value2);
-
-        list = ormQueryFactory.modelCacheBuilder(dynamicTable).findAllByColumn(testColumn, "1");
-        assertEquals(list.size(), 1);
-
-        DynamicTableModel value3 = createDynamicModel("1");
-        ormQueryFactory.insert(value3);
-
-        list = ormQueryFactory.modelCacheBuilder(dynamicTable).findAllByColumn(testColumn, "1");
-        assertEquals(list.size(), 2);
-    }
-
-    @Test
-    public void testCacheByColumnNotNull() {
-        QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
-        StringPath testColumn = dynamicTable.getStringColumnByName("TestColumn");
-        DynamicTableModel value1 = createDynamicModel("1");
-        ormQueryFactory.insert(value1);
-        DynamicTableModel valueNotNull = ormQueryFactory.modelCacheBuilder(dynamicTable).findOneByColumnIsNotNull(testColumn);
-        assertNotNull(valueNotNull);
-        valueNotNull.addColumnValue(testColumn, null);
-        ormQueryFactory.updateById(valueNotNull);
-        DynamicTableModel valueNull = ormQueryFactory.modelCacheBuilder(dynamicTable).findOneByColumnIsNotNull(testColumn);
-        assertNull(valueNull);
-    }
 
     @Test
     public void testFetchOneEmpty() {

@@ -6,6 +6,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.sql.RelationalPath;
 import com.querydsl.sql.SQLCommonQuery;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ public interface SelectBuilder
      */
     <MODEL extends DMLModel> List<MODEL> findAll(RelationalPath<?> qTable,
                                                  Class<MODEL> modelClass);
+
     /**
      * The fetch all  data models from a database using sqlQuery query.
      * the result is mapped to the data models
@@ -91,7 +93,7 @@ public interface SelectBuilder
      * @param expression any QueryDsl Expression
      * @return List of results
      */
-    <TYPE> List<TYPE> findAll(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression);
+    <TYPE extends Serializable> List<TYPE> findAll(SQLCommonQuery<?> sqlQuery, Expression<TYPE> expression);
 
     /**
      * The fetch a data model from a database using sqlQuery query.
@@ -140,7 +142,7 @@ public interface SelectBuilder
      * @param expression any QueryDsl Expression
      * @return typed result
      */
-    <TYPE> TYPE findOne(SQLCommonQuery<?> sqlQuery,
+    <TYPE extends Serializable> TYPE findOne(SQLCommonQuery<?> sqlQuery,
                         Expression<TYPE> expression);
 
 

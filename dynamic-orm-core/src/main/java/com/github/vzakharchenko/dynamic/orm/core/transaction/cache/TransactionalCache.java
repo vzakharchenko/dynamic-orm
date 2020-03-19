@@ -1,6 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
-import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -21,11 +21,11 @@ public interface TransactionalCache {
 
     void cacheEvict(Serializable key);
 
-    void deleteModel(PrimaryKeyCacheKey key);
+    void deleteModel(CompositeKey key);
 
-    void insertModel(PrimaryKeyCacheKey key);
+    void insertModel(CompositeKey key);
 
-    void updateModel(PrimaryKeyCacheKey key);
+    void updateModel(CompositeKey key);
 
     Map<Serializable, Serializable> getInternalCache();
 
@@ -38,10 +38,6 @@ public interface TransactionalCache {
     Set<Serializable> getDeletedObjects();
 
     <T> T getFromTargetCache(Serializable key, Class<T> tClass);
-
-    void lock(Serializable key);
-
-    void unLock(Serializable key);
 
     void clearAll();
 }

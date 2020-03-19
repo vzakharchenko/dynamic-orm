@@ -1,10 +1,8 @@
 package orm.query.examples.ehcache.dao;
 
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
-import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGeneratorInteger;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
 import com.querydsl.sql.SQLCommonQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,9 +50,9 @@ public class BoServiceImpl implements BoDAO {
     public List<Botable> byUser(String userName) {
         Userdata userByName = accountDAO.getUserByName(userName);
         Assert.notNull(userByName);
-        CacheBuilder<Botable> cacheBuilder = ormQueryFactory.modelCacheBuilder(Botable.class);
-        LazyList<Botable> list = cacheBuilder.findAllByColumn(QBotable.botable.userId, userByName.getId());
-        return list.getModelList();
+        return ormQueryFactory.selectCache().findAll(ormQueryFactory.buildQuery().where(
+                QBotable.botable.userId.eq(
+                        userByName.getId())), Botable.class);
     }
 
 
