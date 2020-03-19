@@ -27,7 +27,7 @@ public class StatisticCacheHolder<T extends Serializable> implements Serializabl
 
     public boolean valid(QueryStatistic queryStatistic, TransactionalCache transactionCache) {
         return queryStatistic.getTables().stream().allMatch(qTable -> {
-            String key = StringUtils.upperCase(qTable.getTableName());
+            StatisticCacheKey key = new StatisticCacheKey(qTable.getTableName());
             String id = transactionCache.getFromCache(
                     key, String.class);
             if (id == null) {

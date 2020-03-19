@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.StatisticCacheKey;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,8 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.Serializable;
-import java.util.function.BiConsumer;
+import java.util.Objects;
+import java.util.UUID;
 
 public class OrmTransactionSynchronizationAdapter extends TransactionSynchronizationAdapter {
 
@@ -42,17 +44,29 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
         evict(evictKey);
     }
 
+
+    private void evict(String cacheValue, StatisticCacheKey key, Serializable value) {
+        if (!Objects.equals(cacheValue, value)) {
+            targetCache.evict(key);
+        }
+    }
+
+    private void afterCompletion(StatisticCacheKey key, Serializable value) {
+        String s = targetCache.get(key, String.class);
+        if (s != null) {
+            evict(s, key, value);
+        } else {
+            targetCache.put(key, value);
+        }
+    }
+
     private void afterCompletion(TransactionalCache transactionalCache) {
         if (transactionalCache != null) {
-            transactionalCache.getInternalCache().forEach(new BiConsumer<Serializable, Serializable>() {
-                @Override
-                public void accept(Serializable key, Serializable value) {
-                    Cache.ValueWrapper valueWrapper = targetCache.get(key);
-                    if (valueWrapper != null && valueWrapper.get() != null) {
-                        targetCache.evict(key);
-                    } else {
-                        targetCache.put(key, value);
-                    }
+            transactionalCache.getInternalCache().forEach((key, value) -> {
+                if (key instanceof StatisticCacheKey) {
+                    afterCompletion((StatisticCacheKey) key, value);
+                } else {
+                    targetCache.put(key, value);
                 }
             });
             transactionalCache.getEvictObjects().forEach(evictKey ->
@@ -69,6 +83,7 @@ public class OrmTransactionSynchronizationAdapter extends TransactionSynchroniza
     private void evict(CompositeKey compositeKey) {
         String key = StringUtils.upperCase(compositeKey.getTable().getTableName());
         targetCache.evict(key);
+        targetCache.put(new StatisticCacheKey(key), UUID.randomUUID().toString());
     }
 
     private void evict(Serializable evictKey) {

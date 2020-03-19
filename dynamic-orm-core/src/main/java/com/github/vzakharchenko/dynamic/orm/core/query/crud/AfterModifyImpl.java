@@ -8,6 +8,7 @@ import com.github.vzakharchenko.dynamic.orm.core.cache.event.EventFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.StatisticCacheKey;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
@@ -133,7 +134,8 @@ public class AfterModifyImpl<MODEL extends DMLModel> implements AfterModify<MODE
     @Override
     public void cleanQueryCache() {
         TransactionalCache transactionCache = queryContext.getTransactionCache();
-        transactionCache.cacheEvict(StringUtils.upperCase(qTable.getTableName()));
+        transactionCache.cacheEvict(
+                new StatisticCacheKey(StringUtils.upperCase(qTable.getTableName())));
     }
 
     private Map<CompositeKey, DiffColumnModel> softDeletedMap(

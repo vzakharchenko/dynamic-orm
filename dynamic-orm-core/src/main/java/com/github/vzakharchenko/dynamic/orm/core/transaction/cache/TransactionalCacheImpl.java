@@ -120,8 +120,6 @@ public class TransactionalCacheImpl implements TransactionalCache {
         if (transactionCache.containsKey(key)) {
             return false;
         }
-
-        targetCache.put(key, value);
         transactionCache.put(key, value);
         return true;
     }

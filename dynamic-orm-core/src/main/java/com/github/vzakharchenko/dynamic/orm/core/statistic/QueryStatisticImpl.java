@@ -1,10 +1,10 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic;
 
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.StatisticCacheHolder;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.StatisticCacheKey;
 import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.sql.RelationalPath;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -36,7 +36,7 @@ public class QueryStatisticImpl implements QueryStatistic, QueryStatisticRegistr
                                     List<? extends Serializable> primaryKeys) {
         String uuid = UUID.randomUUID().toString();
         getTables().forEach(qTable -> transactionalCache
-                .putToCache(StringUtils.upperCase(qTable.getTableName()), uuid));
+                .putToCache(new StatisticCacheKey(qTable.getTableName()), uuid));
         StatisticCacheHolder statisticCacheHolder = new StatisticCacheHolder(primaryKeys, uuid);
         transactionalCache.putToCache(sql, statisticCacheHolder);
         return statisticCacheHolder;
