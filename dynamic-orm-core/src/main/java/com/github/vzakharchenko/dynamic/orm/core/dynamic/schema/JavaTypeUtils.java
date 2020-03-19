@@ -15,9 +15,6 @@ public final class JavaTypeUtils {
 
     private static final Map<Integer, Class<?>> DEFAULT_TYPES = new HashMap<>();
 
-    private JavaTypeUtils() {
-    }
-
     // CHECKSTYLE:OFF
     static {
         registerDefault(-101, Object.class);
@@ -76,6 +73,9 @@ public final class JavaTypeUtils {
         registerDefault(Types.ROWID, Object.class);
         registerDefault(Types.STRUCT, Object.class);
 
+    }
+
+    private JavaTypeUtils() {
     }
 
     private static void registerDefault(int sqlType, Class<?> javaType) {

@@ -11,7 +11,7 @@
         <property name="validateExistingTransaction" value="true"/>
     </bean>
     <!-- enable support annotation  -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <tx:annotation-driven/>
 
     <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
         <constructor-arg name="transactionManager" ref="transactionManager"/>

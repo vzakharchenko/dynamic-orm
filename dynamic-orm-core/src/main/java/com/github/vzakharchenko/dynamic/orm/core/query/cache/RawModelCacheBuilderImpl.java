@@ -11,7 +11,6 @@ import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.Transactional
 import com.querydsl.core.types.Expression;
 import com.querydsl.sql.SQLQuery;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -37,17 +36,13 @@ public class RawModelCacheBuilderImpl extends RawModelBuilderImpl {
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(sqlQuery, queryCacheContext.getqRelatedTables());
         String sqlString = showSql(columns);
-        queryContext.getCacheContext().register(sqlString, queryStatistic);
+        StatisticCacheManagerImpl<RawModel> manager = new StatisticCacheManagerImpl<>(
+                queryContext.getTransactionCache());
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(sqlString);
         try {
-            List<RawModel> rawModels = transactionCache.getFromCache(sqlString, List.class);
-            if (rawModels == null) {
-                rawModels = rawModelBuilder.findAll(columns);
-                transactionCache.putToCache(sqlString, (Serializable) rawModels);
-            }
-
-            return rawModels;
+            return manager.get(sqlString, queryStatistic,
+                    () -> rawModelBuilder.findAll(columns));
         } finally {
             transactionCache.unLock(sqlString);
         }

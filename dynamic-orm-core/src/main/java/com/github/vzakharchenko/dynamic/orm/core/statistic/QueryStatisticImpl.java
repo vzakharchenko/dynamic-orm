@@ -1,11 +1,13 @@
 package com.github.vzakharchenko.dynamic.orm.core.statistic;
 
-import com.google.common.collect.ImmutableSet;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.StatisticCacheHolder;
+import com.github.vzakharchenko.dynamic.orm.core.transaction.cache.TransactionalCache;
+import com.google.common.collect.ImmutableList;
 import com.querydsl.sql.RelationalPath;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  *
@@ -24,7 +26,19 @@ public class QueryStatisticImpl implements QueryStatistic, QueryStatisticRegistr
     }
 
     @Override
-    public Set<RelationalPath> getTables() {
-        return ImmutableSet.copyOf(qTables);
+    public List<RelationalPath> getTables() {
+        return ImmutableList.copyOf(qTables);
     }
+
+    @Override
+    public StatisticCacheHolder get(TransactionalCache transactionalCache,
+                                    String sql,
+                                    List<? extends Serializable> primaryKeys) {
+        String uuid = UUID.randomUUID().toString();
+        qTables.forEach(qTable -> transactionalCache
+                .putToCache(StringUtils.upperCase(qTable.getTableName()), uuid));
+        return new StatisticCacheHolder(primaryKeys, uuid);
+    }
+
+
 }

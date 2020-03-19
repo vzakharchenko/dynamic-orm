@@ -21,9 +21,8 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         extends RelationalPathBase<Object> {
 
     protected final Map<String, Path<?>> columns = new LinkedHashMap<>();
-    private final Map<String, Path<?>> removedColumns = new LinkedHashMap<>();
-
     protected final Map<Path<?>, ColumnMetaDataInfo> columnMetaDataInfoMap = new HashMap<>();
+    private final Map<String, Path<?>> removedColumns = new LinkedHashMap<>();
 
 
     protected QAbstractDynamicTable(String tableName) {

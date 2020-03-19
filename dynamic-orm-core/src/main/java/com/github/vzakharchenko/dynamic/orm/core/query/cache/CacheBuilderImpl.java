@@ -31,17 +31,16 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
     @Override
     public MODEL findOneById(Serializable key) {
-        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(
-                PrimaryKeyHelper.getCompositeKey(key, qTable));
+        CompositeKey compositeKey = PrimaryKeyHelper.getCompositeKey(key, qTable);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
-        Map<Path<?>, Object> modelMap = transactionCache.getFromCache(pkCacheKey, HashMap.class);
+        Map<Path<?>, Object> modelMap = transactionCache.getFromCache(compositeKey, HashMap.class);
         if (modelMap == null) {
             MODEL model = queryContext.getOrmQueryFactory().select().findOne(findByIdQuery(key),
                     qTable, modelClass);
             modelMap = CacheHelper.buildMapFromModel(qTable, model);
             if (MapUtils.isNotEmpty(modelMap) && (softDelete == null || Objects.equals(
                     modelMap.get(softDelete.getColumn()), softDelete.getDeletedValue()))) {
-                transactionCache.putToCache(pkCacheKey, (Serializable) modelMap);
+                transactionCache.putToCache(compositeKey, (Serializable) modelMap);
             }
         }
         return CacheHelper.buildModel(qTable, modelClass, modelMap);
@@ -88,18 +87,6 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
 
     @Override
-    public <TYPE extends Serializable> LazyList<MODEL> findAllByColumn(Path<TYPE> column,
-                                                                       TYPE columnValue) {
-        return findAllByColumn(column, columnValue, false);
-    }
-
-    @Override
-    public <TYPE extends Serializable> LazyList<MODEL> findAllByColumnIsNotNull(
-            Path<TYPE> column) {
-        return findAllByColumn(column, null, true);
-    }
-
-    @Override
     public LazyList<MODEL> findAll() {
         CachedAllData cachedAllData = CacheHelper.buildAllDataCache(qTable);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
@@ -125,36 +112,9 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
     }
 
     @Override
-    public <TYPE extends Serializable> MODEL findOneByColumn(
-            Path<TYPE> column, TYPE columnValue) {
-        LazyList<MODEL> lazyList = findAllByColumn(column, columnValue, false);
-        if (lazyList.size() == 0) {
-            return null;
-        } else if (lazyList.size() > SIZE) {
-            throw new IllegalStateException("found " + lazyList.size() + " but expected 1");
-        }
-
-        return lazyList.getModelList().get(0);
-    }
-
-    @Override
-    public <TYPE extends Serializable> MODEL findOneByColumnIsNotNull(Path<TYPE> column) {
-        LazyList<MODEL> lazyList = findAllByColumn(column, null, true);
-        if (lazyList.size() == 0) {
-            return null;
-        } else if (lazyList.size() > SIZE) {
-            throw new IllegalStateException("found " + lazyList.size() + " but expected 1");
-        }
-
-        return lazyList.getModelList().get(0);
-    }
-
-
-    @Override
     public boolean isPresentInCache(Serializable key) {
-        PrimaryKeyCacheKey pkCacheKey = CacheHelper.buildPrimaryKeyCacheKey(
-                PrimaryKeyHelper.getCompositeKey(key, qTable));
+        CompositeKey compositeKey = PrimaryKeyHelper.getCompositeKey(key, qTable);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
-        return transactionCache.isInCache(pkCacheKey);
+        return transactionCache.isInCache(compositeKey);
     }
 }

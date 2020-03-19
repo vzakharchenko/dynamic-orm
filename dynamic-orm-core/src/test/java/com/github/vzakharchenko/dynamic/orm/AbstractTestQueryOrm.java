@@ -14,10 +14,14 @@ import org.springframework.cache.CacheManager;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import javax.sql.DataSource;
@@ -29,6 +33,7 @@ import java.util.Map;
 /**
  *
  */
+@Commit
 public abstract class AbstractTestQueryOrm
         extends AbstractTransactionalTestNGSpringContextTests {
 
@@ -152,4 +157,5 @@ public abstract class AbstractTestQueryOrm
             return beans;
         }
     }
+
 }

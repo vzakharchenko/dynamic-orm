@@ -39,25 +39,21 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     public <MODEL extends DMLModel> List<MODEL> findAll(SQLCommonQuery<?> sqlQuery,
                                                         RelationalPath<?> qTable,
                                                         Class<MODEL> modelClass) {
-        SQLCommonQuery<?> sqlQuery0 = sqlQuery;
-        sqlQuery0 = validateQuery(sqlQuery0, qTable, modelClass);
+        SQLCommonQuery<?> sqlQuery0 = validateQuery(sqlQuery, qTable, modelClass);
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(DBHelper.castProjectionQueryToSqlQuery(sqlQuery0),
                         queryCacheContext.getqRelatedTables());
+        StatisticCacheManagerImpl<CompositeKey> manager = new StatisticCacheManagerImpl<>(
+                queryContext.getTransactionCache());
         List<? extends Path<?>> primaryKeyColumns = PrimaryKeyHelper.getPrimaryKeyColumns(qTable);
         String sqlString = showListSql(sqlQuery0, primaryKeyColumns);
-        queryContext.getCacheContext().register(sqlString, queryStatistic);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(sqlString);
         try {
-            List<CompositeKey> primaryKeys = transactionCache.getFromCache(sqlString, List.class);
-
-            if (primaryKeys == null) {
-                primaryKeys = selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns);
-                transactionCache.putToCache(sqlString, (Serializable) primaryKeys);
-            }
+            List<CompositeKey> compositeKeys = manager.get(sqlString, queryStatistic, () ->
+                    selectPrimaryKeys(sqlQuery0, qTable, primaryKeyColumns));
             LazyList<MODEL> lazyList = ModelLazyListFactory.buildLazyList(qTable,
-                    primaryKeys, modelClass, queryContext);
+                    compositeKeys, modelClass, queryContext);
             return lazyList.getModelList();
         } finally {
             transactionCache.unLock(sqlString);
@@ -81,24 +77,20 @@ public class SelectCacheBuilderImpl extends SelectBuilderImpl implements SelectC
     }
 
     @Override
-    public <TYPE> List<TYPE> findAll(SQLCommonQuery<?> sqlQuery,
-                                     Expression<TYPE> expression) {
+    public <TYPE extends Serializable>
+    List<TYPE> findAll(SQLCommonQuery<?> sqlQuery,
+                       Expression<TYPE> expression) {
         QueryStatistic queryStatistic = QueryStatisticFactory
                 .buildStatistic(DBHelper.castProjectionQueryToSqlQuery(sqlQuery),
                         queryCacheContext.getqRelatedTables());
+        StatisticCacheManagerImpl<TYPE> manager = new StatisticCacheManagerImpl<>(
+                queryContext.getTransactionCache());
         String key = showSql(sqlQuery, expression);
-        queryContext.getCacheContext().register(key, queryStatistic);
         TransactionalCache transactionCache = queryContext.getTransactionCache();
         transactionCache.lock(key);
         try {
-            List<TYPE> cached = transactionCache.getFromCache(key, List.class);
-
-            if (cached == null) {
-                cached = selectBuilder.findAll(sqlQuery, expression);
-                transactionCache.putToCache(key, (Serializable) cached);
-            }
-
-            return cached;
+            return manager.get(key, queryStatistic, () -> selectBuilder
+                    .findAll(sqlQuery, expression));
         } finally {
             transactionCache.unLock(key);
         }

@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
-import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import org.springframework.cache.Cache;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -67,6 +67,11 @@ public class TransactionalCacheImpl implements TransactionalCache {
     }
 
     @Override
+    public void putToTargetCache(Serializable key, Serializable value) {
+        targetCache.put(key, value);
+    }
+
+    @Override
     public void cacheEvict(Serializable key) {
         transactionCache.remove(key);
         evictValues.put(key, key);
@@ -75,23 +80,23 @@ public class TransactionalCacheImpl implements TransactionalCache {
     }
 
     @Override
-    public void deleteModel(PrimaryKeyCacheKey key) {
+    public void deleteModel(CompositeKey key) {
         cacheEvict(key);
-        cacheEvict(new CachedAllData(key.getTableName()));
+        cacheEvict(new CachedAllData(key.getTable()));
         deletedObjects.put(key, key);
         insertedObjects.remove(key);
         updatedObjects.remove(key);
     }
 
     @Override
-    public void insertModel(PrimaryKeyCacheKey key) {
-        cacheEvict(new CachedAllData(key.getTableName()));
+    public void insertModel(CompositeKey key) {
+        cacheEvict(new CachedAllData(key.getTable()));
         insertedObjects.put(key, key);
     }
 
     @Override
-    public void updateModel(PrimaryKeyCacheKey key) {
-        cacheEvict(new CachedAllData(key.getTableName()));
+    public void updateModel(CompositeKey key) {
+        cacheEvict(new CachedAllData(key.getTable()));
         cacheEvict(key);
         updatedObjects.put(key, key);
     }

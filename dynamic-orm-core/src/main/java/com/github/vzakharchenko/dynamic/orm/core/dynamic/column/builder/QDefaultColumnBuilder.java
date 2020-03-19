@@ -15,8 +15,8 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
         BUILDER_TYPE extends QColumnBuilder<QTableColumn, ?>>
         implements QColumnBuilder<QTableColumn, BUILDER_TYPE> {
     protected final COLUMN_TYPE columnType;
-    private final QTableColumnContext qTableColumn;
     protected final QDynamicTable qDynamicTable;
+    private final QTableColumnContext qTableColumn;
 
     protected QDefaultColumnBuilder(QTableColumnContext qTableColumnContext,
                                     QDynamicTable dynamicTable, String columnName) {

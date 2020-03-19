@@ -1,7 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.PrimaryKeyCacheKey;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.helper.DBHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import org.slf4j.Logger;
@@ -118,6 +118,11 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
+    public void putToTargetCache(Serializable key, Serializable value) {
+        targetCache.put(key, value);
+    }
+
+    @Override
     public void cacheEvict(Serializable key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
@@ -128,7 +133,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void deleteModel(PrimaryKeyCacheKey key) {
+    public void deleteModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.deleteModel(key);
@@ -138,7 +143,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void insertModel(PrimaryKeyCacheKey key) {
+    public void insertModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.insertModel(key);
@@ -148,7 +153,7 @@ public class TransactionalCacheDecorator implements TransactionalCache {
     }
 
     @Override
-    public void updateModel(PrimaryKeyCacheKey key) {
+    public void updateModel(CompositeKey key) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionalCache transactionalCache = getTransactionCache();
             transactionalCache.updateModel(key);

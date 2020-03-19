@@ -28,8 +28,8 @@ public abstract class AbstractDeleteBuilder<MODEL extends DMLModel> implements D
     protected final Class<MODEL> modelClass;
 
     protected final RelationalPath<?> qTable;
-    protected Path<?> versionColumn;
     protected final AfterModify<MODEL> afterModify;
+    protected Path<?> versionColumn;
 
     protected AbstractDeleteBuilder(Class<MODEL> modelClass, RelationalPath<?> qTable,
                                     QueryContextImpl queryContext) {
@@ -38,7 +38,6 @@ public abstract class AbstractDeleteBuilder<MODEL extends DMLModel> implements D
         this.queryContext = queryContext;
         this.afterModify = new AfterModifyImpl<>(qTable, modelClass, queryContext);
     }
-
 
 
     public Long deleteByIds0(List<Serializable> ids) {

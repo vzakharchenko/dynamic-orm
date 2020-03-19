@@ -1,10 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
-import com.github.vzakharchenko.dynamic.orm.core.cache.*;
+import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
+import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumn;
+import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumnWithValue;
+import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
-import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.MapUtils;
@@ -21,19 +23,14 @@ import java.util.Map;
  */
 public abstract class CacheHelper {
 
-    public static void checkModelIsDeleted(
-            QueryContextImpl queryContext, DMLModel model, RelationalPath<?> qTable) {
-        PrimaryKeyCacheKey primaryKeyCacheKey = buildPrimaryKeyCacheModel(model, qTable);
-        if (queryContext.getTransactionCache().isDeleted(primaryKeyCacheKey)) {
-            throw new IllegalStateException(qTable + ":" + model + "is deleted");
-        }
-    }
+//    public static void checkModelIsDeleted(
+//            QueryContextImpl queryContext, DMLModel model, RelationalPath<?> qTable) {
+//        CompositeKey primaryKeyCacheKey = buildPrimaryKeyCacheModel(model, qTable);
+//        if (queryContext.getTransactionCache().isDeleted(primaryKeyCacheKey)) {
+//            throw new IllegalStateException(qTable + ":" + model + "is deleted");
+//        }
+//    }
 
-
-    public static PrimaryKeyCacheKey buildPrimaryKeyCacheKey(
-            CompositeKey key) {
-        return new PrimaryKeyCacheKey(key);
-    }
 
     public static CachedAllData buildAllDataCache(RelationalPath<?> qTable) {
         return new CachedAllData(qTable);
@@ -48,14 +45,10 @@ public abstract class CacheHelper {
         return new CachedColumn(column);
     }
 
-    public static CachedAllData buildCachedAllData(RelationalPath<?> qTable) {
-        return new CachedAllData(qTable);
-    }
-
-    public static PrimaryKeyCacheKey buildPrimaryKeyCacheModel(
+    public static CompositeKey buildPrimaryKeyCacheModel(
             DMLModel model, RelationalPath<?> qTable) {
-        return new PrimaryKeyCacheKey(PrimaryKeyHelper
-                .getPrimaryKeyValues(model, qTable));
+        return PrimaryKeyHelper
+                .getPrimaryKeyValues(model, qTable);
     }
 
     public static <MODEL extends DMLModel> MODEL newInstance(

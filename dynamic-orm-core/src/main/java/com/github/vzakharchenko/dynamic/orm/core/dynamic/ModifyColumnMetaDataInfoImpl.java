@@ -20,8 +20,18 @@ public class ModifyColumnMetaDataInfoImpl
     }
 
     @Override
+    public void setColumn(Path column) {
+        this.column = column;
+    }
+
+    @Override
     public Integer getSize() {
         return size == null ? columnMetaDataInfo.getSize() : size;
+    }
+
+    @Override
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     @Override
@@ -35,6 +45,11 @@ public class ModifyColumnMetaDataInfoImpl
     }
 
     @Override
+    public void setDecimalDigits(Integer decimalDigits) {
+        this.decimalDigits = decimalDigits;
+    }
+
+    @Override
     public Boolean isNullable() {
         return nullable == null ? columnMetaDataInfo.isNullable() : nullable;
     }
@@ -42,21 +57,6 @@ public class ModifyColumnMetaDataInfoImpl
     @Override
     public Boolean isPrimaryKey() {
         return columnMetaDataInfo.isPrimaryKey();
-    }
-
-    @Override
-    public void setColumn(Path column) {
-        this.column = column;
-    }
-
-    @Override
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    @Override
-    public void setDecimalDigits(Integer decimalDigits) {
-        this.decimalDigits = decimalDigits;
     }
 
     @Override
