@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.github.vzakharchenko</groupId>
             <artifactId>dynamic-orm-core</artifactId>
-            <version>1.1.1</version>
+            <version>1.2.2</version>
         </dependency>
     </dependencies>
 ```
@@ -695,7 +695,7 @@ pom.xml
             <plugin>
                 <groupId>com.github.vzakharchenko</groupId>
                 <artifactId>dynamic-orm-plugin</artifactId>
-                <version>1.1.1</version>
+                <version>1.2.2</version>
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
