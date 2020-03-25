@@ -10,6 +10,7 @@
  - Oracle
  - Postgres
  - MySQL
+ - MariaDB
  - Hsql
  - H2
  - Derby
