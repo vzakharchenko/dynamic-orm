@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.github.vzakharchenko</groupId>
             <artifactId>dynamic-orm-core</artifactId>
-            <version>1.2.2</version>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 ```
@@ -161,7 +161,7 @@ public class SpringAnnotationTest extends CachingConfigurerSupport {
                  OrmQueryFactoryInit.create(dataSource())
                 .transactionCacheManager(new TransactionCacheManagerImpl(cacheManager()))
                 .transactionalEventPublisher(transactionAwareApplicationEventPublisher) // event publisher
-                .debug() // show all sql queries in console
+                .debug() // show all sql queries in logger
                 .cacheRegion("cache-orm") // cache region
                 .transactionManager(transactionNameManager)
                 .build();
@@ -795,7 +795,7 @@ pom.xml
             <plugin>
                 <groupId>com.github.vzakharchenko</groupId>
                 <artifactId>dynamic-orm-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.3.0</version>
                 <configuration>
                     <targetQModelFolder>${targetFolder}</targetQModelFolder>
                     <modelPackage>${ModelPackage}</modelPackage>
