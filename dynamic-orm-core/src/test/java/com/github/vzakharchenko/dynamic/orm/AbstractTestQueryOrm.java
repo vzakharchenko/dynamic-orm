@@ -104,6 +104,7 @@ public abstract class AbstractTestQueryOrm
         for (DbStructureService dbStructureService : dbStructureServices) {
             dbStructureService.clear();
         }
+        qDynamicTableFactory.clear();
         checkConnectionLeaks();
 
     }

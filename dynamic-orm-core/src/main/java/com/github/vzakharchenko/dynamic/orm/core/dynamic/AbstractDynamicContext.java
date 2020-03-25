@@ -44,6 +44,7 @@ public class AbstractDynamicContext {
         for (QDynamicTable qDynamicTable : qDynamicTables) {
             qDynamicTableMap.put(StringUtils.upperCase(
                     qDynamicTable.getTableName()), qDynamicTable);
+            qDynamicTable.reInit();
         }
         updateCache(qDynamicTableMap, cacheName);
     }

@@ -37,6 +37,11 @@ public class QDynamicTable extends QAbstractSetColumnDynamicTable<QDynamicTable>
         super(StringUtils.upperCase(tableName));
     }
 
+    @Override
+    protected void init() {
+        removedIndexList.clear();
+    }
+
     // CHECKSTYLE:OFF
     @Override
     public boolean equals(Object o) { //NOPMD

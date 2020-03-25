@@ -167,6 +167,14 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         return this.removedForeignKeys;
     }
 
+    protected abstract void init();
+
+    public void reInit() {
+        deletedColumns().clear();
+        deletedForeignKeys().clear();
+        init();
+    }
+
     public void removeForeignKey(List<Path<?>> localColumns) {
         List<ForeignKey<?>> foreignKeys = getForeignKeys().stream().filter(
                 (Predicate<ForeignKey<?>>) foreignKey ->
