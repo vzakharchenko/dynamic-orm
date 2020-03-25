@@ -68,12 +68,13 @@ public class DebugSpringAnnotationTest extends CachingConfigurerSupport {
 
     @Bean()
     public OrmQueryFactory ormQueryFactory() {
-        OrmQueryFactory ormQueryFactory = OrmQueryFactoryInit.create(dataSource())
+        return OrmQueryFactoryInit.create(dataSource())
                 .transactionCacheManager(new TransactionCacheManagerImpl(cacheManager()))
-                .transactionalEventPublisher(transactionAwareApplicationEventPublisher)
-                .debug().cacheRegion("cache-orm")
-                .transactionManager(transactionNameManager).build();
-        return ormQueryFactory;
+                .transactionalEventPublisher(transactionAwareApplicationEventPublisher) // event publisher
+                .debug() // show all sql queries in console
+                .cacheRegion("cache-orm") // cache region
+                .transactionManager(transactionNameManager)
+                .build();
     }
 
     @Bean()
