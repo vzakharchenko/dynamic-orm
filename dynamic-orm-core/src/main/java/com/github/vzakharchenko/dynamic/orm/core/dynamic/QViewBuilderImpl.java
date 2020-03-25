@@ -34,7 +34,7 @@ public class QViewBuilderImpl implements QViewBuilder {
     }
 
     @Override
-    public QDynamicTableFactory finish() {
+    public QDynamicTableFactory addView() {
         dynamicBuilderContext.getViewSequances().put(viewModel.getName(), viewModel);
         return dynamicBuilderContext;
     }

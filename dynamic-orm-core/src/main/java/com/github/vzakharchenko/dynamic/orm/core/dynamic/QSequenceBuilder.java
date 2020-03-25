@@ -9,5 +9,5 @@ public interface QSequenceBuilder {
 
     QSequenceBuilder max(Long maxValue);
 
-    QDynamicTableFactory finish();
+    QDynamicTableFactory addSequence();
 }

@@ -1,6 +1,7 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.pk.QPrimaryKeyBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.querydsl.core.types.Path;
@@ -18,14 +19,25 @@ public class QPrimaryKeyBuilderImpl implements QPrimaryKeyBuilder {
 
 
     @Override
-    public QPrimaryKeyBuilder addPrimaryKey(Path path) {
-        dynamicTable.addPrimaryKey(path);
+    public QPrimaryKeyBuilder addPrimaryKey(Path column) {
+        dynamicTable.modifyPrimaryKey(column, false);
         return this;
+    }
+
+    @Override
+    public QPrimaryKeyBuilder removePrimaryKey(Path column) {
+        return removePrimaryKey(ModelHelper.getColumnName(column));
     }
 
     @Override
     public QPrimaryKeyBuilder addPrimaryKey(String columnName) {
         dynamicTable.addPrimaryKey(columnName);
+        return this;
+    }
+
+    @Override
+    public QPrimaryKeyBuilder removePrimaryKey(String columnName) {
+        dynamicTable.removePrimaryKey(columnName);
         return this;
     }
 
@@ -40,7 +52,7 @@ public class QPrimaryKeyBuilderImpl implements QPrimaryKeyBuilder {
     }
 
     @Override
-    public QTableBuilder finish() {
+    public QTableBuilder endPrimaryKey() {
         return tableBuilder;
     }
 }

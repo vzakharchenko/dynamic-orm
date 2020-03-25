@@ -49,11 +49,11 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicInsert() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
-                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
-                .finish().buildSchema();
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().createColumn()
+                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
+                .endBuildTables().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
         ormQueryFactory.modify(qDynamicTable)
@@ -67,12 +67,12 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicPresetInsert() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
-                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().createColumn()
+                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
                 .addVersionColumn("VERSION")
-                .finish().buildSchema();
+                .endBuildTables().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
         ormQueryFactory.insert(testTableVersion);
@@ -196,11 +196,11 @@ public class VersionTest extends OracleTestQueryOrm {
     @Test
     public void testDynamicUpdate() {
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
-                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
-                .finish().buildSchema();
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().createColumn()
+                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
+                .endBuildTables().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
         CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable)
@@ -230,11 +230,11 @@ public class VersionTest extends OracleTestQueryOrm {
 
         ormQueryFactory.transactionManager().startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("TEST_DYNAMIC_TABLE")
-                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().create()
-                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
-                .finish().buildSchema();
+                .columns().addStringColumn("ID").size(100).useAsPrimaryKey().createColumn()
+                .addNumberColumn("VERSION", Integer.class).size(38).decimalDigits(0).notNull().createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
+                .endBuildTables().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("TEST_DYNAMIC_TABLE");
         DynamicTableModel testTableVersion = new DynamicTableModel(qDynamicTable);
         CrudBuilder<DynamicTableModel> builder = ormQueryFactory.modify(qDynamicTable)

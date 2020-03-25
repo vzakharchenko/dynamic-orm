@@ -19,12 +19,12 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).endPrimaryKey()
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
     }
 
     @Test
@@ -71,12 +71,12 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     public void testDeleteDynamicCompositeIds() {
         qDynamicTableFactory.buildTables("DynamicTable2")
                 .columns()
-                .addStringColumn("Id1").size(255).useAsPrimaryKey().create()
-                .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .addStringColumn("Id1").size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("Id2").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
 
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
         DynamicTableModel dynamicTableModel1 = new DynamicTableModel(dynamicTable);
@@ -105,14 +105,14 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     public void testSoftDeleteDynamicCompositeIds() {
         qDynamicTableFactory.buildTables("DynamicTable2")
                 .columns()
-                .addStringColumn("Id1").size(255).useAsPrimaryKey().create()
-                .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addBooleanColumn("softDelete").create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
+                .addStringColumn("Id1").size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("Id2").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addBooleanColumn("softDelete").createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
                 .addSoftDeleteColumn("softDelete",true,false)
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
 
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
         DynamicTableModel dynamicTableModel1 = new DynamicTableModel(dynamicTable);
@@ -204,11 +204,11 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
 
         qDynamicTableFactory.buildTables("DynamicTable2")
                 .columns()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
                 .addVersionColumn("modificationTime")
-                .finish()
+                .endBuildTables()
                 .buildSchema();
 
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
@@ -230,11 +230,11 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
 
         qDynamicTableFactory.buildTables("DynamicTable2")
                 .columns()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
                 .addVersionColumn("modificationTime")
-                .finish()
+                .endBuildTables()
                 .buildSchema();
 
         QDynamicTable dynamicTable = qDynamicTableFactory.getQDynamicTableByName("DynamicTable2");
@@ -267,79 +267,79 @@ public class CrudTest extends DebugAnnotationTestQueryOrm {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed1() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addStringColumn(null).create();
+                .columns().addStringColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed2() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addDateTimeColumn(null).create();
+                .columns().addDateTimeColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed3() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addNumberColumn(null, null).create();
+                .columns().addNumberColumn(null, null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed4() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addNumberColumn("dsfs", null).create();
+                .columns().addNumberColumn("dsfs", null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed5() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addDateColumn(null).create();
+                .columns().addDateColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed6() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addDateTimeColumn(null).create();
+                .columns().addDateTimeColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed7() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addBooleanColumn(null).create();
+                .columns().addBooleanColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed8() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addClobColumn(null).create();
+                .columns().addClobColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed9() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addBlobColumn(null).create();
+                .columns().addBlobColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed10() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .columns().addTimeColumn(null).create();
+                .columns().addTimeColumn(null).createColumn();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed11() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .addPrimaryKey().addPrimaryKeyGenerator(null);
+                .primaryKey().addPrimaryKeyGenerator(null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed12() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addPrimaryKey().addPrimaryKey((String) null);
+                .primaryKey().addPrimaryKey((String) null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFailed13() {
         qDynamicTableFactory.buildTables("DynamicTable1")
-                .addPrimaryKey().addPrimaryKey((String) null);
+                .primaryKey().addPrimaryKey((String) null);
     }
 
     @Test(expectedExceptions = IllegalStateException.class)

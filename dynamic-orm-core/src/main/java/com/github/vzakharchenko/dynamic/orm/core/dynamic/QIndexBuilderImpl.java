@@ -32,12 +32,18 @@ public class QIndexBuilderImpl implements QIndexBuilder {
     }
 
     @Override
-    public QTableBuilder buildIndex() {
+    public QTableBuilder addIndex() {
         return buildIndex(false);
     }
 
     @Override
-    public QTableBuilder buildUniqueIndex() {
+    public QTableBuilder addUniqueIndex() {
         return buildIndex(true);
+    }
+
+    @Override
+    public QTableBuilder drop() {
+        dynamicTable.removeIndex(localColumns);
+        return tableBuilder;
     }
 }

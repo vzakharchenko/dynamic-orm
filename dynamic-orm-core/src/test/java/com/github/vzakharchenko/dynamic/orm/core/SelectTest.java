@@ -1,6 +1,5 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
-import com.github.vzakharchenko.dynamic.orm.AnnotationTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
 import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
@@ -12,8 +11,6 @@ import com.github.vzakharchenko.dynamic.orm.qModel.QTestTableVersionAnnotation;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.core.types.dsl.Wildcard;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -27,12 +24,12 @@ public class SelectTest extends OracleTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).endPrimaryKey()
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
     }
 
     @Test

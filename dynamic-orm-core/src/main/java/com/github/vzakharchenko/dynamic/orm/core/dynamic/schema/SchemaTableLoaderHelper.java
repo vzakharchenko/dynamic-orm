@@ -28,7 +28,7 @@ public final class SchemaTableLoaderHelper {
                         ClassHelper.getClassType(schemaColumn.getaType()), metadata));
         builder.jdbcType(schemaColumn.getJdbcType()).nullable(schemaColumn.getNullable())
                 .size(schemaColumn.getSize())
-                .decimalDigits(schemaColumn.getDecimalDigits()).create();
+                .decimalDigits(schemaColumn.getDecimalDigits()).createColumn();
     }
 
     private static void loadGenerator(QTableBuilder qTableBuilder, SchemaTable schemaTable) {
@@ -44,7 +44,7 @@ public final class SchemaTableLoaderHelper {
             } else {
                 pkGenerator = primaryKeyGenerators.getPkGenerator();
             }
-            qTableBuilder.addPrimaryKey().addPrimaryKeyGenerator(pkGenerator);
+            qTableBuilder.primaryKey().addPrimaryKeyGenerator(pkGenerator);
         }
     }
 
@@ -53,7 +53,7 @@ public final class SchemaTableLoaderHelper {
                                         List<SchemaPrimaryKey> primaryKeys) {
         if (primaryKeys != null) {
             primaryKeys.forEach(schemaPrimaryKey -> qTableBuilder
-                    .addPrimaryKey().addPrimaryKey(schemaPrimaryKey.getColumn())
+                    .primaryKey().addPrimaryKey(schemaPrimaryKey.getColumn())
             );
             loadGenerator(qTableBuilder, schemaTable);
         }
@@ -69,12 +69,12 @@ public final class SchemaTableLoaderHelper {
         if (indices != null) {
             indices.forEach(schemaIndex -> {
                 QIndexBuilder builder = qTableBuilder
-                        .addIndex(schemaIndex.getColumns().toArray(new String[0]));
+                        .index(schemaIndex.getColumns().toArray(new String[0]));
                 clusteredIndex(builder, schemaIndex);
                 if (schemaIndex.getUniq()) {
-                    builder.buildUniqueIndex();
+                    builder.addUniqueIndex();
                 } else {
-                    builder.buildIndex();
+                    builder.addIndex();
                 }
             });
         }
@@ -125,7 +125,7 @@ public final class SchemaTableLoaderHelper {
             loadIndices(qTableBuilder, schemaTable.getIndices());
             softDeletedColumn(qTableBuilder, schemaTable.getSoftDeleteColumn());
             versionColumn(qTableBuilder, schemaTable.getVersionColumn());
-            qTableBuilder.finish();
+            qTableBuilder.endBuildTables();
         });
     }
 }

@@ -27,23 +27,23 @@ public class ConcurrentSelectCacheTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory
 
                 .buildTables("DynamicTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).endPrimaryKey()
                 .addVersionColumn("modificationTime")
 
                 .buildNextTable("DynamicTable2")
                 .columns()
-                .addStringColumn("Id1").size(255).useAsPrimaryKey().create()
-                .addStringColumn("Id2").size(255).useAsPrimaryKey().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .finish()
+                .addStringColumn("Id1").size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("Id2").size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .endColumns()
                 .addVersionColumn("modificationTime")
 
-                .finish().buildSchema();
+                .endBuildTables().buildSchema();
         ormQueryFactory.transactionManager().commit();
     }
 

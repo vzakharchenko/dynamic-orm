@@ -3,12 +3,13 @@ package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 import com.querydsl.core.types.Path;
 
 public class ModifyColumnMetaDataInfoImpl
-        implements ColumnMetaDataInfo, ModifyColumnMetaDataInfo {
+        implements ModifyColumnMetaDataInfo {
     private final ColumnMetaDataInfo columnMetaDataInfo;
     private Path column;
     private Integer size;
     private Integer decimalDigits;
     private Boolean nullable;
+    private Boolean primaryKey;
 
     public ModifyColumnMetaDataInfoImpl(ColumnMetaDataInfo columnMetaDataInfo) {
         this.columnMetaDataInfo = columnMetaDataInfo;
@@ -56,7 +57,12 @@ public class ModifyColumnMetaDataInfoImpl
 
     @Override
     public Boolean isPrimaryKey() {
-        return columnMetaDataInfo.isPrimaryKey();
+        return primaryKey == null ? columnMetaDataInfo.isPrimaryKey() : primaryKey;
+    }
+
+    @Override
+    public void setPrimaryKey(Boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     @Override

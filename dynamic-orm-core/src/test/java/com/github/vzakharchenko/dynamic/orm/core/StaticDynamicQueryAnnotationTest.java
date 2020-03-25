@@ -31,14 +31,14 @@ public class StaticDynamicQueryAnnotationTest extends AnnotationTestQueryOrm {
         transactionManager.startTransactionIfNeeded();
         // build dynamic Table with foreign Key to Static Table
         qDynamicTableFactory.buildTables("relatedTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addNumberColumn("StaticId", Integer.class).create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addNumberColumn("StaticId", Integer.class).createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
                 .addVersionColumn("modificationTime")
-                .addForeignKey("StaticId").buildForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation, QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
-                .finish().buildSchema();
+                .foreignKey("StaticId").addForeignKey(QTestTableVersionAnnotation.qTestTableVersionAnnotation, QTestTableVersionAnnotation.qTestTableVersionAnnotation.id)
+                .endBuildTables().buildSchema();
 
         // get dynamic table metadata
         QDynamicTable relatedTable = qDynamicTableFactory.getQDynamicTableByName("relatedTable");

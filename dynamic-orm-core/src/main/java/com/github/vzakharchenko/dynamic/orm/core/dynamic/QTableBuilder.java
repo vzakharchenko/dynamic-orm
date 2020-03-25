@@ -14,34 +14,97 @@ import java.io.Serializable;
  */
 public interface QTableBuilder {
 
+    /**
+     * add/modify/drop column
+     *
+     * @return Column builder
+     */
     QTableColumn columns();
 
-    QPrimaryKeyBuilder addPrimaryKey();
+    /**
+     * add primary key for table
+     * add column to composite primary key
+     * remove column from primary key
+     *
+     * @return primary key builder
+     */
+    QPrimaryKeyBuilder primaryKey();
 
-    QForeignKeyBuilder addForeignKey(String... localColumns);
+    /**
+     * add foreign Key
+     *
+     * @param localColumns - column names
+     *                     you should create columns first using method columns()
+     * @return foreign Key builder
+     */
+    QForeignKeyBuilder foreignKey(String... localColumns);
 
-    QForeignKeyBuilder addForeignKeyPath(Path<?>... localColumns);
+    /**
+     * add foreign Key
+     *
+     * @param localColumns - columns
+     * @return foreign Key builder
+     */
+    QForeignKeyBuilder foreignKeyPath(Path<?>... localColumns);
 
-    QIndexBuilder addIndex(String... localColumns);
+    /**
+     * create/drop sql index
+     *
+     * @param localColumns - columns
+     * @return Index builder
+     */
+    QIndexBuilder index(String... localColumns);
 
-    QIndexBuilder addIndex(Path<?>... localColumns);
+    /**
+     * create/drop sql index
+     *
+     * @param localColumns - columns
+     * @return Index builder
+     */
+    QIndexBuilder index(Path<?>... localColumns);
 
+    /**
+     * mark column as  Optimistic Locking
+     *
+     * @param columnName column Name
+     * @return table builder
+     */
     QTableBuilder addVersionColumn(
             String columnName);
 
+    /**
+     * mark column as  Optimistic Locking
+     *
+     * @param versionColumn column
+     * @return table builder
+     */
     QTableBuilder addVersionColumn(Path<?> versionColumn);
 
+    /**
+     * mark column as soft delete column
+     * soft deletion means not real deletion of the record, but simply marks the record as deleted
+     *
+     * @param columnName   column name
+     * @param value        deleted value
+     * @param defaultValue not deleted value
+     * @return table builder
+     */
     QTableBuilder addSoftDeleteColumn(
             String columnName, Serializable value, Serializable defaultValue);
 
     /**
-     * batch build table
+     * build next table
      *
-     * @param tableName
-     * @return
+     * @param tableName name of next table
+     * @return build next table
      */
     QTableBuilder buildNextTable(String tableName);
 
-    QDynamicTableFactory finish();
+    /**
+     * return to table factory
+     *
+     * @return Dynamic Builder Factory
+     */
+    QDynamicTableFactory endBuildTables();
 
 }

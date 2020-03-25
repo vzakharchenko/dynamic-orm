@@ -18,10 +18,10 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory
                 .buildTables("testDynamicTableWithCompositeKey")
                 .columns().addNumberColumn("id1", Integer.class)
-                .useAsPrimaryKey().create()
-                .addStringColumn("id2").size(255).useAsPrimaryKey().create()
-                .addStringColumn("testColumn").size(255).create()
-                .finish().finish().buildSchema();
+                .useAsPrimaryKey().createColumn()
+                .addStringColumn("id2").size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("testColumn").size(255).createColumn()
+                .endColumns().endBuildTables().buildSchema();
     }
 
     public void createSchemaRelatedTable() {
@@ -29,13 +29,13 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory
                 .buildTables("testDynamicTableRelated")
                 .columns().addNumberColumn("id", Integer.class)
-                .useAsPrimaryKey().create()
-                .addNumberColumn("id1", Integer.class).notNull().create()
-                .addStringColumn("id2").size(255).notNull().create()
-                .addStringColumn("testColumn").size(255).create()
-                .finish()
-                .addForeignKey("id1", "id2").buildForeignKey("testDynamicTableWithCompositeKey")
-                .finish()
+                .useAsPrimaryKey().createColumn()
+                .addNumberColumn("id1", Integer.class).notNull().createColumn()
+                .addStringColumn("id2").size(255).notNull().createColumn()
+                .addStringColumn("testColumn").size(255).createColumn()
+                .endColumns()
+                .foreignKey("id1", "id2").addForeignKey("testDynamicTableWithCompositeKey")
+                .endBuildTables()
                 .buildSchema();
     }
 
@@ -44,13 +44,13 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory
                 .buildTables("testDynamicTableRelated")
                 .columns().addNumberColumn("id", Integer.class)
-                .useAsPrimaryKey().create()
-                .addNumberColumn("id1", Integer.class).notNull().create()
-                .addStringColumn("id2").size(255).notNull().create()
-                .addStringColumn("testColumn").size(255).create()
-                .finish()
-                .addForeignKey("id1", "id2").buildForeignKey("testDynamicTableWithCompositeKey","id1", "id2")
-                .finish()
+                .useAsPrimaryKey().createColumn()
+                .addNumberColumn("id1", Integer.class).notNull().createColumn()
+                .addStringColumn("id2").size(255).notNull().createColumn()
+                .addStringColumn("testColumn").size(255).createColumn()
+                .endColumns()
+                .foreignKey("id1", "id2").addForeignKey("testDynamicTableWithCompositeKey", "id1", "id2")
+                .endBuildTables()
                 .buildSchema();
     }
 
@@ -221,6 +221,76 @@ public class DynamicCompositeKeyTest extends DebugAnnotationTestQueryOrm {
         dynamicTableModel2.addColumnValue("Id2", "2");
         dynamicTableModel2.addColumnValue("testColumn", "test");
         ormQueryFactory.insert(dynamicTableModel2);
+
+    }
+
+    @Test
+    public void compositeRemoveTest() {
+        createSchema();
+
+        QDynamicTable table = qDynamicTableFactory
+                .getQDynamicTableByName("testDynamicTableWithCompositeKey");
+        // insert Data with Composite
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
+        dynamicTableModel.addColumnValue("Id1", 1);
+        dynamicTableModel.addColumnValue("Id2", "2");
+        dynamicTableModel.addColumnValue("testColumn", "test");
+        ormQueryFactory.insert(dynamicTableModel);
+
+
+        //  remove Id2 from primary key
+        qDynamicTableFactory
+                .buildTables(table.getTableName())
+                .primaryKey()
+                .removePrimaryKey(table.getColumnByName("Id2"))
+                .endPrimaryKey()
+                .endBuildTables().buildSchema();
+        //  set column Id2 as nullable
+        qDynamicTableFactory
+                .buildTables(table.getTableName())
+                .columns().modifyColumn().nullable("Id2").finish().endColumns()
+                .endBuildTables().buildSchema();
+
+        // insert Data without Id2
+        DynamicTableModel dynamicTableModel1 = new DynamicTableModel(table);
+        dynamicTableModel1.addColumnValue("Id1", 1);
+        dynamicTableModel1.addColumnValue("testColumn", "test");
+        ormQueryFactory.insert(dynamicTableModel1);
+
+    }
+
+    @Test
+    public void compositeRemoveTest2() {
+        createSchema();
+
+        QDynamicTable table = qDynamicTableFactory
+                .getQDynamicTableByName("testDynamicTableWithCompositeKey");
+        // insert Data with Composite
+        DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
+        dynamicTableModel.addColumnValue("Id1", 1);
+        dynamicTableModel.addColumnValue("Id2", "2");
+        dynamicTableModel.addColumnValue("testColumn", "test");
+        ormQueryFactory.insert(dynamicTableModel);
+
+
+        //  remove Id2 from primary key
+        qDynamicTableFactory
+                .buildTables(table.getTableName())
+                .primaryKey()
+                .removePrimaryKey("Id2")
+                .endPrimaryKey()
+                .endBuildTables().buildSchema();
+        //  set column Id2 as nullable
+        qDynamicTableFactory
+                .buildTables(table.getTableName())
+                .columns().modifyColumn().nullable("Id2").finish().endColumns()
+                .endBuildTables().buildSchema();
+
+        // insert Data without Id2
+        DynamicTableModel dynamicTableModel1 = new DynamicTableModel(table);
+        dynamicTableModel1.addColumnValue("Id1", 1);
+        dynamicTableModel1.addColumnValue("testColumn", "test");
+        ormQueryFactory.insert(dynamicTableModel1);
 
     }
 
