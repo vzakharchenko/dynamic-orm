@@ -1,6 +1,8 @@
 package com.github.vzakharchenko.dynamic.orm.core.helper;
 
+import com.github.vzakharchenko.dynamic.orm.core.AccessQueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
+import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumn;
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumnWithValue;
@@ -11,6 +13,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.util.Assert;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -30,6 +33,11 @@ public abstract class CacheHelper {
 //            throw new IllegalStateException(qTable + ":" + model + "is deleted");
 //        }
 //    }
+
+    public static AccessQueryContext getAccessQueryContext(OrmQueryFactory ormQueryFactory) {
+        Assert.notNull(ormQueryFactory, ormQueryFactory + " is null");
+        return (AccessQueryContext) ormQueryFactory;
+    }
 
 
     public static CachedAllData buildAllDataCache(RelationalPath<?> qTable) {

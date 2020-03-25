@@ -52,14 +52,14 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
     }
 
     @Override
-    public BUILDER_TYPE usAsNotPrimaryKey() {
+    public BUILDER_TYPE notPrimaryKey() {
         columnType.setIsPrimaryKey(Boolean.FALSE);
         return (BUILDER_TYPE) this;
     }
 
     @Override
-    public final QTableColumn create() {
-        createColumn();
+    public final QTableColumn createColumn() {
+        createColumn0();
         return qTableColumn;
     }
 
@@ -78,7 +78,7 @@ public abstract class QDefaultColumnBuilder<COLUMN_TYPE extends QDefaultColumn,
         }
     }
 
-    private void createColumn() {
+    private void createColumn0() {
         DataSource dataSource = qTableColumn.getContext().getDataSource();
         Connection connection = DataSourceUtils.getConnection(dataSource);
         try {

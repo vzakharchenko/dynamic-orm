@@ -52,12 +52,12 @@ public final class QDynamicTableBuilder implements QTableBuilder {
     }
 
     @Override
-    public QPrimaryKeyBuilder addPrimaryKey() {
+    public QPrimaryKeyBuilder primaryKey() {
         return new QPrimaryKeyBuilderImpl(this, qDynamicTable);
     }
 
     @Override
-    public QForeignKeyBuilder addForeignKey(String... localColumns) {
+    public QForeignKeyBuilder foreignKey(String... localColumns) {
         List<Path<?>> localStringColumns = Arrays.stream(localColumns)
                 .map(StringUtils::upperCase).map((Function<String, Path<?>>)
                         s -> qDynamicTable.getColumnByName(s))
@@ -66,25 +66,25 @@ public final class QDynamicTableBuilder implements QTableBuilder {
     }
 
     @Override
-    public QForeignKeyBuilder addForeignKeyPath(Path<?>... localColumns) {
+    public QForeignKeyBuilder foreignKeyPath(Path<?>... localColumns) {
         return addForeignKey(Arrays.asList(localColumns));
     }
 
     @Override
-    public QIndexBuilder addIndex(String... localColumns) {
+    public QIndexBuilder index(String... localColumns) {
         List<Path<?>> localStringColumns = Arrays.stream(localColumns)
                 .map(StringUtils::upperCase).map((Function<String, Path<?>>)
                         s -> qDynamicTable.getColumnByName(s))
                 .collect(Collectors.toList());
-        return addIndex(localStringColumns);
+        return index(localStringColumns);
     }
 
     @Override
-    public QIndexBuilder addIndex(Path<?>... localColumns) {
-        return addIndex(Arrays.asList(localColumns));
+    public QIndexBuilder index(Path<?>... localColumns) {
+        return index(Arrays.asList(localColumns));
     }
 
-    private QIndexBuilder addIndex(List<Path<?>> localColumns) {
+    private QIndexBuilder index(List<Path<?>> localColumns) {
         return new QIndexBuilderImpl(this,
                 localColumns, qDynamicTable);
     }
@@ -121,7 +121,7 @@ public final class QDynamicTableBuilder implements QTableBuilder {
     }
 
     @Override
-    public QDynamicTableFactory finish() {
+    public QDynamicTableFactory endBuildTables() {
         dynamicContextHolder.getContextTables().put(qDynamicTable.getTableName(), qDynamicTable);
         return dynamicContextHolder;
     }

@@ -1,10 +1,12 @@
 package com.github.vzakharchenko.dynamic.orm.core.dynamic;
 
 import com.github.vzakharchenko.dynamic.orm.core.helper.ModelHelper;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadataFactory;
 import com.querydsl.sql.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,14 +25,14 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
     protected final Map<String, Path<?>> columns = new LinkedHashMap<>();
     protected final Map<Path<?>, ColumnMetaDataInfo> columnMetaDataInfoMap = new HashMap<>();
     private final Map<String, Path<?>> removedColumns = new LinkedHashMap<>();
-
+    private final List<ForeignKey<?>> removedForeignKeys = new ArrayList<>();
 
     protected QAbstractDynamicTable(String tableName) {
         super(Object.class, PathMetadataFactory.forVariable(tableName), "", tableName);
     }
 
-    protected DYNAMIC_TABLE addPrimaryKey(
-            Path path) {
+    protected DYNAMIC_TABLE modifyPrimaryKey(
+            Path path, boolean remove) {
         Assert.notNull(path);
         RelationalPath<?> qTable = ModelHelper.getQTable(path);
         Assert.isTrue(Objects.equals(this, qTable));
@@ -42,21 +44,33 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
             createPrimaryKey(path);
         } else {
             List<? extends Path<?>> localColumns = primaryKey.getLocalColumns();
-            updatePrimaryKey(localColumns.toArray(new Path[0]), path);
+            updatePrimaryKey(localColumns.toArray(new Path[0]), path, remove);
         }
         return (DYNAMIC_TABLE) this;
     }
 
     protected PrimaryKey<Object> updatePrimaryKey(Path[] columnArray,
-                                                  Path column) {
-        return createPrimaryKey(ArrayUtils.add(columnArray, column));
+                                                  Path column,
+                                                  boolean remove) {
+        return createPrimaryKey(remove ? ArrayUtils.removeElement(columnArray, column) :
+                ArrayUtils.add(columnArray, column));
     }
 
 
     protected DYNAMIC_TABLE addPrimaryKey(String columnName) {
         Assert.hasText(columnName);
         Path<?> pkColumn = columns.get(StringUtils.upperCase(columnName));
-        return addPrimaryKey(pkColumn);
+        return modifyPrimaryKey(pkColumn, false);
+    }
+
+    protected DYNAMIC_TABLE removePrimaryKey(String columnName) {
+        Assert.hasText(columnName);
+        Path<?> pkColumn = columns.get(StringUtils.upperCase(columnName));
+        Assert.notNull(pkColumn, "Column " + columnName + " does not exist.");
+        ModifyColumnMetaDataInfo metaInfo = new ModifyColumnMetaDataInfoImpl(getMetaInfo(pkColumn));
+        metaInfo.setPrimaryKey(Boolean.FALSE);
+        columnMetaDataInfoMap.put(pkColumn, metaInfo);
+        return modifyPrimaryKey(pkColumn, true);
     }
 
     protected DYNAMIC_TABLE addForeignKey(
@@ -77,6 +91,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
                         ModelHelper::getColumnRealName)
                         .collect(Collectors.toList())));
         getForeignKeys().add(foreignKey);
+        removedForeignKeys.remove(foreignKey);
         return (DYNAMIC_TABLE) this;
     }
 
@@ -87,7 +102,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         addMetadata(columnMetaDataInfo);
         Path column = columnMetaDataInfo.getColumn();
         if (BooleanUtils.isTrue(columnMetaDataInfo.isPrimaryKey())) {
-            addPrimaryKey(column);
+            modifyPrimaryKey(column, false);
         }
         columns.put(ModelHelper.getColumnRealName(column), column);
         columnMetaDataInfoMap.put(column, columnMetaDataInfo);
@@ -119,6 +134,7 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
         if (!columnMetaDataInfo.isNullable()) {
             columnMetadata = columnMetadata.notNull();
         }
+        removedColumns.remove(columnMetadata.getName());
         addMetadata(column, columnMetadata);
     }
 
@@ -145,5 +161,31 @@ public abstract class QAbstractDynamicTable<DYNAMIC_TABLE extends QAbstractDynam
 
     public List<String> deletedColumns() {
         return new ArrayList<>(removedColumns.keySet());
+    }
+
+    public List<ForeignKey<?>> deletedForeignKeys() {
+        return this.removedForeignKeys;
+    }
+
+    protected abstract void init();
+
+    public void reInit() {
+        deletedColumns().clear();
+        deletedForeignKeys().clear();
+        init();
+    }
+
+    public void removeForeignKey(List<Path<?>> localColumns) {
+        List<ForeignKey<?>> foreignKeys = getForeignKeys().stream().filter(
+                (Predicate<ForeignKey<?>>) foreignKey ->
+                        !CollectionUtils.isEqualCollection(foreignKey.getLocalColumns(),
+                                localColumns)).collect(Collectors.toList());
+        List<ForeignKey<?>> foreignKeysToDelete = getForeignKeys().stream().filter(
+                (Predicate<ForeignKey<?>>) foreignKey ->
+                        CollectionUtils.isEqualCollection(foreignKey.getLocalColumns(),
+                                localColumns)).collect(Collectors.toList());
+        this.removedForeignKeys.addAll(foreignKeysToDelete);
+        getForeignKeys().clear();
+        getForeignKeys().addAll(foreignKeys);
     }
 }

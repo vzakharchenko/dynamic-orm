@@ -28,13 +28,19 @@ import java.util.stream.Collectors;
  */
 public abstract class TableFactory {
 
+    public static final String DELETED_STRING_OBJECTS = "deletedStringObjects";
+    public static final String DELETED_FOREIGN_KEYS = "deletedForeignKeys";
+    public static final String DELETED_INDICES = "deletedIndices";
+
     private static void createColumns(QDynamicTable dynamicTable,
                                       Table table
     ) {
         table.setAttribute("columns", Lists.newArrayList());
         dynamicTable.getColumns().forEach(column -> table.getColumns()
                 .add(buildColumn(table, dynamicTable.getMetaInfo(column))));
-        table.setAttribute("deletedObjects", dynamicTable.deletedColumns());
+        table.setAttribute(DELETED_STRING_OBJECTS, dynamicTable.deletedColumns());
+        table.setAttribute(DELETED_FOREIGN_KEYS, dynamicTable.deletedForeignKeys());
+        table.setAttribute(DELETED_INDICES, dynamicTable.removedIndices());
     }
 
     private static void createPrivateKey(QDynamicTable dynamicTable,

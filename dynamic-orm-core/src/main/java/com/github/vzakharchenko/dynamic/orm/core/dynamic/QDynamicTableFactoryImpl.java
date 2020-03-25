@@ -7,6 +7,7 @@ import com.github.vzakharchenko.dynamic.orm.core.dynamic.schema.SchemaSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureSaver;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.DynamicStructureUpdater;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.structure.LiquibaseHolder;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -150,6 +151,9 @@ public class QDynamicTableFactoryImpl implements QDynamicBuilderContext, AccessD
         sequenceModelMap.clear();
         dynamicTableMap.clear();
         viewModelMap.clear();
+        removedTables.clear();
+        removedSequences.clear();
+        CacheHelper.getAccessQueryContext(ormQueryFactory).clearCache();
     }
 
 

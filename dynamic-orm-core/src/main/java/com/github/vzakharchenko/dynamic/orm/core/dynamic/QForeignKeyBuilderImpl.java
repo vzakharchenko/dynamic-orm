@@ -35,35 +35,35 @@ public class QForeignKeyBuilderImpl implements QForeignKeyBuilder {
 
 
     @Override
-    public QTableBuilder buildForeignKey(RelationalPath<?> remoteQTable,
-                                         Path<?>... remotePrimaryKeys) {
-        return buildForeignKey(remoteQTable, Arrays.asList(remotePrimaryKeys));
+    public QTableBuilder addForeignKey(RelationalPath<?> remoteQTable,
+                                       Path<?>... remotePrimaryKeys) {
+        return addForeignKey(remoteQTable, Arrays.asList(remotePrimaryKeys));
     }
 
-    public QTableBuilder buildForeignKey(RelationalPath<?> remoteQTable,
-                                         List<Path<?>> remotePrimaryKeys) {
+    public QTableBuilder addForeignKey(RelationalPath<?> remoteQTable,
+                                       List<Path<?>> remotePrimaryKeys) {
         getDynamicTable().addForeignKey(localColumns, remoteQTable, remotePrimaryKeys);
         return tableBuilder;
     }
 
     @Override
-    public QTableBuilder buildForeignKey(QDynamicTable remoteDynamicTable,
-                                         String... remotePrimaryKeys) {
-        return buildForeignKey(remoteDynamicTable,
+    public QTableBuilder addForeignKey(QDynamicTable remoteDynamicTable,
+                                       String... remotePrimaryKeys) {
+        return addForeignKey(remoteDynamicTable,
                 Arrays.stream(remotePrimaryKeys).map((Function<String, Path<?>>)
                         s -> (Path<?>) remoteDynamicTable.getColumnByName(s, Object.class))
                         .collect(Collectors.toList()));
     }
 
     @Override
-    public QTableBuilder buildForeignKey(String remoteDynamicTableName,
-                                         String... remotePrimaryKeys) {
-        return buildForeignKey(getDynamicTable(remoteDynamicTableName), remotePrimaryKeys);
+    public QTableBuilder addForeignKey(String remoteDynamicTableName,
+                                       String... remotePrimaryKeys) {
+        return addForeignKey(getDynamicTable(remoteDynamicTableName), remotePrimaryKeys);
     }
 
     @Override
-    public QTableBuilder buildForeignKey(RelationalPath<?> remoteQTable) {
-        return buildForeignKey(remoteQTable, PrimaryKeyHelper
+    public QTableBuilder addForeignKey(RelationalPath<?> remoteQTable) {
+        return addForeignKey(remoteQTable, PrimaryKeyHelper
                 .getPrimaryKeyColumns(remoteQTable).stream()
                 .map((Function<Path<?>, Path<?>>) path -> path).collect(Collectors.toList()));
     }
@@ -79,13 +79,19 @@ public class QForeignKeyBuilderImpl implements QForeignKeyBuilder {
     }
 
     @Override
-    public QTableBuilder buildForeignKey(String remoteDynamicTableName) {
-        return buildForeignKey(getDynamicTable(remoteDynamicTableName));
+    public QTableBuilder addForeignKey(String remoteDynamicTableName) {
+        return addForeignKey(getDynamicTable(remoteDynamicTableName));
     }
 
     @Override
-    public QTableBuilder buildForeignKey(QDynamicTable remoteDynamicTable) {
-        return buildForeignKey(remoteDynamicTable,
+    public QTableBuilder addForeignKey(QDynamicTable remoteDynamicTable) {
+        return addForeignKey(remoteDynamicTable,
                 PrimaryKeyHelper.getPrimaryKeyColumns(remoteDynamicTable).toArray(new Path[0]));
+    }
+
+    @Override
+    public QTableBuilder drop() {
+        dynamicTable.removeForeignKey(localColumns);
+        return tableBuilder;
     }
 }

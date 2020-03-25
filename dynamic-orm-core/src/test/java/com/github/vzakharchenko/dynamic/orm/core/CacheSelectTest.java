@@ -17,12 +17,12 @@ public class CacheSelectTest extends DebugAnnotationTestQueryOrm {
     @BeforeMethod
     public void beforeMethod() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).endPrimaryKey()
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
     }
 
     @Test

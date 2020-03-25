@@ -5,8 +5,10 @@ import com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper;
 import com.github.vzakharchenko.dynamic.orm.core.pk.PKGenerator;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDelete;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.SoftDeleteFactory;
+import com.google.common.collect.Sets;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.RelationalPath;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -15,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.github.vzakharchenko.dynamic.orm.core.RawModelBuilderImpl.SIZE;
 
@@ -25,12 +28,18 @@ public class QDynamicTable extends QAbstractSetColumnDynamicTable<QDynamicTable>
 
     public static final String WRONG_COLUMN = "Wrong column ";
     private final List<IndexData> indexDatas = new ArrayList<>();
+    private final List<IndexData> removedIndexList = new ArrayList<>();
     private PKGenerator<?> pkGenerator;
     private Path<?> versionColumn;
     private SoftDelete<?> softDelete;
 
     protected QDynamicTable(String tableName) {
         super(StringUtils.upperCase(tableName));
+    }
+
+    @Override
+    protected void init() {
+        removedIndexList.clear();
     }
 
     // CHECKSTYLE:OFF
@@ -125,8 +134,19 @@ public class QDynamicTable extends QAbstractSetColumnDynamicTable<QDynamicTable>
                 throw new IllegalStateException(WRONG_COLUMN + column);
             }
         }
-        indexDatas.add(new IndexData(columns, unique, clustered));
+        IndexData indexData = new IndexData(columns, unique, clustered);
+        indexDatas.add(indexData);
+        resetRemovedIndices(indexData);
         return this;
+    }
+
+
+    private void resetRemovedIndices(IndexData indexData) {
+        List<IndexData> list = removedIndexList.stream().filter(id ->
+                !CollectionUtils.isEqualCollection(
+                        Sets.newHashSet(indexData.getColumns()), Sets.newHashSet(id.getColumns())))
+                .collect(Collectors.toList());
+        updateIndices(removedIndexList, list);
     }
 
     public PKGenerator<?> getPkGenerator() {
@@ -154,5 +174,28 @@ public class QDynamicTable extends QAbstractSetColumnDynamicTable<QDynamicTable>
     @Override
     public List<Path<?>> getColumns() {
         return new ArrayList<>(columns.values());
+    }
+
+    public void removeIndex(List<Path<?>> localColumns) {
+        List<IndexData> list1 = indexDatas.stream().filter(indexData ->
+                !CollectionUtils.isEqualCollection(
+                        Sets.newHashSet(indexData.getColumns()),
+                        Sets.newHashSet(localColumns))).collect(Collectors.toList());
+
+        List<IndexData> list2 = indexDatas.stream().filter(indexData ->
+                CollectionUtils.isEqualCollection(
+                        Sets.newHashSet(indexData.getColumns()),
+                        Sets.newHashSet(localColumns))).collect(Collectors.toList());
+        updateIndices(indexDatas, list1);
+        removedIndexList.addAll(list2);
+    }
+
+    public List<IndexData> removedIndices() {
+        return this.removedIndexList;
+    }
+
+    private void updateIndices(List<IndexData> origin, List<IndexData> list) {
+        origin.clear();
+        origin.addAll(list);
     }
 }

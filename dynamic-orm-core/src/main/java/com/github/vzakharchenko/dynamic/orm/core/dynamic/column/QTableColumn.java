@@ -38,6 +38,6 @@ public interface QTableColumn {
 
     QTableColumn dropColumns(String... columns);
 
-    QTableBuilder finish();
+    QTableBuilder endColumns();
 
 }

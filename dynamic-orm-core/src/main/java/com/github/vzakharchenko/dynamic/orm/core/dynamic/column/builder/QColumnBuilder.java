@@ -10,7 +10,7 @@ public interface QColumnBuilder<RETURN_TYPE,
 
     BUILDER_TYPE useAsPrimaryKey();
 
-    BUILDER_TYPE usAsNotPrimaryKey();
+    BUILDER_TYPE notPrimaryKey();
 
-    RETURN_TYPE create();
+    RETURN_TYPE createColumn();
 }

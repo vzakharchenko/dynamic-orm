@@ -47,7 +47,7 @@ public class QSequenceBuilderImpl implements QSequenceBuilder {
     }
 
     @Override
-    public QDynamicTableFactory finish() {
+    public QDynamicTableFactory addSequence() {
         dynamicBuilderContext.getContextSequances().put(
                 StringUtils.upperCase(sequanceModel.getName(), Locale.US),
                 sequanceModel);

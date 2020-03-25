@@ -23,7 +23,7 @@ public final class SchemaLoaderHelper {
                 .increment(ClassHelper.transform(schemaSequence.getIncrement()))
                 .max(ClassHelper.transform(schemaSequence.getMax()))
                 .min(ClassHelper.transform(schemaSequence.getMin()))
-                .finish());
+                .addSequence());
     }
 
 
@@ -43,7 +43,7 @@ public final class SchemaLoaderHelper {
                                  SchemaView schemaView) {
         List<SchemaColumn> columns = schemaView.getColumns();
         dynamicTableFactory.createView(schemaView.getName()).resultSet(schemaView.getSql(),
-                getFromViewColumn(columns)).finish();
+                getFromViewColumn(columns)).addView();
     }
 
     private static void loadViews(QDynamicTableFactory dynamicTableFactory,

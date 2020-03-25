@@ -114,7 +114,7 @@ public class QTableColumnContextImpl implements QTableColumnContext {
     }
 
     @Override
-    public QTableBuilder finish() {
+    public QTableBuilder endColumns() {
         return qTableBuilder;
     }
 

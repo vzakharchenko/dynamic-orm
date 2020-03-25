@@ -8,11 +8,13 @@ import liquibase.snapshot.InvalidExampleException;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.DatabaseObjectCollection;
 import liquibase.structure.core.*;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -119,28 +121,16 @@ public class DynamicDatabaseSnapshot extends DatabaseSnapshot {
         });
     }
 
-
-    private boolean isDeleted(DatabaseObject databaseObject, List<String> removedColumns) {
-        if (CollectionUtils.isNotEmpty(removedColumns)) {
-            return removedColumns.stream().anyMatch(s ->
-                    removedColumns.contains(StringUtils.upperCase(
-                            databaseObject.getAttribute(
-                                    "name", String.class))));
-        }
-        return false;
-    }
-
     private boolean isDeleted(DatabaseObject databaseObject, Relation table) {
         Relation tableOrigin = getDatabaseObjectCollection().get(table, null);
         if (tableOrigin != null) {
-            return isDeleted(databaseObject, tableOrigin
-                    .getAttribute("deletedObjects", List.class));
+            return LiquibaseHelper.isDeletedTableOrigin(databaseObject, tableOrigin);
         }
         return false;
     }
 
     private boolean isDeleted(DatabaseObject databaseObject) {
-        Relation table = databaseObject.getAttribute("relation", Relation.class);
+        Relation table = LiquibaseHelper.getRelation(databaseObject);
         if (table != null) {
             return liquibaseHolder.isDeletedRelation(table) || isDeleted(databaseObject, table);
         }

@@ -18,13 +18,13 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
     @BeforeMethod
     public void createDefaultSchema() {
         qDynamicTableFactory.buildTables("DynamicTable")
-                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("TestColumn").notNull().size(255).create()
-                .addNumberColumn("TestColumnNull", Integer.class).nullable().size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).finish()
-                .addVersionColumn("modificationTime").finish().buildSchema();
+                .columns().addStringColumn("Id").size(255).useAsPrimaryKey().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("TestColumn").notNull().size(255).createColumn()
+                .addNumberColumn("TestColumnNull", Integer.class).nullable().size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(PrimaryKeyGenerators.UUID.getPkGenerator()).endPrimaryKey()
+                .addVersionColumn("modificationTime").endBuildTables().buildSchema();
     }
 
     @Test
@@ -34,8 +34,8 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
                 .modifyColumn()
                 .dropColumns("TestColumn")
                 .finish()
-                .finish()
-                .finish().buildSchema();
+                .endColumns()
+                .endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         ormQueryFactory.insert(dynamicTableModel);
@@ -45,8 +45,8 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
     public void testDeleteColumnModificationSchema2() {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns().dropColumns("TestColumn")
-                .finish()
-                .finish().buildSchema();
+                .endColumns()
+                .endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         ormQueryFactory.insert(dynamicTableModel);
@@ -67,7 +67,7 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
     @Test()
     public void testDropSequenceTable() {
         qDynamicTableFactory
-                .createSequence("sequence1").finish()
+                .createSequence("sequence1").addSequence()
                 .buildSchema();
         qDynamicTableFactory.dropSequence("sequence1").buildSchema();
     }
@@ -79,8 +79,8 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
                 .modifyColumn()
                 .size("TestColumn", 1)
                 .finish()
-                .finish()
-                .finish()
+                .endColumns()
+                .endBuildTables()
                 .buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
@@ -93,7 +93,7 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
                 .modifyColumn()
-                .size("TestColumn", 1).finish().finish().finish().buildSchema();
+                .size("TestColumn", 1).finish().endColumns().endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         dynamicTableModel.addColumnValue("TestColumn", "Size bigger than 1");
@@ -105,7 +105,7 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
                 .modifyColumn()
-                .nullable("TestColumn").finish().finish().finish().buildSchema();
+                .nullable("TestColumn").finish().endColumns().endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         ormQueryFactory.insert(dynamicTableModel);
@@ -117,7 +117,7 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
                 .columns()
                 .modifyColumn()
                 .decimalDigits("TestColumnNull", 10)
-                .changeNumberType("TestColumnNull", Double.class).finish().finish().finish().buildSchema();
+                .changeNumberType("TestColumnNull", Double.class).finish().endColumns().endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         dynamicTableModel.addColumnValue("TestColumnNull", 1.1);
@@ -133,7 +133,7 @@ public class ModifySchemaTest extends DebugAnnotationTestQueryOrm {
         qDynamicTableFactory.buildTables("DynamicTable")
                 .columns()
                 .modifyColumn()
-                .notNull("TestColumnNull").finish().finish().finish().buildSchema();
+                .notNull("TestColumnNull").finish().endColumns().endBuildTables().buildSchema();
         QDynamicTable table = qDynamicTableFactory.getQDynamicTableByName("DynamicTable");
         DynamicTableModel dynamicTableModel = new DynamicTableModel(table);
         ormQueryFactory.insert(dynamicTableModel);

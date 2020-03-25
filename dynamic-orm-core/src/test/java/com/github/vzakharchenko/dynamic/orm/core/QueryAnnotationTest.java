@@ -25,27 +25,27 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         // build schema
         qDynamicTableFactory.buildTables("firstTable")
                 .columns().addStringColumn("Id")
-                .size(255).useAsPrimaryKey().create()
-                .addStringColumn("TestStringColumn").size(255).create()
-                .addDateColumn("modificationTime").create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
-                .finish()
+                .size(255).useAsPrimaryKey().createColumn()
+                .addStringColumn("TestStringColumn").size(255).createColumn()
+                .addDateColumn("modificationTime").createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance())
+                .endPrimaryKey()
                 .addVersionColumn("modificationTime")
                 .buildNextTable("secondTable")
                 .columns().addStringColumn("Id")
-                .size(255).useAsPrimaryKey().create()
-                .addBooleanColumn("isDeleted").notNull().create()
-                .addDateTimeColumn("modificationTime").notNull().create()
-                .addStringColumn("linkToFirstTable").size(255).create()
-                .addStringColumn("uniqValue").size(255).create()
-                .finish()
-                .addPrimaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).finish()
+                .size(255).useAsPrimaryKey().createColumn()
+                .addBooleanColumn("isDeleted").notNull().createColumn()
+                .addDateTimeColumn("modificationTime").notNull().createColumn()
+                .addStringColumn("linkToFirstTable").size(255).createColumn()
+                .addStringColumn("uniqValue").size(255).createColumn()
+                .endColumns()
+                .primaryKey().addPrimaryKeyGenerator(UUIDPKGenerator.getInstance()).endPrimaryKey()
                 .addSoftDeleteColumn("isDeleted", true, false)
                 .addVersionColumn("modificationTime")
-                .addIndex("uniqValue").buildUniqueIndex()
-                .addForeignKey("linkToFirstTable").buildForeignKey( "firstTable")
-                .finish().buildSchema();
+                .index("uniqValue").addUniqueIndex()
+                .foreignKey("linkToFirstTable").addForeignKey( "firstTable")
+                .endBuildTables().buildSchema();
         transactionManager.commit();
 
         QDynamicTable firstTable = qDynamicTableFactory.getQDynamicTableByName("firstTable");
@@ -73,8 +73,8 @@ public class QueryAnnotationTest extends AnnotationTestQueryOrm {
         // add integer column to table1
         transactionManager.startTransactionIfNeeded();
         qDynamicTableFactory.buildTables("firstTable")
-                .columns().addNumberColumn("newColumn", Integer.class).create().finish()
-                .finish().buildSchema();
+                .columns().addNumberColumn("newColumn", Integer.class).createColumn().endColumns()
+                .endBuildTables().buildSchema();
         transactionManager.commit();
 
 

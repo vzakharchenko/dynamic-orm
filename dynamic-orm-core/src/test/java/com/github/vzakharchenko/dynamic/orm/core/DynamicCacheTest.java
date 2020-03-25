@@ -1,7 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core;
 
 import com.github.vzakharchenko.dynamic.orm.OracleTestQueryOrm;
-import com.github.vzakharchenko.dynamic.orm.core.cache.LazyList;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QTableBuilder;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
@@ -26,15 +25,15 @@ public class DynamicCacheTest extends OracleTestQueryOrm {
     public void testCacheSelect() {
         QTableBuilder testTable1 = qDynamicTableFactory.buildTables("testtable1");
         // build primary key
-        testTable1.columns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().create();
+        testTable1.columns().addNumberColumn("ID", Integer.class).size(18).decimalDigits(0).useAsPrimaryKey().createColumn();
 
         // build String Field
 
-        testTable1.columns().addStringColumn("STRING_Test_FIELD").size( 200).create();
+        testTable1.columns().addStringColumn("STRING_Test_FIELD").size( 200).createColumn();
 
         // validate and create structure
 
-        testTable1.finish().buildSchema();
+        testTable1.endBuildTables().buildSchema();
         QDynamicTable qDynamicTable = qDynamicTableFactory.getQDynamicTableByName("testtable1");
         assertNotNull(qDynamicTable);
 
