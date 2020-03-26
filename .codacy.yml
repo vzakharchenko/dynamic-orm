@@ -3,4 +3,5 @@ exclude_paths:
   - '*.min.js'
   - '**/tests/**'
   - '**/test/**'
+  - '*.sh'
   - 'dynamic-orm-examples/**'
