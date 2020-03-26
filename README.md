@@ -4,6 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c587a6e77be5e8cbef0/maintainability)](https://codeclimate.com/github/vzakharchenko/dynamic-orm/maintainability)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm)
 [![BCH compliance](https://bettercodehub.com/edge/badge/vzakharchenko/dynamic-orm?branch=master)](https://bettercodehub.com/)  
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7bd6c5b0ce2e4ca9ae497aff44a8a64a)](https://www.codacy.com/manual/vzaharchenko/dynamic-orm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vzakharchenko/dynamic-orm&amp;utm_campaign=Badge_Grade)  
 [![Known Vulnerabilities](https://snyk.io/test/github/vzakharchenko/dynamic-orm/badge.svg)](https://snyk.io/test/github/vzakharchenko/dynamic-orm)
 
 # supported database
