@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  *
  */
 public abstract class AbstractCacheBuilder<MODEL extends DMLModel>
-        implements CacheBuilder<MODEL>, RawCacheBuilder {
+        implements RawCacheBuilder<MODEL> {
 
     public final SoftDelete<?> softDelete;
     protected final Class<MODEL> modelClass;

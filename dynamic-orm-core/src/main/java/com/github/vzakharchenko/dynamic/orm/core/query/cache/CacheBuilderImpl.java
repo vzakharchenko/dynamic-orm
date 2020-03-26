@@ -48,17 +48,8 @@ public class CacheBuilderImpl<MODEL extends DMLModel>
 
     @Override
     public List<MODEL> findAllByIds(List<? extends Serializable> keys) {
-
-        List<MODEL> returnedModels = new ArrayList<>(keys.size());
-
-        Map<CompositeKey, MapModel> listOfMapByIds = findAllOfMapByIds(
-                PrimaryKeyHelper.getCompositeKeys(keys, qTable));
-
-        for (Serializable key : keys) {
-            returnedModels.add(CacheHelper.buildModel(modelClass, listOfMapByIds.get(key)));
-        }
-
-        return returnedModels;
+        return ModelLazyListFactory
+                .buildModelLazyList(PrimaryKeyHelper.getCompositeKeys(keys, qTable), this);
     }
 
     @Override

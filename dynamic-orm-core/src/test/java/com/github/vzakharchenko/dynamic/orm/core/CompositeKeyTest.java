@@ -125,7 +125,7 @@ public class CompositeKeyTest extends DebugAnnotationTestQueryOrm {
 
     }
 
-    @Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Primary key value is null")
+    @Test(expectedExceptions =  IllegalArgumentException.class, expectedExceptionsMessageRegExp = "TEST_COMPOSITE_PK_TABLE has composite Primary key")
     public void testSelectSmartCacheFailedJustValue() {
         TestTableCompositePrimaryKey data1 = createStaticDml(1, "key1", 11);
         // insert data
@@ -135,7 +135,7 @@ public class CompositeKeyTest extends DebugAnnotationTestQueryOrm {
                 .findAllByIds(Arrays.asList(1));
     }
 
-    @Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "Primary key value is null")
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "TEST_COMPOSITE_PK_TABLE contains another Primary Key.")
     public void testSelectSmartCacheOnlyOneKey() {
         TestTableCompositePrimaryKey data1 = createStaticDml(1, "key1", 11);
         // insert data

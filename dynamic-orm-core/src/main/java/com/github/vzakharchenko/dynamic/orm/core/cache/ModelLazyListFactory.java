@@ -3,7 +3,7 @@ package com.github.vzakharchenko.dynamic.orm.core.cache;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
-import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 import com.querydsl.sql.RelationalPath;
 
 import java.util.List;
@@ -14,8 +14,9 @@ import java.util.List;
 public abstract class ModelLazyListFactory {
 
     public static <MODEL extends DMLModel> List<MODEL> buildModelLazyList(
-            List<CompositeKey> keys, CacheBuilder<MODEL> cacheBuilder) {
-        return new ModelLazyList<MODEL>(keys, cacheBuilder);
+            List<CompositeKey> keys,
+            RawCacheBuilder<MODEL> cacheBuilder) {
+        return new ModelLazyList<>(keys, cacheBuilder);
     }
 
     public static <MODEL extends DMLModel> LazyList<MODEL> buildLazyList(

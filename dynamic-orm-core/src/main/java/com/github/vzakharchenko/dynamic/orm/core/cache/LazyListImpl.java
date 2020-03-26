@@ -5,6 +5,7 @@ import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import com.github.vzakharchenko.dynamic.orm.core.query.QueryContextImpl;
 import com.github.vzakharchenko.dynamic.orm.core.query.cache.CacheBuilder;
+import com.github.vzakharchenko.dynamic.orm.core.query.cache.RawCacheBuilder;
 import com.querydsl.sql.RelationalPath;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -40,7 +41,8 @@ public class LazyListImpl<MODEL extends DMLModel> implements LazyList<MODEL> {
             return Collections.EMPTY_LIST;
         }
         CacheBuilder<MODEL> cacheBuilder = ormQueryFactory.modelCacheBuilder(qTable, modelClass);
-        return ModelLazyListFactory.buildModelLazyList(listPrimaryKey, cacheBuilder);
+        return ModelLazyListFactory.buildModelLazyList(listPrimaryKey,
+                (RawCacheBuilder<MODEL>) cacheBuilder);
     }
 
     @Override

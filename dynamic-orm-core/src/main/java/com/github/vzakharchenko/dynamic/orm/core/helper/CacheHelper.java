@@ -4,8 +4,6 @@ import com.github.vzakharchenko.dynamic.orm.core.AccessQueryContext;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.OrmQueryFactory;
 import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
-import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumn;
-import com.github.vzakharchenko.dynamic.orm.core.cache.CachedColumnWithValue;
 import com.github.vzakharchenko.dynamic.orm.core.cache.MapModel;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.QDynamicTable;
 import com.github.vzakharchenko.dynamic.orm.core.dynamic.dml.DynamicTableModel;
@@ -15,7 +13,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,20 +41,12 @@ public abstract class CacheHelper {
         return new CachedAllData(qTable);
     }
 
-    public static <TYPE extends Serializable> CachedColumnWithValue buildCachedColumnWithValue(
-            Path<TYPE> column, TYPE value) {
-        return new CachedColumnWithValue(column, value);
-    }
 
-    public static CachedColumn buildCachedColumn(Path column) {
-        return new CachedColumn(column);
-    }
-
-    public static CompositeKey buildPrimaryKeyCacheModel(
-            DMLModel model, RelationalPath<?> qTable) {
-        return PrimaryKeyHelper
-                .getPrimaryKeyValues(model, qTable);
-    }
+//    public static CompositeKey buildPrimaryKeyCacheModel(
+//            DMLModel model, RelationalPath<?> qTable) {
+//        return PrimaryKeyHelper
+//                .getPrimaryKeyValues(model, qTable);
+//    }
 
     public static <MODEL extends DMLModel> MODEL newInstance(
             RelationalPath<?> qTable, Class<MODEL> modelClass) {
