@@ -1,6 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.core.transaction.cache;
 
-import com.github.vzakharchenko.dynamic.orm.core.cache.CachedAllData;
+import com.github.vzakharchenko.dynamic.orm.core.helper.CacheHelper;
 import com.github.vzakharchenko.dynamic.orm.core.helper.CompositeKey;
 import org.springframework.cache.Cache;
 
@@ -67,7 +67,7 @@ public class TransactionalCacheImpl implements TransactionalCache {
     @Override
     public void deleteModel(CompositeKey key) {
         cacheEvict(key);
-        cacheEvict(new CachedAllData(key.getTable()));
+        cacheEvict(CacheHelper.buildAllDataCache(key.getTable()));
         deletedObjects.put(key, key);
         insertedObjects.remove(key);
         updatedObjects.remove(key);
@@ -75,13 +75,13 @@ public class TransactionalCacheImpl implements TransactionalCache {
 
     @Override
     public void insertModel(CompositeKey key) {
-        cacheEvict(new CachedAllData(key.getTable()));
+        cacheEvict(CacheHelper.buildAllDataCache(key.getTable()));
         insertedObjects.put(key, key);
     }
 
     @Override
     public void updateModel(CompositeKey key) {
-        cacheEvict(new CachedAllData(key.getTable()));
+        cacheEvict(CacheHelper.buildAllDataCache(key.getTable()));
         cacheEvict(key);
         updatedObjects.put(key, key);
     }

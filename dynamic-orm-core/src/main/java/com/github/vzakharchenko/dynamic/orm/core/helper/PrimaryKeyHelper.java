@@ -3,9 +3,11 @@ package com.github.vzakharchenko.dynamic.orm.core.helper;
 import com.github.vzakharchenko.dynamic.orm.core.DMLModel;
 import com.github.vzakharchenko.dynamic.orm.core.RawModel;
 import com.github.vzakharchenko.dynamic.orm.core.query.crud.UpdateModelBuilder;
+import com.google.common.collect.Sets;
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.PrimaryKey;
 import com.querydsl.sql.RelationalPath;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -51,10 +53,20 @@ public final class PrimaryKeyHelper {
         return (PrimaryKey<?>) qTable.getPrimaryKey();
     }
 
+    public static CompositeKey validateCompositeKey(CompositeKey compositeKey,
+                                                    RelationalPath<?> qTable) {
+        Assert.notNull(qTable.getPrimaryKey(),
+                qTable + " does not have Primary Key");
+        Assert.isTrue(CollectionUtils.isEqualCollection(
+                compositeKey.getCompositeMap().keySet(),
+                Sets.newHashSet(qTable.getPrimaryKey().getLocalColumns())),
+                qTable + " contains another Primary Key.");
+        return compositeKey;
+    }
 
     public static CompositeKey getCompositeKey(Serializable value, RelationalPath<?> qTable) {
         if (value instanceof CompositeKey) {
-            return (CompositeKey) value;
+            return validateCompositeKey((CompositeKey) value, qTable);
         } else {
             return getOnePrimaryKey(qTable, value);
         }
@@ -152,6 +164,10 @@ public final class PrimaryKeyHelper {
             RelationalPath qTable,
             Serializable value) {
         List<? extends Path<?>> primaryKeyColumns = getPrimaryKeyColumns(qTable);
+        Assert.isTrue(!primaryKeyColumns.isEmpty(),
+                qTable + " does not have Primary Key");
+        Assert.isTrue(primaryKeyColumns.size() == 1,
+                qTable + " has composite Primary key");
         Path<?> column = primaryKeyColumns.get(0);
         return CompositeKeyBuilder
                 .create(qTable).addPrimaryKey(column, value).build();
