@@ -14,6 +14,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import static org.testng.Assert.assertNotNull;
+
 /**
  *
  */
@@ -42,10 +44,13 @@ public class LogAudit implements ApplicationListener<CacheEvent> {
                     System.out.println("update table " + cacheEvent.getQTable().getTableName());
                     DiffColumnModel diffModel = cacheEvent.getDiffModel(pk);
                     for (Map.Entry<Path<?>, DiffColumn<?>> entry : diffModel.getOnlyChangedColumns().entrySet()) {
+                        DiffColumn<?> diffColumn = entry.getValue();
+                        diffColumn.isChanged();
+                        assertNotNull(diffColumn.getColumn());
                         System.out.println(" --- column " + ModelHelper.getColumnRealName(entry.getKey())
-                                + " set " + entry.getValue().getNewValue()
+                                + " set " + diffColumn.getNewValue()
                                 + " old value "
-                                + entry.getValue().getOldValue());
+                                + diffColumn.getOldValue());
                     }
                 }
 

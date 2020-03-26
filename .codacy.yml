@@ -1,0 +1,5 @@
+---
+exclude_paths:
+  - '*.min.js'
+  - '**/tests/**'
+  - 'dynamic-orm-examples/**'
