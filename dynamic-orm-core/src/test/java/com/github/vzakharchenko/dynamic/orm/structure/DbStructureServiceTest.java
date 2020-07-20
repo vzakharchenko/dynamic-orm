@@ -6,6 +6,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Comparator;
 
 import static org.mockito.Mockito.mock;
@@ -67,11 +69,10 @@ public class DbStructureServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testSpringResourceOpener(){
+    public void testSpringResourceOpener() throws IOException {
         SpringResourceOpener springResourceOpener = new SpringResourceOpener();
-        Resource resource = springResourceOpener.getResource("classpath:testSchema.json");
-        assertNotNull(resource);
-        springResourceOpener.toClassLoader();
+        InputStream inputStream = springResourceOpener.openStream("","classpath:testSchema.json");
+        assertNotNull(inputStream);
 
     }
 

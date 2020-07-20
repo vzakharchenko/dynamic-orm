@@ -1,6 +1,6 @@
 package com.github.vzakharchenko.dynamic.orm.structure;
 
-import liquibase.resource.ResourceAccessor;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -9,20 +9,21 @@ import org.springframework.core.io.support.ResourcePatternUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by vzakharchenko on 04.07.14.
  */
-public class SpringResourceOpener implements ResourceAccessor {
+public class SpringResourceOpener extends ClassLoaderResourceAccessor {
 
     private static final ResourceLoader RESOURCE_LOADER = new PathMatchingResourcePatternResolver();
+
     // CHECKSTYLE:OFF
     @Override
-    public Set<String> list(String relativeTo, String path, boolean includeFiles,
-                            boolean includeDirectories, boolean recursive) throws IOException {
-        Set<String> returnSet = new HashSet<>();
+    public SortedSet<String> list(String relativeTo, String path, boolean includeFiles,
+                                  boolean includeDirectories, boolean recursive) throws IOException {
+        SortedSet<String> returnSet = new TreeSet<>();
 
         Resource[] resources = ResourcePatternUtils
                 .getResourcePatternResolver(RESOURCE_LOADER).getResources(adjustClasspath(path));
@@ -38,27 +39,6 @@ public class SpringResourceOpener implements ResourceAccessor {
 
         return returnSet;
     }
-    // CHECKSTYLE:ON
-    @Override
-    public Set<InputStream> getResourcesAsStream(String path) throws IOException {
-
-        Resource[] resources = ResourcePatternUtils
-                .getResourcePatternResolver(RESOURCE_LOADER).getResources(adjustClasspath(path));
-
-        if (resources.length == 0) {
-            return null;
-        }
-        Set<InputStream> returnSet = new HashSet<>(resources.length);
-        for (Resource resource : resources) {
-            returnSet.add(resource.getInputStream());
-        }
-
-        return returnSet;
-    }
-
-    public Resource getResource(String file) {
-        return RESOURCE_LOADER.getResource(adjustClasspath(file));
-    }
 
     private String adjustClasspath(String file) {
         return !isPrefixPresent(file) ? ResourceLoader.CLASSPATH_URL_PREFIX + file : file;
@@ -72,7 +52,8 @@ public class SpringResourceOpener implements ResourceAccessor {
     }
 
     @Override
-    public ClassLoader toClassLoader() {
-        return RESOURCE_LOADER.getClassLoader();
+    public InputStream openStream(String relativeTo, String streamPath) throws IOException {
+        Resource resource = RESOURCE_LOADER.getResource(streamPath);
+        return resource.getInputStream();
     }
 }
