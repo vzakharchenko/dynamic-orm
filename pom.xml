@@ -567,7 +567,7 @@
             <dependency>
                 <groupId>com.mattbertolini</groupId>
                 <artifactId>liquibase-slf4j</artifactId>
-                <version>2.0.0</version>
+                <version>4.0.0</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.liquibase</groupId>
