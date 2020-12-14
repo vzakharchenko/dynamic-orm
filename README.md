@@ -6,7 +6,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.vzakharchenko/dynamic-orm)  
 [![BCH compliance](https://bettercodehub.com/edge/badge/vzakharchenko/dynamic-orm?branch=master)](https://bettercodehub.com/)  
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7bd6c5b0ce2e4ca9ae497aff44a8a64a)](https://www.codacy.com/manual/vzaharchenko/dynamic-orm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vzakharchenko/dynamic-orm&amp;utm_campaign=Badge_Grade)  
-[![Known Vulnerabilities](https://snyk.io/test/github/vzakharchenko/dynamic-orm/badge.svg)](https://snyk.io/test/github/vzakharchenko/dynamic-orm)
+[![Known Vulnerabilities](https://snyk.io/test/github/vzakharchenko/dynamic-orm/badge.svg)](https://snyk.io/test/github/vzakharchenko/dynamic-orm)  
+[![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://secure.wayforpay.com/button/b8de34ba8b4ab)   
 
 # supported database
  - Oracle
@@ -1386,3 +1387,4 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         dynamicTableModel1.addColumnValue("testColumn", "test");
         ormQueryFactory.insert(dynamicTableModel1);
 ```
+# If you find these useful, please [Donate](https://secure.wayforpay.com/button/be27056b0a2b4)!  
