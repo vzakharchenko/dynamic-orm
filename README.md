@@ -1387,4 +1387,4 @@ if you use selectcache() pay attention to the method "registerRelatedTables"
         dynamicTableModel1.addColumnValue("testColumn", "test");
         ormQueryFactory.insert(dynamicTableModel1);
 ```
-# If you find these useful, please [Donate](https://secure.wayforpay.com/button/be27056b0a2b4)!  
+# If you find these useful, please [Donate](https://secure.wayforpay.com/button/b8de34ba8b4ab)!  
