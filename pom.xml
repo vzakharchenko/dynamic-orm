@@ -63,7 +63,7 @@
         <skipCoveralls>true</skipCoveralls>
         <coveralls>${skipCoveralls}</coveralls>
 
-        <testng>7.3.0</testng>
+        <testng>7.4.0</testng>
         <spring>5.3.4</spring>
         <querydsl>4.4.0</querydsl>
     </properties>
