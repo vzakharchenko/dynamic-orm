@@ -64,7 +64,7 @@
         <coveralls>${skipCoveralls}</coveralls>
 
         <testng>7.4.0</testng>
-        <spring>5.3.4</spring>
+        <spring>5.3.5</spring>
         <querydsl>4.4.0</querydsl>
     </properties>
 
