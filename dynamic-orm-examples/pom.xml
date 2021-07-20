@@ -25,7 +25,7 @@
         <javadoc>${basedir}/../analizers/javadoc</javadoc>
         <fast-build>true</fast-build>
         <coveralls>true</coveralls>
-        <slf4j>1.7.31</slf4j>
+        <slf4j>1.7.32</slf4j>
     </properties>
 
     <dependencies>
