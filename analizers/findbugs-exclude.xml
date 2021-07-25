@@ -112,11 +112,11 @@
         <Bug pattern="CE_CLASS_ENVY"/>
     </Match>
     <Match>
-        <Class name="com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper, com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper"/>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.helper.PrimaryKeyHelper"/>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
     </Match>
     <Match>
-        <Class name="com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl, com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl"/>
+        <Class name="com.github.vzakharchenko.dynamic.orm.core.query.UnionBuilderImpl"/>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
     </Match>
 </FindBugsFilter>
