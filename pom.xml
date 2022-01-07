@@ -64,7 +64,7 @@
         <coveralls>${skipCoveralls}</coveralls>
 
         <testng>7.4.0</testng>
-        <spring>5.3.13</spring>
+        <spring>5.3.14</spring>
         <querydsl>5.0.0</querydsl>
     </properties>
 
@@ -177,7 +177,7 @@
                                 <requireJavaVersion>
                                     <version>${java.version}</version>
                                 </requireJavaVersion>
-                                <DependencyConvergence />
+                                <DependencyConvergence/>
                             </rules>
                             <fail>true</fail>
                         </configuration>
